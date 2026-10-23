@@ -1,5 +1,5 @@
 /**
- * Cliente HTTP mínimo. Cuando IAM esté, acá se agrega el header Authorization.
+ * Cliente HTTP mínimo con soporte para JWT en Authorization header.
  */
 export interface ErrorApi {
   statusCode: number;
@@ -21,6 +21,17 @@ export class HttpError extends Error {
   }
 }
 
+function obtenerHeaders(): HeadersInit {
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+  };
+  const token = localStorage.getItem('his_token');
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+  return headers;
+}
+
 async function manejar<T>(respuesta: Response): Promise<T> {
   if (respuesta.ok) return (await respuesta.json()) as T;
   const cuerpo = (await respuesta
@@ -31,13 +42,23 @@ async function manejar<T>(respuesta: Response): Promise<T> {
 
 export const http = {
   get<T>(url: string): Promise<T> {
-    return fetch(url).then((r) => manejar<T>(r));
+    return fetch(url, { headers: obtenerHeaders() }).then((r) => manejar<T>(r));
   },
-  post<T>(url: string, body: unknown): Promise<T> {
+  post<T>(url: string, body?: unknown): Promise<T> {
     return fetch(url, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
+      headers: obtenerHeaders(),
+      body: body !== undefined ? JSON.stringify(body) : undefined,
     }).then((r) => manejar<T>(r));
+  },
+  setToken(token: string | null) {
+    if (token) {
+      localStorage.setItem('his_token', token);
+    } else {
+      localStorage.removeItem('his_token');
+    }
+  },
+  getToken(): string | null {
+    return localStorage.getItem('his_token');
   },
 };

@@ -206,10 +206,10 @@ Pensado para unas 10 semanas. Ajustar a las fechas de la cátedra en la primera 
 
 ### Fase 7 — Facturación
 
-- [ ] Dominio por TDD: `Cuenta` (una por consulta o internación), `Cargo` idempotente por evento, `Tarifa`.
-- [ ] Handlers: `EvolucionRegistrada` → cargo consulta; `MedicacionAdministrada` → cargo medicación; `PacienteInternado` → abre cuenta; `PacienteDadoDeAlta` → cargo por días de cama y cierra cuenta.
-- [ ] Validar cobertura con un adaptador fake (acepta o rechaza según la obra social) detrás de un puerto.
-- [ ] Reportes: facturación por período y ocupación de camas.
+- [x] Dominio por TDD: `Cuenta` (una por consulta o internación), `Cargo` idempotente por evento, `Tarifa`.
+- [x] Handlers: `EvolucionRegistrada` → cargo consulta; `MedicacionAdministrada` → cargo medicación; `PacienteInternado` → abre cuenta; `PacienteDadoDeAlta` → cargo por días de cama y cierra cuenta.
+- [x] Validar cobertura con un adaptador fake (acepta o rechaza según la obra social) detrás de un puerto.
+- [x] Reportes: facturación por período y ocupación de camas.
 - [ ] Pantalla: cuenta del paciente y los dos reportes.
 
 ### Fase 8 — Cierre
@@ -316,7 +316,7 @@ Cada módulo tiene un responsable y un revisor habitual. Nadie revisa su propio 
 | HCE                              |                 |         |
 | Enfermería                       |                 |         |
 | Recursos y Camas                 |                 |         |
-| Facturación                      |                 |         |
+| Facturación                      | Ezequiel        |         |
 | Frontend                         | rota por módulo |         |
 
 Sugerencia según tamaño: con 3 personas, A = esqueleto + IAM + Facturación, B = Admisión + Recursos, C = HCE + Enfermería. Con 4, se separa Facturación. Con 5 o 6, un módulo por persona.

@@ -93,6 +93,53 @@ reservar(@UsuarioActual() usuario: UsuarioAutenticado, @Body() dto: ReservarTurn
 Sin token → `401 TOKEN_INVALIDO`. Con token pero sin el permiso → `403 PERMISO_FALTANTE`.
 Endpoints: `POST /api/auth/login`, `GET /api/auth/me`, `GET|POST /api/usuarios`, `PATCH /api/usuarios/:id/rol`.
 
+## Facturación — probar con curl
+
+Todos los endpoints requieren `Authorization: Bearer <token>`. Primero obtener un token con el login de arriba y guardar el valor:
+
+```bash
+# En PowerShell, guardar el token en una variable:
+$TOKEN = "eyJhbG..."
+```
+
+### Listar cuentas de un paciente
+
+```bash
+curl -X GET "http://localhost:3000/api/cuentas?pacienteId=<UUID_PACIENTE>" -H "Authorization: Bearer $TOKEN"
+```
+
+### Ver detalle de una cuenta (con cargos y total)
+
+```bash
+curl -X GET "http://localhost:3000/api/cuentas/<UUID_CUENTA>" -H "Authorization: Bearer $TOKEN"
+```
+
+### Validar cobertura de obra social
+
+```bash
+curl -X POST http://localhost:3000/api/cobertura/validar -H "Content-Type: application/json" -H "Authorization: Bearer $TOKEN" -d "{\"pacienteId\":\"<UUID_PACIENTE>\",\"codigoObraSocial\":\"OSDE\",\"numeroAfiliado\":\"123456789\"}"
+```
+
+Respuestas posibles:
+- `{ "aprobada": true, "porcentajeCobertura": 80 }` → OSDE cubre el 80%
+- `{ "aprobada": true, "porcentajeCobertura": 100 }` → PAMI cubre el 100%
+- `{ "aprobada": true, "porcentajeCobertura": 0 }` → PARTICULAR, sin cobertura
+- `{ "aprobada": false, ... }` → afiliado rechazado
+
+### Reporte de facturación por período
+
+```bash
+curl -X GET "http://localhost:3000/api/reportes/facturacion?desde=2026-10-01T00:00:00Z&hasta=2026-10-31T23:59:59Z" -H "Authorization: Bearer $TOKEN"
+```
+
+### Reporte de ocupación hospitalaria
+
+```bash
+curl -X GET http://localhost:3000/api/reportes/ocupacion -H "Authorization: Bearer $TOKEN"
+```
+
+> **Nota:** Los cargos se crean automáticamente al registrar evoluciones, administrar medicación, internar y dar de alta pacientes. No hay endpoint manual para crear cargos — todo llega por eventos internos.
+
 ## Equipo
 
 | Módulo            | Responsable |
@@ -102,4 +149,4 @@ Endpoints: `POST /api/auth/login`, `GET /api/auth/me`, `GET|POST /api/usuarios`,
 | HCE               |             |
 | Enfermería        |             |
 | Recursos y Camas  |             |
-| Facturación       |             |
+| Facturación       | Ezequías   |

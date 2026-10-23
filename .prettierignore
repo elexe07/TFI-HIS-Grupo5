@@ -1,0 +1,7 @@
+node_modules
+dist
+coverage
+pnpm-lock.yaml
+_version-extendida
+docs/consigna
+apps/api/prisma/migrations

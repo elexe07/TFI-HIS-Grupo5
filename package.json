@@ -1,0 +1,30 @@
+{
+  "name": "his",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Hospital Information System - Programación 4",
+  "packageManager": "pnpm@9.15.9",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "api": "pnpm --filter @his/api",
+    "web": "pnpm --filter @his/web",
+    "dev": "pnpm --filter @his/api start:dev",
+    "build": "pnpm -r build",
+    "lint": "pnpm -r lint",
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm -r test",
+    "test:integration": "pnpm --filter @his/api test:integration",
+    "arch": "pnpm --filter @his/api arch",
+    "format": "prettier --write \"**/*.{ts,tsx,js,cjs,json,md,yml,yaml}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,cjs,json,md,yml,yaml}\"",
+    "db:up": "docker compose up -d",
+    "db:down": "docker compose down",
+    "db:migrate": "pnpm --filter @his/api prisma:migrate",
+    "db:seed": "pnpm --filter @his/api prisma:seed"
+  },
+  "devDependencies": {
+    "prettier": "^3.4.2"
+  }
+}

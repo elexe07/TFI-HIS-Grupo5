@@ -1,0 +1,70 @@
+:root {
+  font-family: system-ui, sans-serif;
+  color: #1f2933;
+  background: #f5f7fa;
+}
+
+body {
+  margin: 0;
+}
+
+.layout {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  border-bottom: 1px solid #d9e2ec;
+  padding-bottom: 12px;
+  margin-bottom: 16px;
+}
+
+header h1 {
+  margin: 0;
+  font-size: 1.4rem;
+}
+
+nav {
+  display: flex;
+  gap: 12px;
+}
+
+.badge {
+  margin-left: auto;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  background: #e4e7eb;
+}
+
+.badge-ok {
+  background: #c6f6d5;
+}
+
+.badge-warn {
+  background: #fefcbf;
+}
+
+.badge-error {
+  background: #fed7d7;
+}
+
+.fila {
+  display: flex;
+  gap: 8px;
+}
+
+.error {
+  color: #c53030;
+}
+
+input,
+button {
+  padding: 6px 10px;
+  font: inherit;
+}

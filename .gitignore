@@ -1,0 +1,33 @@
+# dependencias
+node_modules/
+.pnpm-store/
+
+# builds
+dist/
+build/
+coverage/
+*.tsbuildinfo
+
+# entorno
+.env
+.env.*
+!.env.example
+
+# prisma
+apps/api/prisma/*.db
+
+# editores / SO
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+.DS_Store
+Thumbs.db
+
+# logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# versión extendida del plan: solo referencia, no se versiona
+_version-extendida/

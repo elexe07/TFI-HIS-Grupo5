@@ -1,0 +1,21 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: his-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-his}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-his}
+      POSTGRES_DB: ${POSTGRES_DB:-his}
+    ports:
+      - '${POSTGRES_PORT:-5433}:5432'
+    volumes:
+      - his-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-his} -d ${POSTGRES_DB:-his}']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  his-pgdata:

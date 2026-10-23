@@ -1,0 +1,5 @@
+# Todos trabajan en Windows: forzar LF en el repo para que Prettier, ESLint y el CI (Linux) vean lo mismo.
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.docx binary

@@ -1,0 +1,525 @@
+generator client {
+  provider        = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  schemas  = ["iam", "admision", "hce", "enfermeria", "recursos", "facturacion"]
+}
+
+// ============================ IAM ============================
+
+model Usuario {
+  id           String   @id @db.Uuid
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  nombre       String
+  rolId        String   @map("rol_id") @db.Uuid
+  activo       Boolean  @default(true)
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt    DateTime @updatedAt @map("updated_at") @db.Timestamptz
+  rol          Rol      @relation(fields: [rolId], references: [id])
+
+  @@map("usuarios")
+  @@schema("iam")
+}
+
+model Rol {
+  id       String       @id @db.Uuid
+  nombre   String       @unique
+  usuarios Usuario[]
+  permisos RolPermiso[]
+
+  @@map("roles")
+  @@schema("iam")
+}
+
+model Permiso {
+  id     String       @id @db.Uuid
+  codigo String       @unique
+  roles  RolPermiso[]
+
+  @@map("permisos")
+  @@schema("iam")
+}
+
+model RolPermiso {
+  rolId     String  @map("rol_id") @db.Uuid
+  permisoId String  @map("permiso_id") @db.Uuid
+  rol       Rol     @relation(fields: [rolId], references: [id])
+  permiso   Permiso @relation(fields: [permisoId], references: [id])
+
+  @@id([rolId, permisoId])
+  @@map("roles_permisos")
+  @@schema("iam")
+}
+
+// ============================ ADMISION ============================
+
+enum TipoDocumento {
+  DNI
+  PASAPORTE
+  OTRO
+  @@schema("admision")
+}
+
+enum Sexo {
+  F
+  M
+  X
+  @@schema("admision")
+}
+
+enum EstadoTurno {
+  RESERVADO
+  CANCELADO
+  ATENDIDO
+  @@schema("admision")
+}
+
+// El orden de declaración es el orden de prioridad.
+enum NivelTriaje {
+  ROJO
+  NARANJA
+  AMARILLO
+  VERDE
+  AZUL
+  @@schema("admision")
+}
+
+enum EstadoTriaje {
+  EN_ESPERA
+  ATENDIDO
+  @@schema("admision")
+}
+
+model Paciente {
+  id               String        @id @db.Uuid
+  usuarioId        String?       @unique @map("usuario_id") @db.Uuid
+  tipoDocumento    TipoDocumento @map("tipo_documento")
+  numeroDocumento  String        @map("numero_documento") @db.VarChar(20)
+  nombre           String
+  apellido         String
+  fechaNacimiento  DateTime      @map("fecha_nacimiento") @db.Date
+  sexo             Sexo
+  telefono         String?
+  email            String?
+  obraSocialCodigo String?       @map("obra_social_codigo")
+  numeroAfiliado   String?       @map("numero_afiliado")
+  createdAt        DateTime      @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt        DateTime      @updatedAt @map("updated_at") @db.Timestamptz
+  turnos           Turno[]
+  triajes          Triaje[]
+
+  @@unique([tipoDocumento, numeroDocumento])
+  @@index([apellido])
+  @@map("pacientes")
+  @@schema("admision")
+}
+
+model Medico {
+  id           String   @id @db.Uuid
+  usuarioId    String   @unique @map("usuario_id") @db.Uuid
+  matricula    String   @unique
+  nombre       String
+  apellido     String
+  especialidad String
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz
+  agendas      Agenda[]
+  turnos       Turno[]
+
+  @@map("medicos")
+  @@schema("admision")
+}
+
+model Agenda {
+  id               String   @id @db.Uuid
+  medicoId         String   @map("medico_id") @db.Uuid
+  diaSemana        Int      @map("dia_semana") @db.SmallInt
+  horaInicio       DateTime @map("hora_inicio") @db.Time
+  horaFin          DateTime @map("hora_fin") @db.Time
+  duracionTurnoMin Int      @map("duracion_turno_min") @db.SmallInt
+  medico           Medico   @relation(fields: [medicoId], references: [id])
+
+  @@index([medicoId])
+  @@map("agendas")
+  @@schema("admision")
+}
+
+model Turno {
+  id             String      @id @db.Uuid
+  pacienteId     String      @map("paciente_id") @db.Uuid
+  medicoId       String      @map("medico_id") @db.Uuid
+  inicio         DateTime    @db.Timestamptz
+  fin            DateTime    @db.Timestamptz
+  estado         EstadoTurno @default(RESERVADO)
+  motivoConsulta String?     @map("motivo_consulta")
+  creadoPor      String      @map("creado_por") @db.Uuid
+  createdAt      DateTime    @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt      DateTime    @updatedAt @map("updated_at") @db.Timestamptz
+  paciente       Paciente    @relation(fields: [pacienteId], references: [id])
+  medico         Medico      @relation(fields: [medicoId], references: [id])
+
+  @@index([medicoId, inicio])
+  @@index([pacienteId, inicio])
+  @@map("turnos")
+  @@schema("admision")
+}
+
+model Triaje {
+  id            String       @id @db.Uuid
+  pacienteId    String       @map("paciente_id") @db.Uuid
+  nivel         NivelTriaje
+  motivo        String
+  estado        EstadoTriaje @default(EN_ESPERA)
+  llegadaEn     DateTime     @map("llegada_en") @db.Timestamptz
+  registradoPor String       @map("registrado_por") @db.Uuid
+  paciente      Paciente     @relation(fields: [pacienteId], references: [id])
+
+  @@index([estado, nivel, llegadaEn])
+  @@map("triajes")
+  @@schema("admision")
+}
+
+// ============================ HCE ============================
+
+enum SeveridadAlergia {
+  LEVE
+  MODERADA
+  GRAVE
+  @@schema("hce")
+}
+
+enum EstadoPrescripcion {
+  ACTIVA
+  SUSPENDIDA
+  FINALIZADA
+  @@schema("hce")
+}
+
+enum TipoEstudio {
+  LABORATORIO
+  IMAGEN
+  OTRO
+  @@schema("hce")
+}
+
+model HistoriaClinica {
+  id             String                @id @db.Uuid
+  pacienteId     String                @unique @map("paciente_id") @db.Uuid
+  origenEventoId String                @unique @map("origen_evento_id") @db.Uuid
+  createdAt      DateTime              @default(now()) @map("created_at") @db.Timestamptz
+  evoluciones    Evolucion[]
+  alergias       Alergia[]
+  antecedentes   AntecedenteFamiliar[]
+  prescripciones Prescripcion[]
+  estudios       Estudio[]
+
+  @@map("historias_clinicas")
+  @@schema("hce")
+}
+
+model Evolucion {
+  id            String          @id @db.Uuid
+  historiaId    String          @map("historia_id") @db.Uuid
+  turnoId       String?         @map("turno_id") @db.Uuid
+  internacionId String?         @map("internacion_id") @db.Uuid
+  medicoId      String          @map("medico_id") @db.Uuid
+  motivo        String
+  diagnostico   String
+  tratamiento   String?
+  registradoEn  DateTime        @default(now()) @map("registrado_en") @db.Timestamptz
+  historia      HistoriaClinica @relation(fields: [historiaId], references: [id])
+  prescripciones Prescripcion[]
+
+  @@index([historiaId, registradoEn(sort: Desc)])
+  @@map("evoluciones")
+  @@schema("hce")
+}
+
+model Alergia {
+  id            String           @id @db.Uuid
+  historiaId    String           @map("historia_id") @db.Uuid
+  sustancia     String
+  severidad     SeveridadAlergia
+  registradoEn  DateTime         @default(now()) @map("registrado_en") @db.Timestamptz
+  registradoPor String           @map("registrado_por") @db.Uuid
+  historia      HistoriaClinica  @relation(fields: [historiaId], references: [id])
+
+  @@unique([historiaId, sustancia])
+  @@map("alergias")
+  @@schema("hce")
+}
+
+model AntecedenteFamiliar {
+  id            String          @id @db.Uuid
+  historiaId    String          @map("historia_id") @db.Uuid
+  parentesco    String
+  condicion     String
+  registradoEn  DateTime        @default(now()) @map("registrado_en") @db.Timestamptz
+  registradoPor String          @map("registrado_por") @db.Uuid
+  historia      HistoriaClinica @relation(fields: [historiaId], references: [id])
+
+  @@index([historiaId])
+  @@map("antecedentes_familiares")
+  @@schema("hce")
+}
+
+model Prescripcion {
+  id              String             @id @db.Uuid
+  historiaId      String             @map("historia_id") @db.Uuid
+  evolucionId     String?            @map("evolucion_id") @db.Uuid
+  medicoId        String             @map("medico_id") @db.Uuid
+  medicamento     String
+  dosis           String
+  frecuenciaHoras Int                @map("frecuencia_horas") @db.SmallInt
+  duracionDias    Int                @map("duracion_dias") @db.SmallInt
+  estado          EstadoPrescripcion @default(ACTIVA)
+  createdAt       DateTime           @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt       DateTime           @updatedAt @map("updated_at") @db.Timestamptz
+  historia        HistoriaClinica    @relation(fields: [historiaId], references: [id])
+  evolucion       Evolucion?         @relation(fields: [evolucionId], references: [id])
+
+  @@index([historiaId, estado])
+  @@map("prescripciones")
+  @@schema("hce")
+}
+
+model Estudio {
+  id            String          @id @db.Uuid
+  historiaId    String          @map("historia_id") @db.Uuid
+  tipo          TipoEstudio
+  descripcion   String
+  resultado     String?
+  fecha         DateTime        @db.Date
+  registradoPor String          @map("registrado_por") @db.Uuid
+  createdAt     DateTime        @default(now()) @map("created_at") @db.Timestamptz
+  historia      HistoriaClinica @relation(fields: [historiaId], references: [id])
+
+  @@index([historiaId])
+  @@map("estudios")
+  @@schema("hce")
+}
+
+// ============================ ENFERMERIA ============================
+
+enum EstadoIndicacion {
+  PENDIENTE
+  EJECUTADA
+  OMITIDA
+  @@schema("enfermeria")
+}
+
+model Indicacion {
+  id             String                    @id @db.Uuid
+  internacionId  String                    @map("internacion_id") @db.Uuid
+  pacienteId     String                    @map("paciente_id") @db.Uuid
+  prescripcionId String                    @map("prescripcion_id") @db.Uuid
+  descripcion    String
+  programadaPara DateTime                  @map("programada_para") @db.Timestamptz
+  estado         EstadoIndicacion          @default(PENDIENTE)
+  motivoOmision  String?                   @map("motivo_omision")
+  createdAt      DateTime                  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt      DateTime                  @updatedAt @map("updated_at") @db.Timestamptz
+  administracion AdministracionMedicacion?
+
+  @@unique([prescripcionId, programadaPara])
+  @@index([internacionId, programadaPara])
+  @@map("indicaciones")
+  @@schema("enfermeria")
+}
+
+model SignosVitales {
+  id                 String   @id @db.Uuid
+  pacienteId         String   @map("paciente_id") @db.Uuid
+  internacionId      String?  @map("internacion_id") @db.Uuid
+  temperatura        Decimal? @db.Decimal(4, 1)
+  presionSistolica   Int?     @map("presion_sistolica") @db.SmallInt
+  presionDiastolica  Int?     @map("presion_diastolica") @db.SmallInt
+  frecuenciaCardiaca Int?     @map("frecuencia_cardiaca") @db.SmallInt
+  saturacionO2       Int?     @map("saturacion_o2") @db.SmallInt
+  registradoEn       DateTime @default(now()) @map("registrado_en") @db.Timestamptz
+  registradoPor      String   @map("registrado_por") @db.Uuid
+
+  @@index([pacienteId, registradoEn(sort: Desc)])
+  @@map("signos_vitales")
+  @@schema("enfermeria")
+}
+
+model AdministracionMedicacion {
+  id              String     @id @db.Uuid
+  indicacionId    String     @unique @map("indicacion_id") @db.Uuid
+  pacienteId      String     @map("paciente_id") @db.Uuid
+  medicamento     String
+  administradaEn  DateTime   @default(now()) @map("administrada_en") @db.Timestamptz
+  administradaPor String     @map("administrada_por") @db.Uuid
+  indicacion      Indicacion @relation(fields: [indicacionId], references: [id])
+
+  @@index([pacienteId])
+  @@map("administraciones_medicacion")
+  @@schema("enfermeria")
+}
+
+model NotaEnfermeria {
+  id            String   @id @db.Uuid
+  pacienteId    String   @map("paciente_id") @db.Uuid
+  internacionId String?  @map("internacion_id") @db.Uuid
+  texto         String
+  registradoEn  DateTime @default(now()) @map("registrado_en") @db.Timestamptz
+  registradoPor String   @map("registrado_por") @db.Uuid
+
+  @@index([pacienteId, registradoEn(sort: Desc)])
+  @@map("notas_enfermeria")
+  @@schema("enfermeria")
+}
+
+// ============================ RECURSOS ============================
+
+enum EstadoCama {
+  LIBRE
+  OCUPADA
+  EN_LIMPIEZA
+  BLOQUEADA
+  @@schema("recursos")
+}
+
+enum EstadoInternacion {
+  ACTIVA
+  ALTA
+  @@schema("recursos")
+}
+
+model Habitacion {
+  id     String @id @db.Uuid
+  sector String
+  numero String
+  camas  Cama[]
+
+  @@unique([sector, numero])
+  @@map("habitaciones")
+  @@schema("recursos")
+}
+
+model Cama {
+  id            String        @id @db.Uuid
+  habitacionId  String        @map("habitacion_id") @db.Uuid
+  codigo        String        @unique
+  estado        EstadoCama    @default(LIBRE)
+  updatedAt     DateTime      @updatedAt @map("updated_at") @db.Timestamptz
+  habitacion    Habitacion    @relation(fields: [habitacionId], references: [id])
+  internaciones Internacion[]
+
+  @@index([estado])
+  @@map("camas")
+  @@schema("recursos")
+}
+
+model Internacion {
+  id         String            @id @db.Uuid
+  pacienteId String            @map("paciente_id") @db.Uuid
+  camaId     String            @map("cama_id") @db.Uuid
+  medicoId   String            @map("medico_id") @db.Uuid
+  motivo     String
+  estado     EstadoInternacion @default(ACTIVA)
+  ingresoEn  DateTime          @map("ingreso_en") @db.Timestamptz
+  egresoEn   DateTime?         @map("egreso_en") @db.Timestamptz
+  createdAt  DateTime          @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt  DateTime          @updatedAt @map("updated_at") @db.Timestamptz
+  cama       Cama              @relation(fields: [camaId], references: [id])
+
+  @@index([pacienteId])
+  @@index([camaId])
+  @@map("internaciones")
+  @@schema("recursos")
+}
+
+model Insumo {
+  id                  String   @id @db.Uuid
+  codigo              String   @unique
+  nombre              String
+  medicamentoAsociado String?  @map("medicamento_asociado")
+  stockActual         Int      @map("stock_actual")
+  stockMinimo         Int      @map("stock_minimo")
+  updatedAt           DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  @@index([medicamentoAsociado])
+  @@map("insumos")
+  @@schema("recursos")
+}
+
+// ============================ FACTURACION ============================
+
+enum ConceptoCargo {
+  CONSULTA
+  MEDICACION
+  DIA_CAMA
+  @@schema("facturacion")
+}
+
+enum TipoCuenta {
+  CONSULTA
+  INTERNACION
+  @@schema("facturacion")
+}
+
+enum EstadoCuenta {
+  ABIERTA
+  CERRADA
+  @@schema("facturacion")
+}
+
+model ObraSocial {
+  id                  String  @id @db.Uuid
+  codigo              String  @unique
+  nombre              String
+  porcentajeCobertura Decimal @map("porcentaje_cobertura") @db.Decimal(5, 2)
+
+  @@map("obras_sociales")
+  @@schema("facturacion")
+}
+
+model Tarifa {
+  id       String        @id @db.Uuid
+  concepto ConceptoCargo @unique
+  monto    Decimal       @db.Decimal(12, 2)
+
+  @@map("tarifas")
+  @@schema("facturacion")
+}
+
+model Cuenta {
+  id                  String       @id @db.Uuid
+  pacienteId          String       @map("paciente_id") @db.Uuid
+  tipo                TipoCuenta
+  referenciaId        String       @map("referencia_id") @db.Uuid
+  coberturaValidada   Boolean      @default(false) @map("cobertura_validada")
+  porcentajeCobertura Decimal?     @map("porcentaje_cobertura") @db.Decimal(5, 2)
+  estado              EstadoCuenta @default(ABIERTA)
+  createdAt           DateTime     @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt           DateTime     @updatedAt @map("updated_at") @db.Timestamptz
+  cargos              Cargo[]
+
+  @@unique([tipo, referenciaId])
+  @@index([pacienteId])
+  @@map("cuentas")
+  @@schema("facturacion")
+}
+
+model Cargo {
+  id             String        @id @db.Uuid
+  cuentaId       String        @map("cuenta_id") @db.Uuid
+  concepto       ConceptoCargo
+  descripcion    String
+  cantidad       Int
+  montoUnitario  Decimal       @map("monto_unitario") @db.Decimal(12, 2)
+  montoTotal     Decimal       @map("monto_total") @db.Decimal(12, 2)
+  origenEventoId String        @unique @map("origen_evento_id") @db.Uuid
+  createdAt      DateTime      @default(now()) @map("created_at") @db.Timestamptz
+  cuenta         Cuenta        @relation(fields: [cuentaId], references: [id])
+
+  @@index([cuentaId])
+  @@index([concepto, createdAt])
+  @@map("cargos")
+  @@schema("facturacion")
+}

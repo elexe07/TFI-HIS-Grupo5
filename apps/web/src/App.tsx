@@ -1,6 +1,7 @@
 import { Link, Route, Routes } from 'react-router-dom';
 import { EstadoApi } from './components/EstadoApi';
 import { SaludosPage } from './pages/SaludosPage';
+import { EnfermeriaPage } from './pages/EnfermeriaPage';
 
 /**
  * Esqueleto de la SPA. Cada módulo agrega su carpeta en src/modules/<modulo>/ con sus páginas
@@ -13,6 +14,7 @@ export function App() {
         <h1>HIS</h1>
         <nav>
           <Link to="/">Inicio</Link>
+          <Link to="/enfermeria">Atención y Enfermería</Link>
           <Link to="/ejemplo">Ejemplo</Link>
           <a href="/docs" target="_blank" rel="noreferrer">
             Swagger
@@ -23,6 +25,7 @@ export function App() {
       <main>
         <Routes>
           <Route path="/" element={<Inicio />} />
+          <Route path="/enfermeria" element={<EnfermeriaPage />} />
           <Route path="/ejemplo" element={<SaludosPage />} />
         </Routes>
       </main>

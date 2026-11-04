@@ -181,11 +181,11 @@ Pensado para unas 10 semanas. Ajustar a las fechas de la cátedra en la primera 
 
 ### Fase 4 — HCE
 
-- [ ] Dominio por TDD: `HistoriaClinica`, `Evolucion` (inmutable), `Alergia`, `AntecedenteFamiliar`, `Prescripcion`, `Estudio`.
-- [ ] Repositorio sin `update` ni `delete` para evoluciones. Test de arquitectura o unitario que lo verifique.
-- [ ] Casos de uso: abrir historia (por evento), registrar evolución, registrar alergia, registrar antecedente, crear prescripción (bloquea si hay alergia al medicamento), registrar estudio, consultar historia.
-- [ ] Acceso: Médico y Enfermero leen cualquier historia; Paciente solo la propia.
-- [ ] Publica `EvolucionRegistrada` y `PrescripcionCreada`.
+- [x] Dominio por TDD: `HistoriaClinica`, `Evolucion` (inmutable), `Alergia`, `AntecedenteFamiliar`, `Prescripcion`, `Estudio`.
+- [x] Repositorio sin `update` ni `delete` para evoluciones. Test de arquitectura o unitario que lo verifique.
+- [x] Casos de uso: abrir historia (por evento), registrar evolución, registrar alergia, registrar antecedente, crear prescripción (bloquea si hay alergia al medicamento), registrar estudio, consultar historia.
+- [x] Acceso: Médico y Enfermero leen cualquier historia; Paciente solo la propia.
+- [x] Publica `EvolucionRegistrada` y `PrescripcionCreada`.
 - [ ] Pantallas: historia clínica como línea de tiempo, nueva evolución, nueva prescripción.
 
 ### Fase 5 — Enfermería

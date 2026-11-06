@@ -1,5 +1,8 @@
 import { Link, Route, Routes } from 'react-router-dom';
 import { EstadoApi } from './components/EstadoApi';
+import { GuardiaPage } from './modules/admision/GuardiaPage';
+import { PacientesPage } from './modules/admision/PacientesPage';
+import { TurnosPage } from './modules/admision/TurnosPage';
 import { SaludosPage } from './pages/SaludosPage';
 
 /**
@@ -13,6 +16,9 @@ export function App() {
         <h1>HIS</h1>
         <nav>
           <Link to="/">Inicio</Link>
+          <Link to="/pacientes">Pacientes</Link>
+          <Link to="/turnos">Turnos</Link>
+          <Link to="/guardia">Guardia</Link>
           <Link to="/ejemplo">Ejemplo</Link>
           <a href="/docs" target="_blank" rel="noreferrer">
             Swagger
@@ -23,6 +29,9 @@ export function App() {
       <main>
         <Routes>
           <Route path="/" element={<Inicio />} />
+          <Route path="/pacientes" element={<PacientesPage />} />
+          <Route path="/turnos" element={<TurnosPage />} />
+          <Route path="/guardia" element={<GuardiaPage />} />
           <Route path="/ejemplo" element={<SaludosPage />} />
         </Routes>
       </main>
@@ -36,7 +45,8 @@ function Inicio() {
       <h2>Hospital Information System</h2>
       <p>Módulos: IAM · Admisión y Turnos · HCE · Enfermería · Recursos y Camas · Facturación.</p>
       <p>
-        Cada módulo registra sus páginas en <code>App.tsx</code>.
+        Accedé a <strong>Pacientes</strong>, <strong>Turnos</strong> y <strong>Guardia</strong>{' '}
+        desde el menú superior.
       </p>
     </section>
   );

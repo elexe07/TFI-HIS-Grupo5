@@ -174,10 +174,10 @@ Pensado para unas 10 semanas. Ajustar a las fechas de la cátedra en la primera 
 
 ### Fase 3 — Admisión y Turnos
 
-- [ ] Dominio por TDD: `Paciente`, `Agenda` (franjas semanales), `Turno` (estados: reservado, cancelado, atendido), `Triaje` (niveles rojo a azul).
-- [ ] Casos de uso: registrar paciente, buscar paciente, definir agenda, reservar turno (sin solapar), cancelar turno, registrar triaje, ver cola de guardia.
-- [ ] Publica `PacienteRegistrado`.
-- [ ] Pantallas: alta/búsqueda de paciente, reservar turno, cola de guardia.
+- [x] Dominio por TDD: `Paciente`, `Agenda` (franjas semanales), `Turno` (estados: reservado, cancelado, atendido), `Triaje` (niveles rojo a azul).
+- [x] Casos de uso: registrar paciente, buscar paciente, definir agenda, reservar turno (sin solapar), cancelar turno, registrar triaje, ver cola de guardia.
+- [x] Publica `PacienteRegistrado`.
+- [x] Pantallas: alta/búsqueda de paciente, reservar turno, cola de guardia.
 
 ### Fase 4 — HCE
 

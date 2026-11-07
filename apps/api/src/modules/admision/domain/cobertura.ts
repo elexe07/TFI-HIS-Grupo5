@@ -34,4 +34,3 @@ export class Cobertura extends ValueObject<CoberturaProps> {
     return this.props.numeroAfiliado;
   }
 }
-

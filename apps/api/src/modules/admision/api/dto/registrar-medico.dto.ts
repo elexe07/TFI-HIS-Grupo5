@@ -30,4 +30,3 @@ export class RegistrarMedicoDto {
   @MaxLength(100)
   especialidad!: string;
 }
-

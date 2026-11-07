@@ -23,4 +23,3 @@ export function aMedicoDto(m: Medico): MedicoDto {
     createdAt: m.creadoEn.toISOString(),
   };
 }
-

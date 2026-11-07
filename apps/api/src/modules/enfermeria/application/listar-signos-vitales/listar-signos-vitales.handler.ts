@@ -4,10 +4,7 @@ import {
   SIGNOS_VITALES_REPOSITORY,
   type SignosVitalesRepository,
 } from '../../domain/signos-vitales.repository';
-import {
-  mapearSignosVitalesADto,
-  type SignosVitalesDto,
-} from '../dtos/signos-vitales.dto';
+import { mapearSignosVitalesADto, type SignosVitalesDto } from '../dtos/signos-vitales.dto';
 
 export class ListarSignosVitalesQuery {
   constructor(
@@ -19,9 +16,10 @@ export class ListarSignosVitalesQuery {
 }
 
 @Injectable()
-export class ListarSignosVitalesHandler
-  implements CasoDeUso<ListarSignosVitalesQuery, SignosVitalesDto[]>
-{
+export class ListarSignosVitalesHandler implements CasoDeUso<
+  ListarSignosVitalesQuery,
+  SignosVitalesDto[]
+> {
   constructor(
     @Inject(SIGNOS_VITALES_REPOSITORY)
     private readonly repository: SignosVitalesRepository,
@@ -32,4 +30,3 @@ export class ListarSignosVitalesHandler
     return listado.map(mapearSignosVitalesADto);
   }
 }
-

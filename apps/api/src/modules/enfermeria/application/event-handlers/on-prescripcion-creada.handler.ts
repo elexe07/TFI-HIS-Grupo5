@@ -1,9 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
-import {
-  PRESCRIPCION_CREADA,
-  type PrescripcionCreadaEvent,
-} from '../../../hce/public';
+import { PRESCRIPCION_CREADA, type PrescripcionCreadaEvent } from '../../../hce/public';
 import { GenerarIndicacionesCommand } from '../generar-indicaciones/generar-indicaciones.command';
 import { GenerarIndicacionesHandler } from '../generar-indicaciones/generar-indicaciones.handler';
 

@@ -1,65 +1,65 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, nextTick } from 'vue'
-import type { ModalProps } from './Modal.types'
+import { ref, onMounted, onUnmounted, nextTick } from 'vue';
+import type { ModalProps } from './Modal.types';
 
-const props = defineProps<ModalProps>()
+const props = defineProps<ModalProps>();
 
 const emit = defineEmits<{
-  'update:modelValue': [value: boolean]
-  close: []
-}>()
+  'update:modelValue': [value: boolean];
+  close: [];
+}>();
 
-const overlayRef = ref<HTMLDivElement | null>(null)
-const descriptionId = `modal-desc-${Math.random().toString(36).slice(2, 9)}`
+const overlayRef = ref<HTMLDivElement | null>(null);
+const descriptionId = `modal-desc-${Math.random().toString(36).slice(2, 9)}`;
 
 const closeModal = () => {
-  emit('update:modelValue', false)
-  emit('close')
-}
+  emit('update:modelValue', false);
+  emit('close');
+};
 
 const handleKeydown = (event: KeyboardEvent) => {
   if (event.key === 'Escape' && props.closable) {
-    closeModal()
+    closeModal();
   }
   if (event.key === 'Tab') {
-    trapFocus(event)
+    trapFocus(event);
   }
-}
+};
 
 const trapFocus = (event: KeyboardEvent) => {
   const focusableElements = overlayRef.value?.querySelectorAll<HTMLElement>(
     'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
-  )
-  if (!focusableElements?.length) return
+  );
+  if (!focusableElements?.length) return;
 
-  const firstElement = focusableElements[0]
-  const lastElement = focusableElements[focusableElements.length - 1]
+  const firstElement = focusableElements[0];
+  const lastElement = focusableElements[focusableElements.length - 1];
 
-  if (!firstElement || !lastElement) return
+  if (!firstElement || !lastElement) return;
 
   if (event.shiftKey && document.activeElement === firstElement) {
-    event.preventDefault()
-    lastElement.focus()
+    event.preventDefault();
+    lastElement.focus();
   } else if (!event.shiftKey && document.activeElement === lastElement) {
-    event.preventDefault()
-    firstElement.focus()
+    event.preventDefault();
+    firstElement.focus();
   }
-}
+};
 
 onMounted(() => {
-  document.body.style.overflow = 'hidden'
+  document.body.style.overflow = 'hidden';
   // Focus first focusable element
   nextTick(() => {
     const firstFocusable = overlayRef.value?.querySelector<HTMLElement>(
       'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
-    )
-    firstFocusable?.focus()
-  })
-})
+    );
+    firstFocusable?.focus();
+  });
+});
 
 onUnmounted(() => {
-  document.body.style.overflow = ''
-})
+  document.body.style.overflow = '';
+});
 </script>
 
 <template>
@@ -88,7 +88,14 @@ onUnmounted(() => {
               @click="closeModal"
               aria-label="Cerrar modal"
             >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
                 <line x1="18" y1="6" x2="6" y2="18"></line>
                 <line x1="6" y1="6" x2="18" y2="18"></line>
               </svg>
@@ -133,11 +140,21 @@ onUnmounted(() => {
   animation: slideInUp var(--transition-normal);
 }
 
-.modal-sm { max-width: 400px; }
-.modal-md { max-width: 560px; }
-.modal-lg { max-width: 800px; }
-.modal-xl { max-width: 1024px; }
-.modal-full { max-width: 95vw; }
+.modal-sm {
+  max-width: 400px;
+}
+.modal-md {
+  max-width: 560px;
+}
+.modal-lg {
+  max-width: 800px;
+}
+.modal-xl {
+  max-width: 1024px;
+}
+.modal-full {
+  max-width: 95vw;
+}
 
 .modal-content {
   display: flex;

@@ -36,4 +36,3 @@ export function aPacienteDto(p: Paciente): PacienteDto {
     updatedAt: p.actualizadoEn.toISOString(),
   };
 }
-

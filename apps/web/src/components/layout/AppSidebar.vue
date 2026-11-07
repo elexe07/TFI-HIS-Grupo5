@@ -1,127 +1,186 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { useAuthStore } from '@/stores/auth'
-import { Badge } from '@/components/ui'
-import type { NombreRol, Permiso } from '@/types/api'
+import { ref, computed, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { useAuthStore } from '@/stores/auth';
+import { Badge } from '@/components/ui';
+import type { NombreRol, Permiso } from '@/types/api';
 
-const route = useRoute()
-const router = useRouter()
-const authStore = useAuthStore()
+const route = useRoute();
+const router = useRouter();
+const authStore = useAuthStore();
 
-const collapsed = ref(false)
-const mobileOpen = ref(false)
-const expandedSections = ref<string[]>([])
+const collapsed = ref(false);
+const mobileOpen = ref(false);
+const expandedSections = ref<string[]>([]);
 
 // Icons
-const HomeIcon = { template: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>` }
-const UsersIcon = { template: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>` }
-const FileTextIcon = { template: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>` }
-const HeartIcon = { template: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>` }
-const BuildingIcon = { template: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><path d="M3 9h18"></path><path d="M9 21V9"></path></svg>` }
-const DollarSignIcon = { template: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>` }
-const SettingsIcon = { template: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>` }
+const HomeIcon = {
+  template: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>`,
+};
+const UsersIcon = {
+  template: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>`,
+};
+const FileTextIcon = {
+  template: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>`,
+};
+const HeartIcon = {
+  template: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>`,
+};
+const BuildingIcon = {
+  template: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><path d="M3 9h18"></path><path d="M9 21V9"></path></svg>`,
+};
+const DollarSignIcon = {
+  template: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>`,
+};
+const SettingsIcon = {
+  template: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>`,
+};
 
 interface NavItem {
-  path: string
-  label: string
-  icon?: any
-  permisos?: Permiso[]
-  children?: { path: string; label: string }[]
-  badge?: { variant: 'primary' | 'success' | 'warning' | 'danger' | 'info' | 'neutral'; text: string }
+  path: string;
+  label: string;
+  icon?: any;
+  permisos?: Permiso[];
+  children?: { path: string; label: string }[];
+  badge?: {
+    variant: 'primary' | 'success' | 'warning' | 'danger' | 'info' | 'neutral';
+    text: string;
+  };
 }
 
 interface NavSection {
-  label: string
-  items: NavItem[]
+  label: string;
+  items: NavItem[];
 }
 
-const navSections = computed<NavSection[]>(() => [
-  {
-    label: 'Principal',
-    items: [
-      { path: '/', label: 'Dashboard', icon: HomeIcon, permisos: [] },
-    ],
-  },
-  {
-    label: 'Módulos Clínicos',
-    items: [
-      { path: '/admision', label: 'Admisión y Turnos', icon: UsersIcon, permisos: ['pacientes:leer'] as Permiso[], children: [
-        { path: '/admision', label: 'Pacientes' },
-        { path: '/admision/agenda', label: 'Agenda Médica' },
-        { path: '/admision/turnos', label: 'Turnos' },
-        { path: '/admision/triaje', label: 'Triaje y Guardia' },
-      ]},
-      { path: '/hce', label: 'Historia Clínica', icon: FileTextIcon, permisos: ['hce:leer'] as Permiso[], children: [
-        { path: '/hce/paciente/:pacienteId', label: 'Ver Historia' },
-        { path: '/hce/paciente/:pacienteId/evolucion/nueva', label: 'Nueva Evolución' },
-      ]},
-      { path: '/enfermeria', label: 'Enfermería', icon: HeartIcon, permisos: ['enfermeria:indicaciones:leer'] as Permiso[], children: [
-        { path: '/enfermeria', label: 'Indicaciones' },
-        { path: '/enfermeria/signos-vitales', label: 'Signos Vitales' },
-        { path: '/enfermeria/notas', label: 'Notas' },
-      ]},
-    ],
-  },
-  {
-    label: 'Operaciones',
-    items: [
-      { path: '/recursos', label: 'Recursos y Camas', icon: BuildingIcon, permisos: ['camas:leer'] as Permiso[], children: [
-        { path: '/recursos', label: 'Mapa de Camas' },
-        { path: '/recursos/internaciones', label: 'Internaciones' },
-        { path: '/recursos/insumos', label: 'Insumos' },
-      ]},
-      { path: '/facturacion', label: 'Facturación', icon: DollarSignIcon, permisos: ['facturacion:leer'] as Permiso[], children: [
-        { path: '/facturacion', label: 'Cuentas' },
-        { path: '/facturacion/cobertura', label: 'Validar Cobertura' },
-        { path: '/facturacion/reportes', label: 'Reportes' },
-      ]},
-    ],
-  },
-  {
-    label: 'Administración',
-    items: [
-      { path: '/admin', label: 'Usuarios y Roles', icon: SettingsIcon, permisos: ['iam:usuarios:leer'] as Permiso[], children: [
-        { path: '/admin/usuarios', label: 'Usuarios' },
-      ]},
-    ],
-  },
-].filter(section => section.items.some(item => !item.permisos?.length || authStore.tieneCualquierPermiso(item.permisos))))
+const navSections = computed<NavSection[]>(() =>
+  [
+    {
+      label: 'Principal',
+      items: [{ path: '/', label: 'Dashboard', icon: HomeIcon, permisos: [] }],
+    },
+    {
+      label: 'Módulos Clínicos',
+      items: [
+        {
+          path: '/admision',
+          label: 'Admisión y Turnos',
+          icon: UsersIcon,
+          permisos: ['pacientes:leer'] as Permiso[],
+          children: [
+            { path: '/admision', label: 'Pacientes' },
+            { path: '/admision/agenda', label: 'Agenda Médica' },
+            { path: '/admision/turnos', label: 'Turnos' },
+            { path: '/admision/triaje', label: 'Triaje y Guardia' },
+          ],
+        },
+        {
+          path: '/hce',
+          label: 'Historia Clínica',
+          icon: FileTextIcon,
+          permisos: ['hce:leer'] as Permiso[],
+          children: [
+            { path: '/hce/paciente/:pacienteId', label: 'Ver Historia' },
+            { path: '/hce/paciente/:pacienteId/evolucion/nueva', label: 'Nueva Evolución' },
+          ],
+        },
+        {
+          path: '/enfermeria',
+          label: 'Enfermería',
+          icon: HeartIcon,
+          permisos: ['enfermeria:indicaciones:leer'] as Permiso[],
+          children: [
+            { path: '/enfermeria', label: 'Indicaciones' },
+            { path: '/enfermeria/signos-vitales', label: 'Signos Vitales' },
+            { path: '/enfermeria/notas', label: 'Notas' },
+          ],
+        },
+      ],
+    },
+    {
+      label: 'Operaciones',
+      items: [
+        {
+          path: '/recursos',
+          label: 'Recursos y Camas',
+          icon: BuildingIcon,
+          permisos: ['camas:leer'] as Permiso[],
+          children: [
+            { path: '/recursos', label: 'Mapa de Camas' },
+            { path: '/recursos/internaciones', label: 'Internaciones' },
+            { path: '/recursos/insumos', label: 'Insumos' },
+          ],
+        },
+        {
+          path: '/facturacion',
+          label: 'Facturación',
+          icon: DollarSignIcon,
+          permisos: ['facturacion:leer'] as Permiso[],
+          children: [
+            { path: '/facturacion', label: 'Cuentas' },
+            { path: '/facturacion/cobertura', label: 'Validar Cobertura' },
+            { path: '/facturacion/reportes', label: 'Reportes' },
+          ],
+        },
+      ],
+    },
+    {
+      label: 'Administración',
+      items: [
+        {
+          path: '/admin',
+          label: 'Usuarios y Roles',
+          icon: SettingsIcon,
+          permisos: ['iam:usuarios:leer'] as Permiso[],
+          children: [{ path: '/admin/usuarios', label: 'Usuarios' }],
+        },
+      ],
+    },
+  ].filter((section) =>
+    section.items.some(
+      (item) => !item.permisos?.length || authStore.tieneCualquierPermiso(item.permisos),
+    ),
+  ),
+);
 
 // Auto-expandir sección activa
-watch(() => route.path, (newPath) => {
-  for (const section of navSections.value) {
-    for (const item of section.items) {
-      if (item.children?.some(c => newPath.startsWith(c.path.replace(':pacienteId', '')))) {
-        if (!expandedSections.value.includes(item.path)) {
-          expandedSections.value.push(item.path)
+watch(
+  () => route.path,
+  (newPath) => {
+    for (const section of navSections.value) {
+      for (const item of section.items) {
+        if (item.children?.some((c) => newPath.startsWith(c.path.replace(':pacienteId', '')))) {
+          if (!expandedSections.value.includes(item.path)) {
+            expandedSections.value.push(item.path);
+          }
         }
       }
     }
-  }
-}, { immediate: true })
+  },
+  { immediate: true },
+);
 
 function isActive(path: string): boolean {
-  if (path === '/') return route.path === '/'
-  return route.path.startsWith(path.replace(':pacienteId', ''))
+  if (path === '/') return route.path === '/';
+  return route.path.startsWith(path.replace(':pacienteId', ''));
 }
 
 function isSectionActive(item: NavItem): boolean {
-  return item.children?.some(child => isActive(child.path)) ?? false
+  return item.children?.some((child) => isActive(child.path)) ?? false;
 }
 
 function toggleSection(path: string) {
-  const idx = expandedSections.value.indexOf(path)
+  const idx = expandedSections.value.indexOf(path);
   if (idx === -1) {
-    expandedSections.value.push(path)
+    expandedSections.value.push(path);
   } else {
-    expandedSections.value.splice(idx, 1)
+    expandedSections.value.splice(idx, 1);
   }
 }
 
 function navigate(path: string) {
-  router.push(path)
-  mobileOpen.value = false
+  router.push(path);
+  mobileOpen.value = false;
 }
 
 function getRolLabel(rol: NombreRol): string {
@@ -131,32 +190,45 @@ function getRolLabel(rol: NombreRol): string {
     ENFERMERO: 'Enfermero',
     RECEPCIONISTA: 'Recepcionista',
     PACIENTE: 'Paciente',
-  }
-  return labels[rol] ?? rol
+  };
+  return labels[rol] ?? rol;
 }
 
-function getRolColor(rol: NombreRol): 'primary' | 'success' | 'warning' | 'danger' | 'info' | 'neutral' {
-  const colors: Record<NombreRol, 'primary' | 'success' | 'warning' | 'danger' | 'info' | 'neutral'> = {
+function getRolColor(
+  rol: NombreRol,
+): 'primary' | 'success' | 'warning' | 'danger' | 'info' | 'neutral' {
+  const colors: Record<
+    NombreRol,
+    'primary' | 'success' | 'warning' | 'danger' | 'info' | 'neutral'
+  > = {
     ADMINISTRADOR: 'danger',
     MEDICO: 'primary',
     ENFERMERO: 'success',
     RECEPCIONISTA: 'warning',
     PACIENTE: 'info',
-  }
-  return colors[rol] ?? 'primary'
+  };
+  return colors[rol] ?? 'primary';
 }
 </script>
 
 <template>
   <aside
     class="app-sidebar"
-    :class="{ 'collapsed': collapsed, 'mobile-open': mobileOpen }"
+    :class="{ collapsed: collapsed, 'mobile-open': mobileOpen }"
     :aria-label="collapsed ? 'Menú principal colapsado' : 'Menú principal'"
   >
     <div class="sidebar-header">
       <div v-if="!collapsed" class="sidebar-brand">
         <router-link to="/" class="brand-link" aria-label="HIS - Inicio">
-          <svg class="brand-icon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <svg
+            class="brand-icon"
+            width="28"
+            height="28"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
             <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
             <polyline points="22 4 12 14.01 9 11.01"></polyline>
           </svg>
@@ -171,7 +243,14 @@ function getRolColor(rol: NombreRol): 'primary' | 'success' | 'warning' | 'dange
         :aria-label="collapsed ? 'Expandir menú' : 'Colapsar menú'"
         :aria-expanded="!collapsed"
       >
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
           <polyline v-if="collapsed" points="9 18 15 12 9 6"></polyline>
           <polyline v-else points="15 18 9 12 15 6"></polyline>
         </svg>
@@ -195,20 +274,36 @@ function getRolColor(rol: NombreRol): 'primary' | 'success' | 'warning' | 'dange
             >
               <component :is="item.icon" class="sidebar-icon" aria-hidden="true" />
               <span v-if="!collapsed" class="sidebar-label">{{ item.label }}</span>
-              <Badge v-if="!collapsed && item.badge" :variant="item.badge.variant" size="sm">{{ item.badge.text }}</Badge>
+              <Badge v-if="!collapsed && item.badge" :variant="item.badge.variant" size="sm">{{
+                item.badge.text
+              }}</Badge>
             </router-link>
 
             <button
               v-else
               type="button"
               class="sidebar-link sidebar-link-parent"
-              :class="{ active: isSectionActive(item), expanded: expandedSections.includes(item.path) }"
+              :class="{
+                active: isSectionActive(item),
+                expanded: expandedSections.includes(item.path),
+              }"
               @click="toggleSection(item.path)"
               :aria-expanded="expandedSections.includes(item.path)"
             >
               <component :is="item.icon" class="sidebar-icon" aria-hidden="true" />
               <span v-if="!collapsed" class="sidebar-label">{{ item.label }}</span>
-              <svg v-if="!collapsed" class="sidebar-chevron" :class="{ rotated: expandedSections.includes(item.path) }" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <svg
+                v-if="!collapsed"
+                class="sidebar-chevron"
+                :class="{ rotated: expandedSections.includes(item.path) }"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                aria-hidden="true"
+              >
                 <polyline points="6 9 12 15 18 9"></polyline>
               </svg>
             </button>
@@ -239,7 +334,9 @@ function getRolColor(rol: NombreRol): 'primary' | 'success' | 'warning' | 'dange
         </div>
         <div class="user-details">
           <div class="user-name">{{ authStore.usuario?.nombre }}</div>
-          <Badge :variant="getRolColor(authStore.rol!)" size="sm">{{ getRolLabel(authStore.rol!) }}</Badge>
+          <Badge :variant="getRolColor(authStore.rol!)" size="sm">{{
+            getRolLabel(authStore.rol!)
+          }}</Badge>
         </div>
       </div>
     </div>
@@ -268,7 +365,9 @@ function getRolColor(rol: NombreRol): 'primary' | 'success' | 'warning' | 'dange
   display: flex;
   flex-direction: column;
   z-index: 90;
-  transition: width var(--transition-normal), transform var(--transition-normal);
+  transition:
+    width var(--transition-normal),
+    transform var(--transition-normal);
   overflow: hidden;
 }
 

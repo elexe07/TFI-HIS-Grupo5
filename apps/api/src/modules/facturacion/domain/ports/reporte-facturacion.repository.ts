@@ -18,4 +18,3 @@ export interface ReporteFacturacionPeriodo {
 export interface ReporteFacturacionRepository {
   generarReporte(desde: Date, hasta: Date): Promise<ReporteFacturacionPeriodo>;
 }
-

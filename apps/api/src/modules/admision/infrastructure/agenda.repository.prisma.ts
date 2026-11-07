@@ -65,4 +65,3 @@ function aFranjaDominio(fila: AgendaPrisma): FranjaAgenda {
     duracionTurnoMin: fila.duracionTurnoMin,
   });
 }
-

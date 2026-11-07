@@ -70,8 +70,6 @@ describe('Indicacion', () => {
     const indicacion = crearIndicacion();
     indicacion.omitir('Paciente rechaza medicación', new Date());
 
-    expect(() => indicacion.omitir('Otro motivo', new Date())).toThrow(
-      IndicacionNoEstaPendiente,
-    );
+    expect(() => indicacion.omitir('Otro motivo', new Date())).toThrow(IndicacionNoEstaPendiente);
   });
 });

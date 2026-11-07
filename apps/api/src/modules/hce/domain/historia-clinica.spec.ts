@@ -49,27 +49,13 @@ describe('HistoriaClinica (Domain)', () => {
     historia.registrarAlergia('Ibuprofeno', 'MODERADA', ahora, medicoId);
 
     expect(() => {
-      historia.crearPrescripcion(
-        medicoId,
-        'Ibuprofeno 600mg',
-        '600 mg',
-        8,
-        5,
-        ahora,
-      );
+      historia.crearPrescripcion(medicoId, 'Ibuprofeno 600mg', '600 mg', 8, 5, ahora);
     }).toThrow(PacienteAlergicoAMedicamento);
   });
 
   it('debería crear la prescripción y emitir PrescripcionCreada si no hay alergia', () => {
     const historia = HistoriaClinica.abrir(pacienteId, ahora);
-    const pres = historia.crearPrescripcion(
-      medicoId,
-      'Paracetamol',
-      '500 mg',
-      8,
-      3,
-      ahora,
-    );
+    const pres = historia.crearPrescripcion(medicoId, 'Paracetamol', '500 mg', 8, 3, ahora);
 
     expect(historia.prescripciones).toHaveLength(1);
     expect(pres.medicamento).toBe('Paracetamol');
@@ -79,4 +65,3 @@ describe('HistoriaClinica (Domain)', () => {
     expect(eventos[0]!.nombre).toBe('hce.prescripcion-creada');
   });
 });
-

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import type { ButtonProps } from './Button.types'
+import { computed } from 'vue';
+import type { ButtonProps } from './Button.types';
 
 const props = withDefaults(defineProps<ButtonProps>(), {
   variant: 'primary',
@@ -10,24 +10,22 @@ const props = withDefaults(defineProps<ButtonProps>(), {
   label: '',
   type: 'button',
   disabled: false,
-})
+});
 
-const buttonClasses = computed(() => [
-  'btn',
-  `btn-${props.variant}`,
-  `btn-${props.size}`,
-  { 'btn-block': props.block },
-  { 'btn-loading': props.loading },
-  { 'btn-disabled': props.disabled },
-].join(' '))
+const buttonClasses = computed(() =>
+  [
+    'btn',
+    `btn-${props.variant}`,
+    `btn-${props.size}`,
+    { 'btn-block': props.block },
+    { 'btn-loading': props.loading },
+    { 'btn-disabled': props.disabled },
+  ].join(' '),
+);
 </script>
 
 <template>
-  <button
-    :type="props.type"
-    :disabled="props.disabled || props.loading"
-    :class="buttonClasses"
-  >
+  <button :type="props.type" :disabled="props.disabled || props.loading" :class="buttonClasses">
     <span v-if="props.loading" class="button-spinner" aria-hidden="true"></span>
     <slot v-else />
     <span v-if="!props.loading && !$slots.default">{{ props.label }}</span>
@@ -161,6 +159,8 @@ const buttonClasses = computed(() => [
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 </style>

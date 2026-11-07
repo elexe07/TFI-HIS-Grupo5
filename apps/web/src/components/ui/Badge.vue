@@ -1,15 +1,14 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import type { BadgeProps } from './Badge.types'
+import { computed } from 'vue';
+import type { BadgeProps } from './Badge.types';
 
-const props = defineProps<BadgeProps>()
+const props = defineProps<BadgeProps>();
 
-const badgeClasses = computed(() => [
-  'badge',
-  `badge-${props.variant}`,
-  `badge-${props.size}`,
-  { 'badge-dot': props.dot },
-].filter(Boolean).join(' '))
+const badgeClasses = computed(() =>
+  ['badge', `badge-${props.variant}`, `badge-${props.size}`, { 'badge-dot': props.dot }]
+    .filter(Boolean)
+    .join(' '),
+);
 </script>
 
 <template>
@@ -56,13 +55,33 @@ const badgeClasses = computed(() => [
 }
 
 /* Variants */
-.badge-primary { background-color: var(--color-primary-light); color: var(--color-primary); }
-.badge-success { background-color: var(--color-success-light); color: var(--color-success); }
-.badge-warning { background-color: var(--color-warning-light); color: var(--color-warning); }
-.badge-danger { background-color: var(--color-danger-light); color: var(--color-danger); }
-.badge-info { background-color: var(--color-info-light); color: var(--color-info); }
-.badge-neutral { background-color: var(--color-border); color: var(--color-text-secondary); }
+.badge-primary {
+  background-color: var(--color-primary-light);
+  color: var(--color-primary);
+}
+.badge-success {
+  background-color: var(--color-success-light);
+  color: var(--color-success);
+}
+.badge-warning {
+  background-color: var(--color-warning-light);
+  color: var(--color-warning);
+}
+.badge-danger {
+  background-color: var(--color-danger-light);
+  color: var(--color-danger);
+}
+.badge-info {
+  background-color: var(--color-info-light);
+  color: var(--color-info);
+}
+.badge-neutral {
+  background-color: var(--color-border);
+  color: var(--color-text-secondary);
+}
 
 /* Full rounded */
-:where(.badge) { --radius-full: 9999px; }
+:where(.badge) {
+  --radius-full: 9999px;
+}
 </style>

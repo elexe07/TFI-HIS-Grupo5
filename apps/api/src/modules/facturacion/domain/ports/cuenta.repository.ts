@@ -10,4 +10,3 @@ export interface CuentaRepository {
   guardar(cuenta: Cuenta): Promise<void>;
   existeCargoConOrigenEvento(origenEventoId: string): Promise<boolean>;
 }
-

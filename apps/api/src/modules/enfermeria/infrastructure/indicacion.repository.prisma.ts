@@ -99,7 +99,10 @@ export class IndicacionRepositoryPrisma implements IndicacionRepository {
     return filas.map(aDominio);
   }
 
-  async existePorPrescripcionYFecha(prescripcionId: string, programadaPara: Date): Promise<boolean> {
+  async existePorPrescripcionYFecha(
+    prescripcionId: string,
+    programadaPara: Date,
+  ): Promise<boolean> {
     const count = await this.prisma.indicacion.count({
       where: {
         prescripcionId,
@@ -123,4 +126,3 @@ function aDominio(fila: FilaIndicacion): Indicacion {
     updatedAt: fila.updatedAt,
   });
 }
-

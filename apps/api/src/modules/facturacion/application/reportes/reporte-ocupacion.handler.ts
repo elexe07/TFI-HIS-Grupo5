@@ -17,4 +17,3 @@ export class ReporteOcupacionHandler implements CasoDeUso<void, ResumenOcupacion
     return this.consultor.consultarOcupacion();
   }
 }
-

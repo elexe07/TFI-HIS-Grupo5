@@ -30,4 +30,3 @@ export class MedicacionAdministradaEvent extends DomainEventBase {
     this.administradaPor = props.administradaPor;
   }
 }
-

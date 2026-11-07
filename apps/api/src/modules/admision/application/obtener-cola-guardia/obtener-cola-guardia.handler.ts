@@ -13,4 +13,3 @@ export class ObtenerColaGuardiaHandler implements CasoDeUso<void, TriajeDto[]> {
     return cola.map(aTriajeDto);
   }
 }
-

@@ -154,4 +154,3 @@ describe('ReservarTurnoHandler (ADM-04)', () => {
     ).rejects.toThrow(FranjaOcupada);
   });
 });
-

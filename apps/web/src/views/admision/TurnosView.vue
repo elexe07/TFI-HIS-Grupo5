@@ -1,38 +1,38 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
-import { useAdmisionStore } from '@/stores/admision'
-import { useToastStore } from '@/stores/toast'
-import { Button, Input, Card, Table, Select, Modal, Badge } from '@/components/ui'
-import type { TableColumn } from '@/components/ui/Table.types'
-import type { TurnoDTO, EstadoTurno, MedicoDTO, PacienteDTO } from '@/types/api'
+import { ref, computed, onMounted } from 'vue';
+import { useAdmisionStore } from '@/stores/admision';
+import { useToastStore } from '@/stores/toast';
+import { Button, Input, Card, Table, Select, Modal, Badge } from '@/components/ui';
+import type { TableColumn } from '@/components/ui/Table.types';
+import type { TurnoDTO, EstadoTurno, MedicoDTO, PacienteDTO } from '@/types/api';
 
-const admisionStore = useAdmisionStore()
-const toastStore = useToastStore()
+const admisionStore = useAdmisionStore();
+const toastStore = useToastStore();
 
-const searchDocumento = ref('')
-const searchFechaDesde = ref(new Date().toISOString().split('T')[0])
-const searchFechaHasta = ref(new Date().toISOString().split('T')[0])
-const searchMedico = ref('')
+const searchDocumento = ref('');
+const searchFechaDesde = ref(new Date().toISOString().split('T')[0]);
+const searchFechaHasta = ref(new Date().toISOString().split('T')[0]);
+const searchMedico = ref('');
 
 // Form refs para Nuevo Turno
-const showModalTurno = ref(false)
-const formPacienteId = ref('')
-const formMedicoId = ref('')
-const formFecha = ref(new Date().toISOString().split('T')[0])
-const formInicio = ref('09:00')
-const formFin = ref('09:30')
-const formMotivo = ref('')
+const showModalTurno = ref(false);
+const formPacienteId = ref('');
+const formMedicoId = ref('');
+const formFecha = ref(new Date().toISOString().split('T')[0]);
+const formInicio = ref('09:00');
+const formFin = ref('09:30');
+const formMotivo = ref('');
 
 function formatHoraTurno(fechaIso?: string): string {
-  if (!fechaIso) return '-'
-  const d = new Date(fechaIso)
-  if (isNaN(d.getTime())) return '-'
+  if (!fechaIso) return '-';
+  const d = new Date(fechaIso);
+  if (isNaN(d.getTime())) return '-';
   return d.toLocaleTimeString('en-US', {
     hour: '2-digit',
     minute: '2-digit',
     timeZone: 'UTC',
     hour12: true,
-  })
+  });
 }
 
 const columns: TableColumn<TurnoDTO>[] = [
@@ -40,64 +40,70 @@ const columns: TableColumn<TurnoDTO>[] = [
     key: 'inicio',
     label: 'Fecha',
     width: '120px',
-    format: (v) => v ? new Date(v as string).toLocaleDateString('es-AR', { timeZone: 'UTC' }) : '-'
+    format: (v) =>
+      v ? new Date(v as string).toLocaleDateString('es-AR', { timeZone: 'UTC' }) : '-',
   },
   {
     key: 'hora',
     label: 'Hora',
     width: '130px',
-    format: (_v, row) => formatHoraTurno(row.inicio)
+    format: (_v, row) => formatHoraTurno(row.inicio),
   },
   {
     key: 'paciente',
     label: 'Paciente',
     format: (_v, row) => {
-      const p = row.paciente || admisionStore.pacientes.find(pac => pac.id === row.pacienteId)
-      return p ? `${p.apellido}, ${p.nombre} (${p.tipoDocumento} ${p.numeroDocumento})` : (row.pacienteId || '-')
-    }
+      const p = row.paciente || admisionStore.pacientes.find((pac) => pac.id === row.pacienteId);
+      return p
+        ? `${p.apellido}, ${p.nombre} (${p.tipoDocumento} ${p.numeroDocumento})`
+        : row.pacienteId || '-';
+    },
   },
   {
     key: 'medico',
     label: 'Profesional',
     width: '180px',
     format: (_v, row) => {
-      const m = row.medico || admisionStore.medicos.find(med => med.id === row.medicoId)
-      return m ? `Dr. ${m.apellido}, ${m.nombre}` : (row.medicoId || '-')
-    }
+      const m = row.medico || admisionStore.medicos.find((med) => med.id === row.medicoId);
+      return m ? `Dr. ${m.apellido}, ${m.nombre}` : row.medicoId || '-';
+    },
   },
   { key: 'estado', label: 'Estado', width: '140px' },
   { key: 'motivoConsulta', label: 'Motivo', format: (v): string => (v as string) || '-' },
   { key: 'actions', label: 'Acciones', width: '120px' },
-]
+];
 
 const medicosOptions = computed(() =>
-  (admisionStore.medicos as MedicoDTO[]).map(p => ({ value: p.id, label: `Dr. ${p.apellido}, ${p.nombre} (${p.especialidad})` }))
-)
+  (admisionStore.medicos as MedicoDTO[]).map((p) => ({
+    value: p.id,
+    label: `Dr. ${p.apellido}, ${p.nombre} (${p.especialidad})`,
+  })),
+);
 
 const pacientesOptions = computed(() =>
-  (admisionStore.pacientes as PacienteDTO[]).map(p => ({
+  (admisionStore.pacientes as PacienteDTO[]).map((p) => ({
     value: p.id,
     label: `${p.apellido}, ${p.nombre} (${p.tipoDocumento} ${p.numeroDocumento})`,
-  }))
-)
+  })),
+);
 
 async function buscarTurnos() {
-  let pacienteId: string | undefined = undefined
+  let pacienteId: string | undefined = undefined;
 
   if (searchDocumento.value.trim()) {
-    const doc = searchDocumento.value.trim().toLowerCase()
+    const doc = searchDocumento.value.trim().toLowerCase();
     const match = admisionStore.pacientes.find(
-      (p) => p.numeroDocumento.toLowerCase() === doc || p.id === doc
-    )
+      (p) => p.numeroDocumento.toLowerCase() === doc || p.id === doc,
+    );
     if (match) {
-      pacienteId = match.id
+      pacienteId = match.id;
     } else {
       try {
-        await admisionStore.cargarPacientes({ documento: doc })
+        await admisionStore.cargarPacientes({ documento: doc });
         const primero = admisionStore.pacientes.find(
-          (p) => p.numeroDocumento.toLowerCase() === doc
-        )
-        if (primero) pacienteId = primero.id
+          (p) => p.numeroDocumento.toLowerCase() === doc,
+        );
+        if (primero) pacienteId = primero.id;
       } catch {
         // no encontrado
       }
@@ -109,27 +115,27 @@ async function buscarTurnos() {
     medicoId: searchMedico.value || undefined,
     fechaDesde: searchFechaDesde.value,
     fechaHasta: searchFechaHasta.value,
-  })
+  });
 }
 
 function abrirModalTurno() {
-  formPacienteId.value = admisionStore.pacientes[0]?.id ?? ''
-  formMedicoId.value = admisionStore.medicos[0]?.id ?? ''
-  formFecha.value = new Date().toISOString().split('T')[0]
-  formInicio.value = '09:00'
-  formFin.value = '09:30'
-  formMotivo.value = ''
-  showModalTurno.value = true
+  formPacienteId.value = admisionStore.pacientes[0]?.id ?? '';
+  formMedicoId.value = admisionStore.medicos[0]?.id ?? '';
+  formFecha.value = new Date().toISOString().split('T')[0];
+  formInicio.value = '09:00';
+  formFin.value = '09:30';
+  formMotivo.value = '';
+  showModalTurno.value = true;
 }
 
 async function handleGuardarTurno() {
   if (!formPacienteId.value || !formMedicoId.value || !formFecha.value || !formInicio.value) {
-    toastStore.error('Campos requeridos', 'Complete paciente, profesional, fecha y horario')
-    return
+    toastStore.error('Campos requeridos', 'Complete paciente, profesional, fecha y horario');
+    return;
   }
 
-  const inicioISO = `${formFecha.value}T${formInicio.value}:00.000Z`
-  const finISO = formFin.value ? `${formFecha.value}T${formFin.value}:00.000Z` : undefined
+  const inicioISO = `${formFecha.value}T${formInicio.value}:00.000Z`;
+  const finISO = formFin.value ? `${formFecha.value}T${formFin.value}:00.000Z` : undefined;
 
   try {
     await admisionStore.reservarTurno({
@@ -138,56 +144,60 @@ async function handleGuardarTurno() {
       inicio: inicioISO,
       fin: finISO,
       motivoConsulta: formMotivo.value || undefined,
-    })
-    toastStore.success('Turno reservado', 'El turno ha sido agendado exitosamente')
-    showModalTurno.value = false
-    await buscarTurnos()
+    });
+    toastStore.success('Turno reservado', 'El turno ha sido agendado exitosamente');
+    showModalTurno.value = false;
+    await buscarTurnos();
   } catch (err) {
-    toastStore.apiError(err, 'No se pudo reservar el turno')
+    toastStore.apiError(err, 'No se pudo reservar el turno');
   }
 }
 
 async function confirmarCancelar(turno: TurnoDTO) {
-  const pacienteTexto = turno.paciente ? `${turno.paciente.apellido}, ${turno.paciente.nombre}` : 'este turno'
+  const pacienteTexto = turno.paciente
+    ? `${turno.paciente.apellido}, ${turno.paciente.nombre}`
+    : 'este turno';
   if (confirm(`¿Cancelar turno de ${pacienteTexto}?`)) {
     try {
-      await admisionStore.cancelarTurno(turno.id)
-      toastStore.success('Turno cancelado', 'El turno ha sido cancelado')
-      buscarTurnos()
+      await admisionStore.cancelarTurno(turno.id);
+      toastStore.success('Turno cancelado', 'El turno ha sido cancelado');
+      buscarTurnos();
     } catch (err) {
-      toastStore.error('Error', 'No se pudo cancelar el turno')
+      toastStore.error('Error', 'No se pudo cancelar el turno');
     }
   }
 }
 
-function getEstadoVariant(estado: EstadoTurno): 'primary' | 'success' | 'warning' | 'danger' | 'info' {
+function getEstadoVariant(
+  estado: EstadoTurno,
+): 'primary' | 'success' | 'warning' | 'danger' | 'info' {
   const variants: Record<EstadoTurno, 'primary' | 'success' | 'warning' | 'danger' | 'info'> = {
     RESERVADO: 'info',
     CONFIRMADO: 'primary',
     EN_SALA_ESPERA: 'warning',
     ATENDIDO: 'success',
     CANCELADO: 'danger',
-  }
-  return variants[estado] ?? 'info'
+  };
+  return variants[estado] ?? 'info';
 }
 
 function limpiarFiltros() {
-  searchDocumento.value = ''
-  searchFechaDesde.value = new Date().toISOString().split('T')[0]
-  searchFechaHasta.value = new Date().toISOString().split('T')[0]
-  searchMedico.value = ''
-  buscarTurnos()
+  searchDocumento.value = '';
+  searchFechaDesde.value = new Date().toISOString().split('T')[0];
+  searchFechaHasta.value = new Date().toISOString().split('T')[0];
+  searchMedico.value = '';
+  buscarTurnos();
 }
 
 onMounted(async () => {
   if (admisionStore.medicos.length === 0) {
-    await admisionStore.cargarMedicos()
+    await admisionStore.cargarMedicos();
   }
   if (admisionStore.pacientes.length === 0) {
-    await admisionStore.cargarPacientes({})
+    await admisionStore.cargarPacientes({});
   }
-  buscarTurnos()
-})
+  buscarTurnos();
+});
 </script>
 
 <template>
@@ -197,8 +207,22 @@ onMounted(async () => {
         <h2>Gestión de Turnos</h2>
         <p class="view-subtitle">Búsqueda, filtrado y control de estados de turnos</p>
       </div>
-      <Button variant="primary" @click="abrirModalTurno" :disabled="admisionStore.medicos.length === 0 || admisionStore.pacientes.length === 0">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+      <Button
+        variant="primary"
+        @click="abrirModalTurno"
+        :disabled="admisionStore.medicos.length === 0 || admisionStore.pacientes.length === 0"
+      >
+        <svg
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
         Nuevo Turno
       </Button>
     </div>
@@ -219,26 +243,24 @@ onMounted(async () => {
           size="sm"
         />
         <div class="date-range">
-          <Input
-            v-model="searchFechaDesde"
-            label="Desde"
-            type="date"
-            size="sm"
-          />
-          <Input
-            v-model="searchFechaHasta"
-            label="Hasta"
-            type="date"
-            size="sm"
-          />
+          <Input v-model="searchFechaDesde" label="Desde" type="date" size="sm" />
+          <Input v-model="searchFechaHasta" label="Hasta" type="date" size="sm" />
         </div>
         <Button variant="secondary" @click="buscarTurnos" class="search-btn">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
           Buscar
         </Button>
-        <Button variant="ghost" @click="limpiarFiltros">
-          Limpiar
-        </Button>
+        <Button variant="ghost" @click="limpiarFiltros"> Limpiar </Button>
       </div>
     </Card>
 
@@ -252,11 +274,19 @@ onMounted(async () => {
         emptyText="No se encontraron turnos con los filtros aplicados."
       >
         <template #cell-inicio="{ row }">
-          <span>{{ (row as any).inicio ? new Date((row as any).inicio as string).toLocaleDateString('es-AR', { timeZone: 'UTC' }) : '-' }}</span>
+          <span>{{
+            (row as any).inicio
+              ? new Date((row as any).inicio as string).toLocaleDateString('es-AR', {
+                  timeZone: 'UTC',
+                })
+              : '-'
+          }}</span>
         </template>
 
         <template #cell-hora="{ row }">
-          <strong v-if="(row as any).inicio">{{ formatHoraTurno((row as any).inicio as string) }}</strong>
+          <strong v-if="(row as any).inicio">{{
+            formatHoraTurno((row as any).inicio as string)
+          }}</strong>
           <span v-else class="text-muted">-</span>
         </template>
 
@@ -279,7 +309,18 @@ onMounted(async () => {
               @click.stop="confirmarCancelar(row as unknown as TurnoDTO)"
               title="Cancelar"
             >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="15" y1="9" x2="9" y2="15"></line>
+                <line x1="9" y1="9" x2="15" y2="15"></line>
+              </svg>
             </Button>
           </div>
         </template>
@@ -287,7 +328,12 @@ onMounted(async () => {
     </Card>
 
     <!-- Modal Reservar Turno -->
-    <Modal v-model="showModalTurno" title="Reservar Turno" size="md" @close="showModalTurno = false">
+    <Modal
+      v-model="showModalTurno"
+      title="Reservar Turno"
+      size="md"
+      @close="showModalTurno = false"
+    >
       <div class="turno-form">
         <div class="form-grid">
           <div class="form-row">
@@ -316,7 +362,11 @@ onMounted(async () => {
             <Input v-model="formFin" label="Hora Fin (opcional)" type="time" />
           </div>
           <div class="form-row">
-            <Input v-model="formMotivo" label="Motivo de Consulta" placeholder="Ej: Control general, dolor lumbar..." />
+            <Input
+              v-model="formMotivo"
+              label="Motivo de Consulta"
+              placeholder="Ej: Control general, dolor lumbar..."
+            />
           </div>
         </div>
         <div class="form-actions">

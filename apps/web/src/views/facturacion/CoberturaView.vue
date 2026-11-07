@@ -1,41 +1,51 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
-import { useFacturacionStore } from '@/stores/facturacion'
-import { Button, Input, Card, Table, Modal, Badge } from '@/components/ui'
-import type { TableColumn } from '@/components/ui/Table.types'
-import type { ObraSocialDTO, ConceptoCargo } from '@/types/api'
+import { ref, computed, onMounted } from 'vue';
+import { useFacturacionStore } from '@/stores/facturacion';
+import { Button, Input, Card, Table, Modal, Badge } from '@/components/ui';
+import type { TableColumn } from '@/components/ui/Table.types';
+import type { ObraSocialDTO, ConceptoCargo } from '@/types/api';
 
-const facturacionStore = useFacturacionStore()
+const facturacionStore = useFacturacionStore();
 
-const searchTerm = ref('')
-const showModal = ref(false)
-const editingObraSocial = ref<ObraSocialDTO | null>(null)
+const searchTerm = ref('');
+const showModal = ref(false);
+const editingObraSocial = ref<ObraSocialDTO | null>(null);
 
 const columnsObrasSociales: TableColumn[] = [
   { key: 'codigo', label: 'Código', width: '100px' },
   { key: 'nombre', label: 'Nombre' },
   { key: 'porcentajeCobertura', label: '% Cobertura', width: '120px', format: (v) => `${v}%` },
   { key: 'actions', label: 'Acciones', width: '120px' },
-]
+];
 
 const columnsTarifas: TableColumn[] = [
   { key: 'concepto', label: 'Concepto', width: '150px' },
-  { key: 'monto', label: 'Monto', width: '150px', format: (v) => facturacionStore.formatearMonto(v as number) },
-]
+  {
+    key: 'monto',
+    label: 'Monto',
+    width: '150px',
+    format: (v) => facturacionStore.formatearMonto(v as number),
+  },
+];
 
 const obrasSocialesFiltradas = computed(() => {
-  return facturacionStore.obrasSociales.filter(os => {
-    if (searchTerm.value && !os.nombre.toLowerCase().includes(searchTerm.value.toLowerCase()) && !os.codigo.toLowerCase().includes(searchTerm.value.toLowerCase())) return false
-    return true
-  })
-})
+  return facturacionStore.obrasSociales.filter((os) => {
+    if (
+      searchTerm.value &&
+      !os.nombre.toLowerCase().includes(searchTerm.value.toLowerCase()) &&
+      !os.codigo.toLowerCase().includes(searchTerm.value.toLowerCase())
+    )
+      return false;
+    return true;
+  });
+});
 
 async function cargarObrasSociales() {
-  await facturacionStore.cargarObrasSociales()
+  await facturacionStore.cargarObrasSociales();
 }
 
 async function cargarTarifas() {
-  await facturacionStore.cargarTarifas()
+  await facturacionStore.cargarTarifas();
 }
 
 function getConceptoLabel(concepto: ConceptoCargo): string {
@@ -43,22 +53,22 @@ function getConceptoLabel(concepto: ConceptoCargo): string {
     CONSULTA: 'Consulta Médica',
     MEDICACION: 'Medicación',
     DIA_CAMA: 'Día Cama',
-  }
-  return labels[concepto] ?? concepto
+  };
+  return labels[concepto] ?? concepto;
 }
 
 function limpiarFiltros() {
-  searchTerm.value = ''
+  searchTerm.value = '';
 }
 
 onMounted(() => {
-  cargarObrasSociales()
-  cargarTarifas()
-})
+  cargarObrasSociales();
+  cargarTarifas();
+});
 </script>
 
 <template>
-<div class="cobertura-view">
+  <div class="cobertura-view">
     <div class="view-header">
       <div>
         <h2>Obras Sociales y Tarifas</h2>
@@ -68,15 +78,8 @@ onMounted(() => {
 
     <Card class="search-card">
       <div class="search-form">
-        <Input
-          v-model="searchTerm"
-          label="Buscar"
-          placeholder="Nombre o código..."
-          size="sm"
-        />
-        <Button variant="ghost" @click="limpiarFiltros">
-          Limpiar
-        </Button>
+        <Input v-model="searchTerm" label="Buscar" placeholder="Nombre o código..." size="sm" />
+        <Button variant="ghost" @click="limpiarFiltros"> Limpiar </Button>
       </div>
     </Card>
 
@@ -119,12 +122,29 @@ onMounted(() => {
     </Card>
 
     <!-- Modal Ver Obra Social (Solo lectura - informativo) -->
-    <Modal v-model="showModal" :title="editingObraSocial ? 'Ver Obra Social' : ''" size="md" @close="showModal = false">
+    <Modal
+      v-model="showModal"
+      :title="editingObraSocial ? 'Ver Obra Social' : ''"
+      size="md"
+      @close="showModal = false"
+    >
       <div class="obra-social-form">
         <div class="form-grid">
           <div class="form-row">
-            <Input v-model="editingObraSocial!.codigo" label="Código" placeholder="Código único" required disabled />
-            <Input v-model="editingObraSocial!.nombre" label="Nombre" placeholder="Nombre de la obra social" required disabled />
+            <Input
+              v-model="editingObraSocial!.codigo"
+              label="Código"
+              placeholder="Código único"
+              required
+              disabled
+            />
+            <Input
+              v-model="editingObraSocial!.nombre"
+              label="Nombre"
+              placeholder="Nombre de la obra social"
+              required
+              disabled
+            />
           </div>
           <div class="form-row">
             <Input
@@ -142,12 +162,26 @@ onMounted(() => {
           <Button variant="primary" @click="showModal = false">Cerrar</Button>
         </div>
         <div class="info-note">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-          <span>La gestión de obras sociales se realiza desde el backend. Esta vista es solo de consulta.</span>
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="16" x2="12" y2="12"></line>
+            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+          </svg>
+          <span
+            >La gestión de obras sociales se realiza desde el backend. Esta vista es solo de
+            consulta.</span
+          >
         </div>
       </div>
     </Modal>
-</div>
+  </div>
 </template>
 
 <style scoped>

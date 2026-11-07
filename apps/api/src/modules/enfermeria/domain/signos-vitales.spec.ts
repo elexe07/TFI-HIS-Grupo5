@@ -35,27 +35,27 @@ describe('SignosVitales', () => {
   });
 
   it('falla si la temperatura es menor a 30 °C', () => {
-    expect(() =>
-      SignosVitales.crear({ ...baseProps, temperatura: 29.5 }),
-    ).toThrow(TemperaturaInvalida);
+    expect(() => SignosVitales.crear({ ...baseProps, temperatura: 29.5 })).toThrow(
+      TemperaturaInvalida,
+    );
   });
 
   it('falla si la temperatura es mayor a 45 °C', () => {
-    expect(() =>
-      SignosVitales.crear({ ...baseProps, temperatura: 45.1 }),
-    ).toThrow(TemperaturaInvalida);
+    expect(() => SignosVitales.crear({ ...baseProps, temperatura: 45.1 })).toThrow(
+      TemperaturaInvalida,
+    );
   });
 
   it('falla si la saturación de oxígeno es menor a 50%', () => {
-    expect(() =>
-      SignosVitales.crear({ ...baseProps, saturacionO2: 49 }),
-    ).toThrow(SaturacionO2Invalida);
+    expect(() => SignosVitales.crear({ ...baseProps, saturacionO2: 49 })).toThrow(
+      SaturacionO2Invalida,
+    );
   });
 
   it('falla si la saturación de oxígeno es mayor a 100%', () => {
-    expect(() =>
-      SignosVitales.crear({ ...baseProps, saturacionO2: 101 }),
-    ).toThrow(SaturacionO2Invalida);
+    expect(() => SignosVitales.crear({ ...baseProps, saturacionO2: 101 })).toThrow(
+      SaturacionO2Invalida,
+    );
   });
 
   it('falla si la presión diastólica es mayor que la sistólica', () => {
@@ -69,13 +69,12 @@ describe('SignosVitales', () => {
   });
 
   it('falla si la frecuencia cardíaca está fuera de rango', () => {
-    expect(() =>
-      SignosVitales.crear({ ...baseProps, frecuenciaCardiaca: 0 }),
-    ).toThrow(FrecuenciaCardiacaInvalida);
+    expect(() => SignosVitales.crear({ ...baseProps, frecuenciaCardiaca: 0 })).toThrow(
+      FrecuenciaCardiacaInvalida,
+    );
 
-    expect(() =>
-      SignosVitales.crear({ ...baseProps, frecuenciaCardiaca: 350 }),
-    ).toThrow(FrecuenciaCardiacaInvalida);
+    expect(() => SignosVitales.crear({ ...baseProps, frecuenciaCardiaca: 350 })).toThrow(
+      FrecuenciaCardiacaInvalida,
+    );
   });
 });
-

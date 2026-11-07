@@ -19,7 +19,12 @@ import {
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
-import { PERMISOS, RequierePermiso, UsuarioActual, type UsuarioAutenticado } from '../../iam/public';
+import {
+  PERMISOS,
+  RequierePermiso,
+  UsuarioActual,
+  type UsuarioAutenticado,
+} from '../../iam/public';
 import { AdministrarMedicacionCommand } from '../application/administrar-medicacion/administrar-medicacion.command';
 import { AdministrarMedicacionHandler } from '../application/administrar-medicacion/administrar-medicacion.handler';
 import {
@@ -93,7 +98,9 @@ export class EnfermeriaController {
 
   @Get('indicaciones')
   @RequierePermiso(PERMISOS.ENFERMERIA_LEER)
-  @ApiOperation({ summary: 'Listar indicaciones programadas (filtro por internación, paciente, fecha)' })
+  @ApiOperation({
+    summary: 'Listar indicaciones programadas (filtro por internación, paciente, fecha)',
+  })
   @ApiOkResponse({ description: 'Listado de indicaciones' })
   listarIndicaciones(@Query() dto: ListarIndicacionesDto): Promise<IndicacionDto[]> {
     return this.listarIndicacionesHandler.ejecutar(

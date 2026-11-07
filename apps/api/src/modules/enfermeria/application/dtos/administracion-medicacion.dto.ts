@@ -19,4 +19,3 @@ export const mapearAdministracionADto = (
   administradaEn: adm.administradaEn,
   administradaPor: adm.administradaPor,
 });
-

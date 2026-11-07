@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
-import { useAuthStore } from '@/stores/auth'
-import { useToastStore } from '@/stores/toast'
-import { Button, Input, Card, Table, Badge, Select } from '@/components/ui'
-import type { TableColumn } from '@/components/ui/Table.types'
+import { ref, computed, onMounted } from 'vue';
+import { useAuthStore } from '@/stores/auth';
+import { useToastStore } from '@/stores/toast';
+import { Button, Input, Card, Table, Badge, Select } from '@/components/ui';
+import type { TableColumn } from '@/components/ui/Table.types';
 
-const authStore = useAuthStore()
-const toastStore = useToastStore()
+const authStore = useAuthStore();
+const toastStore = useToastStore();
 
-const searchTerm = ref('')
-const rolFiltro = ref('')
+const searchTerm = ref('');
+const rolFiltro = ref('');
 
 const columns: TableColumn[] = [
   { key: 'id', label: 'ID', width: '80px' },
@@ -17,7 +17,7 @@ const columns: TableColumn[] = [
   { key: 'nombre', label: 'Nombre Completo' },
   { key: 'rol', label: 'Rol', width: '140px' },
   { key: 'permisos', label: 'Permisos', width: '300px' },
-]
+];
 
 const rolesOptions = [
   { value: '', label: 'Todos' },
@@ -26,21 +26,26 @@ const rolesOptions = [
   { value: 'ENFERMERO', label: 'Enfermero' },
   { value: 'RECEPCIONISTA', label: 'Recepcionista' },
   { value: 'PACIENTE', label: 'Paciente' },
-]
+];
 
 const usuariosFiltrados = computed(() => {
-  return authStore.usuariosSistema.filter(u => {
-    if (searchTerm.value && !u.nombre.toLowerCase().includes(searchTerm.value.toLowerCase()) && !u.email.toLowerCase().includes(searchTerm.value.toLowerCase())) return false
-    if (rolFiltro.value && u.rol !== rolFiltro.value) return false
-    return true
-  })
-})
+  return authStore.usuariosSistema.filter((u) => {
+    if (
+      searchTerm.value &&
+      !u.nombre.toLowerCase().includes(searchTerm.value.toLowerCase()) &&
+      !u.email.toLowerCase().includes(searchTerm.value.toLowerCase())
+    )
+      return false;
+    if (rolFiltro.value && u.rol !== rolFiltro.value) return false;
+    return true;
+  });
+});
 
 async function cargarUsuarios() {
   try {
-    await authStore.cargarUsuariosSistema()
+    await authStore.cargarUsuariosSistema();
   } catch (err) {
-    toastStore.error('Error', 'No se pudieron cargar los usuarios')
+    toastStore.error('Error', 'No se pudieron cargar los usuarios');
   }
 }
 
@@ -51,8 +56,8 @@ function getRolLabel(rol: string): string {
     ENFERMERO: 'Enfermero',
     RECEPCIONISTA: 'Recepcionista',
     PACIENTE: 'Paciente',
-  }
-  return labels[rol] ?? rol
+  };
+  return labels[rol] ?? rol;
 }
 
 function getRolVariant(rol: string): 'primary' | 'success' | 'warning' | 'danger' | 'info' {
@@ -62,23 +67,23 @@ function getRolVariant(rol: string): 'primary' | 'success' | 'warning' | 'danger
     ENFERMERO: 'success',
     RECEPCIONISTA: 'warning',
     PACIENTE: 'info',
-  }
-  return variants[rol] ?? 'primary'
+  };
+  return variants[rol] ?? 'primary';
 }
 
 function limpiarFiltros() {
-  searchTerm.value = ''
-  rolFiltro.value = ''
-  cargarUsuarios()
+  searchTerm.value = '';
+  rolFiltro.value = '';
+  cargarUsuarios();
 }
 
 onMounted(() => {
-  cargarUsuarios()
-})
+  cargarUsuarios();
+});
 </script>
 
 <template>
-<div class="usuarios-view">
+  <div class="usuarios-view">
     <div class="view-header">
       <div>
         <h2>Gestión de Usuarios</h2>
@@ -88,21 +93,9 @@ onMounted(() => {
 
     <Card class="search-card">
       <div class="search-form">
-        <Input
-          v-model="searchTerm"
-          label="Buscar"
-          placeholder="Nombre o email..."
-          size="sm"
-        />
-        <Select
-          v-model="rolFiltro"
-          label="Rol"
-          :options="rolesOptions"
-          size="sm"
-        />
-        <Button variant="ghost" @click="limpiarFiltros">
-          Limpiar
-        </Button>
+        <Input v-model="searchTerm" label="Buscar" placeholder="Nombre o email..." size="sm" />
+        <Select v-model="rolFiltro" label="Rol" :options="rolesOptions" size="sm" />
+        <Button variant="ghost" @click="limpiarFiltros"> Limpiar </Button>
       </div>
     </Card>
 
@@ -116,14 +109,18 @@ onMounted(() => {
         emptyText="No se encontraron usuarios con los filtros aplicados."
       >
         <template #cell-rol="{ value }">
-          <Badge :variant="getRolVariant(value as string)" size="sm">{{ getRolLabel(value as string) }}</Badge>
+          <Badge :variant="getRolVariant(value as string)" size="sm">{{
+            getRolLabel(value as string)
+          }}</Badge>
         </template>
         <template #cell-permisos="{ value }">
-          <span class="text-muted text-xs">{{ (value as string[])?.join(', ') || 'Sin permisos' }}</span>
+          <span class="text-muted text-xs">{{
+            (value as string[])?.join(', ') || 'Sin permisos'
+          }}</span>
         </template>
       </Table>
     </Card>
-</div>
+  </div>
 </template>
 
 <style scoped>

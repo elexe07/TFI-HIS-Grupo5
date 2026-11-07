@@ -37,4 +37,3 @@ export class RegistrarTriajeHandler implements CasoDeUso<RegistrarTriajeCommand,
     return aTriajeDto(triaje);
   }
 }
-

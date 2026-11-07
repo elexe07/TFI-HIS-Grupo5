@@ -24,4 +24,3 @@ describe('Inmutabilidad de la HCE (ADR-008)', () => {
     expect(proto.delete).toBeUndefined();
   });
 });
-

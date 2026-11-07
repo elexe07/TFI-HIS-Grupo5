@@ -13,4 +13,3 @@ export enum ConceptoCargo {
   MEDICACION = 'MEDICACION',
   DIA_CAMA = 'DIA_CAMA',
 }
-

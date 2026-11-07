@@ -1,30 +1,51 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import { useRoute } from 'vue-router'
-import { useAuthStore } from '@/stores/auth'
-import type { Permiso } from '@/types/api'
+import { computed } from 'vue';
+import { useRoute } from 'vue-router';
+import { useAuthStore } from '@/stores/auth';
+import type { Permiso } from '@/types/api';
 
-const route = useRoute()
-const authStore = useAuthStore()
+const route = useRoute();
+const authStore = useAuthStore();
 
 defineProps<{
-  title?: string
-}>()
+  title?: string;
+}>();
 
 const tabs = computed(() => [
-  { path: '/facturacion', label: 'Cuentas', icon: FileTextIcon, permisos: ['facturacion:leer'] as Permiso[] },
-  { path: '/facturacion/cobertura', label: 'Validar Cobertura', icon: ShieldIcon, permisos: ['cobertura:validar'] as Permiso[] },
-  { path: '/facturacion/reportes', label: 'Reportes', icon: BarChartIcon, permisos: ['reportes:leer'] as Permiso[] },
-])
+  {
+    path: '/facturacion',
+    label: 'Cuentas',
+    icon: FileTextIcon,
+    permisos: ['facturacion:leer'] as Permiso[],
+  },
+  {
+    path: '/facturacion/cobertura',
+    label: 'Validar Cobertura',
+    icon: ShieldIcon,
+    permisos: ['cobertura:validar'] as Permiso[],
+  },
+  {
+    path: '/facturacion/reportes',
+    label: 'Reportes',
+    icon: BarChartIcon,
+    permisos: ['reportes:leer'] as Permiso[],
+  },
+]);
 
 function isActiveTab(path: string): boolean {
-  return route.path === path || (path !== '/facturacion' && route.path.startsWith(path))
+  return route.path === path || (path !== '/facturacion' && route.path.startsWith(path));
 }
 
 // Icons
-const FileTextIcon = { template: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>` }
-const ShieldIcon = { template: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>` }
-const BarChartIcon = { template: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>` }
+const FileTextIcon = {
+  template: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>`,
+};
+const ShieldIcon = {
+  template: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>`,
+};
+const BarChartIcon = {
+  template: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>`,
+};
 </script>
 
 <template>
@@ -32,7 +53,9 @@ const BarChartIcon = { template: `<svg width="18" height="18" viewBox="0 0 24 24
     <div class="module-header">
       <div>
         <h1 class="module-title">{{ title || 'Facturación y Administración' }}</h1>
-        <p class="module-subtitle">Gestión de cuentas, validación de cobertura y reportes administrativos</p>
+        <p class="module-subtitle">
+          Gestión de cuentas, validación de cobertura y reportes administrativos
+        </p>
       </div>
     </div>
 

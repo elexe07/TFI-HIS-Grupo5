@@ -50,4 +50,3 @@ export class ValidadorDeCoberturaFake implements ValidadorDeCobertura {
     };
   }
 }
-

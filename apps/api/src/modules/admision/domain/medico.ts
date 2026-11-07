@@ -88,4 +88,3 @@ export class Medico extends Entity {
     return `Dr. ${this.nombre} ${this.apellido}`;
   }
 }
-

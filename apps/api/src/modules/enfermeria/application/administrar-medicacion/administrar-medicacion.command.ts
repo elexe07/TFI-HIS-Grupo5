@@ -4,4 +4,3 @@ export class AdministrarMedicacionCommand {
     readonly administradaPor: string,
   ) {}
 }
-

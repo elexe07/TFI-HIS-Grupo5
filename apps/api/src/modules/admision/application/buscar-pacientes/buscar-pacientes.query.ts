@@ -7,4 +7,3 @@ export class BuscarPacientesQuery {
     this.apellido = filtros?.apellido?.trim();
   }
 }
-

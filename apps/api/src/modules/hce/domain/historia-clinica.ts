@@ -85,7 +85,12 @@ export class HistoriaClinica extends AggregateRoot {
     return this._estudios;
   }
 
-  registrarAlergia(sustancia: string, severidad: SeveridadAlergia, ahora: Date, registradoPor: string): Alergia {
+  registrarAlergia(
+    sustancia: string,
+    severidad: SeveridadAlergia,
+    ahora: Date,
+    registradoPor: string,
+  ): Alergia {
     const yaExiste = this._alergias.some(
       (a) => a.sustancia.toLowerCase() === sustancia.trim().toLowerCase(),
     );
@@ -98,7 +103,12 @@ export class HistoriaClinica extends AggregateRoot {
     return alergia;
   }
 
-  registrarAntecedente(parentesco: string, condicion: string, ahora: Date, registradoPor: string): AntecedenteFamiliar {
+  registrarAntecedente(
+    parentesco: string,
+    condicion: string,
+    ahora: Date,
+    registradoPor: string,
+  ): AntecedenteFamiliar {
     const antecedente = AntecedenteFamiliar.crear(parentesco, condicion, ahora, registradoPor);
     this._antecedentes.push(antecedente);
     return antecedente;
@@ -113,7 +123,15 @@ export class HistoriaClinica extends AggregateRoot {
     turnoId?: string,
     internacionId?: string,
   ): Evolucion {
-    const evolucion = Evolucion.crear(medicoId, motivo, diagnostico, ahora, tratamiento, turnoId, internacionId);
+    const evolucion = Evolucion.crear(
+      medicoId,
+      motivo,
+      diagnostico,
+      ahora,
+      tratamiento,
+      turnoId,
+      internacionId,
+    );
     this._evoluciones.push(evolucion);
 
     this.registrarEvento(
@@ -141,9 +159,10 @@ export class HistoriaClinica extends AggregateRoot {
     internacionId?: string,
   ): Prescripcion {
     // Validar si el paciente es alérgico
-    const tieneAlergia = this._alergias.some((a) =>
-      medicamento.toLowerCase().includes(a.sustancia.toLowerCase()) ||
-      a.sustancia.toLowerCase().includes(medicamento.toLowerCase()),
+    const tieneAlergia = this._alergias.some(
+      (a) =>
+        medicamento.toLowerCase().includes(a.sustancia.toLowerCase()) ||
+        a.sustancia.toLowerCase().includes(medicamento.toLowerCase()),
     );
     if (tieneAlergia) {
       throw new PacienteAlergicoAMedicamento(medicamento);
@@ -189,4 +208,3 @@ export class HistoriaClinica extends AggregateRoot {
     return estudio;
   }
 }
-

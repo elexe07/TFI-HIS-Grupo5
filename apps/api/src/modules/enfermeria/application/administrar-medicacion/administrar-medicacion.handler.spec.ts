@@ -93,4 +93,3 @@ describe('AdministrarMedicacionHandler', () => {
     ).rejects.toThrow(MedicacionYaAdministrada);
   });
 });
-

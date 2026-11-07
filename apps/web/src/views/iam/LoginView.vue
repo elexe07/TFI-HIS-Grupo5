@@ -1,39 +1,39 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
-import { useAuthStore } from '@/stores/auth'
-import { useToastStore } from '@/stores/toast'
-import { Button } from '@/components/ui'
-import { Input } from '@/components/ui'
-import { Card } from '@/components/ui'
+import { ref } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
+import { useAuthStore } from '@/stores/auth';
+import { useToastStore } from '@/stores/toast';
+import { Button } from '@/components/ui';
+import { Input } from '@/components/ui';
+import { Card } from '@/components/ui';
 
-const router = useRouter()
-const route = useRoute()
-const authStore = useAuthStore()
-const toastStore = useToastStore()
+const router = useRouter();
+const route = useRoute();
+const authStore = useAuthStore();
+const toastStore = useToastStore();
 
-const redirect = route.query.redirect as string || '/'
+const redirect = (route.query.redirect as string) || '/';
 
-const email = ref('admin@his.local')
-const password = ref('Admin1234!')
-const submitting = ref(false)
-const formError = ref<string | null>(null)
+const email = ref('admin@his.local');
+const password = ref('Admin1234!');
+const submitting = ref(false);
+const formError = ref<string | null>(null);
 
 async function onSubmit() {
   if (!email.value.trim() || !password.value.trim()) {
-    formError.value = 'Email y contraseña son requeridos'
-    return
+    formError.value = 'Email y contraseña son requeridos';
+    return;
   }
-  submitting.value = true
-  formError.value = null
+  submitting.value = true;
+  formError.value = null;
   try {
-    await authStore.login(email.value, password.value)
-    toastStore.success('Bienvenido', `Hola, ${authStore.usuario?.nombre}`)
-    await router.push(redirect)
+    await authStore.login(email.value, password.value);
+    toastStore.success('Bienvenido', `Hola, ${authStore.usuario?.nombre}`);
+    await router.push(redirect);
   } catch (err) {
     // Error ya manejado en el store
   } finally {
-    submitting.value = false
+    submitting.value = false;
   }
 }
 </script>
@@ -42,7 +42,15 @@ async function onSubmit() {
   <div class="login-page">
     <div class="login-container">
       <div class="login-brand">
-        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="brand-icon">
+        <svg
+          width="48"
+          height="48"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          class="brand-icon"
+        >
           <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
           <polyline points="22 4 12 14.01 9 11.01"></polyline>
         </svg>
@@ -88,15 +96,13 @@ async function onSubmit() {
 
         <div class="login-footer">
           <p class="login-hint">
-            <strong>Credenciales de prueba:</strong><br>
+            <strong>Credenciales de prueba:</strong><br />
             admin@his.local / Admin1234!
           </p>
         </div>
       </Card>
 
-      <div class="login-version">
-        v0.1.0 - Programación 4 TFI
-      </div>
+      <div class="login-version">v0.1.0 - Programación 4 TFI</div>
     </div>
   </div>
 </template>

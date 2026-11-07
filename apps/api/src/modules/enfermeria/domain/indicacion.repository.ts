@@ -16,4 +16,3 @@ export interface IndicacionRepository {
   listar(filtros?: FiltrosListarIndicaciones): Promise<Indicacion[]>;
   existePorPrescripcionYFecha(prescripcionId: string, programadaPara: Date): Promise<boolean>;
 }
-

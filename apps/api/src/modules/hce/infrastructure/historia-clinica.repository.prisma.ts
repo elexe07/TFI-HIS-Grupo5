@@ -169,10 +169,22 @@ function aDominio(fila: FilaHistoria): HistoriaClinica {
     fila.createdAt,
     fila.origenEventoId ?? undefined,
     fila.alergias.map((a) =>
-      Alergia.reconstituir(a.id, a.sustancia, a.severidad as SeveridadAlergia, a.registradoEn, a.registradoPor),
+      Alergia.reconstituir(
+        a.id,
+        a.sustancia,
+        a.severidad as SeveridadAlergia,
+        a.registradoEn,
+        a.registradoPor,
+      ),
     ),
     fila.antecedentes.map((ant) =>
-      AntecedenteFamiliar.reconstituir(ant.id, ant.parentesco, ant.condicion, ant.registradoEn, ant.registradoPor),
+      AntecedenteFamiliar.reconstituir(
+        ant.id,
+        ant.parentesco,
+        ant.condicion,
+        ant.registradoEn,
+        ant.registradoPor,
+      ),
     ),
     fila.evoluciones.map((e) =>
       Evolucion.reconstituir(
@@ -212,4 +224,3 @@ function aDominio(fila: FilaHistoria): HistoriaClinica {
     ),
   );
 }
-

@@ -52,4 +52,3 @@ function aDominio(fila: FilaNota): NotaDeEnfermeria {
     registradoPor: fila.registradoPor,
   });
 }
-

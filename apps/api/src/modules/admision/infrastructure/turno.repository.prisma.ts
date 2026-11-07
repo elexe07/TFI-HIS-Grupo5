@@ -94,4 +94,3 @@ function aDominio(fila: TurnoPrisma): Turno {
     updatedAt: fila.updatedAt,
   });
 }
-

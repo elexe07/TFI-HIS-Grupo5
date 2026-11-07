@@ -121,4 +121,3 @@ describe('Cuenta', () => {
     expect(cuenta.porcentajeCobertura).toBe(50);
   });
 });
-

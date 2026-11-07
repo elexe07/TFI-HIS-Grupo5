@@ -44,4 +44,3 @@ export class DefinirAgendaDto {
   @Type(() => FranjaAgendaItemDto)
   franjas!: FranjaAgendaItemDto[];
 }
-

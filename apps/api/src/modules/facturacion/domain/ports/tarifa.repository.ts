@@ -8,4 +8,3 @@ export interface TarifaRepository {
   guardar(tarifa: Tarifa): Promise<void>;
   listarTodas(): Promise<Tarifa[]>;
 }
-

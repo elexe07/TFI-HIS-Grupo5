@@ -6,10 +6,7 @@ import {
   EVENT_BUS,
   type EventBus,
 } from '../../../../building-blocks/application';
-import {
-  IndicacionNoEncontrada,
-  MedicacionYaAdministrada,
-} from '../../domain/errores';
+import { IndicacionNoEncontrada, MedicacionYaAdministrada } from '../../domain/errores';
 import {
   INDICACION_REPOSITORY,
   type IndicacionRepository,
@@ -25,9 +22,10 @@ import {
 import { AdministrarMedicacionCommand } from './administrar-medicacion.command';
 
 @Injectable()
-export class AdministrarMedicacionHandler
-  implements CasoDeUso<AdministrarMedicacionCommand, AdministracionMedicacionDto>
-{
+export class AdministrarMedicacionHandler implements CasoDeUso<
+  AdministrarMedicacionCommand,
+  AdministracionMedicacionDto
+> {
   // eslint-disable-next-line max-params
   constructor(
     @Inject(INDICACION_REPOSITORY)

@@ -160,9 +160,7 @@ describe('Atención y Enfermería (e2e)', () => {
         })
         .expect(201);
 
-      expect(postRes.body.texto).toBe(
-        'Paciente evoluciona favorablemente. Buena tolerancia oral.',
-      );
+      expect(postRes.body.texto).toBe('Paciente evoluciona favorablemente. Buena tolerancia oral.');
 
       const getRes = await http()
         .get(`/api/enfermeria/notas?pacienteId=${pacienteId}`)

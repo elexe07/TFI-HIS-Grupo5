@@ -20,4 +20,3 @@ export class TriajeRepositoryEnMemoria implements TriajeRepository {
     return Promise.resolve(enEspera);
   }
 }
-

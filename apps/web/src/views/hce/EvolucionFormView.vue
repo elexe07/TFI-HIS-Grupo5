@@ -1,65 +1,70 @@
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue'
-import { useHceStore } from '@/stores/hce'
-import { useAdmisionStore } from '@/stores/admision'
-import { useToastStore } from '@/stores/toast'
-import { useRoute } from 'vue-router'
-import { Card, Button, Input, Select, Table, type TableColumn } from '@/components/ui'
+import { ref, onMounted, watch } from 'vue';
+import { useHceStore } from '@/stores/hce';
+import { useAdmisionStore } from '@/stores/admision';
+import { useToastStore } from '@/stores/toast';
+import { useRoute } from 'vue-router';
+import { Card, Button, Input, Select, Table, type TableColumn } from '@/components/ui';
 
-const hceStore = useHceStore()
-const admisionStore = useAdmisionStore()
-const toastStore = useToastStore()
-const route = useRoute()
+const hceStore = useHceStore();
+const admisionStore = useAdmisionStore();
+const toastStore = useToastStore();
+const route = useRoute();
 
-const pacienteId = ref('')
-const showForm = ref(false)
+const pacienteId = ref('');
+const showForm = ref(false);
 
 const form = ref({
   motivo: '',
   diagnostico: '',
   tratamiento: '',
-})
+});
 
 const columns: TableColumn[] = [
-  { key: 'registradoEn', label: 'Fecha', width: '160px', format: (v) => v ? new Date(v as string).toLocaleString('es-AR') : '-' },
+  {
+    key: 'registradoEn',
+    label: 'Fecha',
+    width: '160px',
+    format: (v) => (v ? new Date(v as string).toLocaleString('es-AR') : '-'),
+  },
   { key: 'motivo', label: 'Motivo', width: '140px' },
   { key: 'diagnostico', label: 'Diagnóstico', width: '180px' },
   { key: 'actions', label: 'Acciones', width: '100px' },
-]
+];
 
 async function cargarDatos() {
-  if (!pacienteId.value) return
-  await hceStore.cargarHistoria(pacienteId.value)
+  if (!pacienteId.value) return;
+  await hceStore.cargarHistoria(pacienteId.value);
 }
 
 async function guardarEvolucion() {
   if (!form.value.motivo.trim() || !form.value.diagnostico.trim()) {
-    toastStore.error('Campos requeridos', 'Motivo y diagnóstico son obligatorios')
-    return
+    toastStore.error('Campos requeridos', 'Motivo y diagnóstico son obligatorios');
+    return;
   }
   try {
     if (!pacienteId.value) {
-      toastStore.error('Error', 'Seleccione un paciente primero')
-      return
+      toastStore.error('Error', 'Seleccione un paciente primero');
+      return;
     }
     if (!hceStore.historiaActual || hceStore.historiaActual.pacienteId !== pacienteId.value) {
-      await hceStore.cargarHistoria(pacienteId.value)
+      await hceStore.cargarHistoria(pacienteId.value);
     }
-    const historia = hceStore.historiaActual
+    const historia = hceStore.historiaActual;
     if (!historia) {
-      toastStore.error('Error', 'No se pudo obtener la historia clínica del paciente')
-      return
+      toastStore.error('Error', 'No se pudo obtener la historia clínica del paciente');
+      return;
     }
     await hceStore.crearEvolucion({
       motivo: form.value.motivo.trim(),
       diagnostico: form.value.diagnostico.trim(),
       tratamiento: form.value.tratamiento.trim() || undefined,
-    })
-    toastStore.success('Evolución guardada', 'Registrada correctamente')
-    resetForm()
-    cargarDatos()
+    });
+    toastStore.success('Evolución guardada', 'Registrada correctamente');
+    resetForm();
+    cargarDatos();
   } catch (err) {
-    toastStore.apiError(err, 'Error al guardar evolución')
+    toastStore.apiError(err, 'Error al guardar evolución');
   }
 }
 
@@ -68,8 +73,8 @@ function resetForm() {
     motivo: '',
     diagnostico: '',
     tratamiento: '',
-  }
-  showForm.value = false
+  };
+  showForm.value = false;
 }
 
 function abrirFormulario() {
@@ -77,38 +82,41 @@ function abrirFormulario() {
     motivo: '',
     diagnostico: '',
     tratamiento: '',
-  }
-  showForm.value = true
+  };
+  showForm.value = true;
 }
 
 watch(pacienteId, (nuevoId) => {
   if (nuevoId) {
-    cargarDatos()
+    cargarDatos();
   }
-})
+});
 
-watch(() => admisionStore.pacienteSeleccionado, (paciente) => {
-  if (paciente) {
-    pacienteId.value = paciente.id
-  }
-})
+watch(
+  () => admisionStore.pacienteSeleccionado,
+  (paciente) => {
+    if (paciente) {
+      pacienteId.value = paciente.id;
+    }
+  },
+);
 
 onMounted(async () => {
   if (admisionStore.pacientes.length === 0) {
-    await admisionStore.cargarPacientes()
+    await admisionStore.cargarPacientes();
   }
-  const idRuta = (route.params.pacienteId || route.query.pacienteId) as string | undefined
+  const idRuta = (route.params.pacienteId || route.query.pacienteId) as string | undefined;
   if (idRuta) {
-    pacienteId.value = idRuta
+    pacienteId.value = idRuta;
   } else if (admisionStore.pacienteSeleccionado) {
-    pacienteId.value = admisionStore.pacienteSeleccionado.id
+    pacienteId.value = admisionStore.pacienteSeleccionado.id;
   } else if (admisionStore.pacientes.length > 0 && admisionStore.pacientes[0]) {
-    pacienteId.value = admisionStore.pacientes[0].id
+    pacienteId.value = admisionStore.pacientes[0].id;
   }
   if (pacienteId.value) {
-    cargarDatos()
+    cargarDatos();
   }
-})
+});
 </script>
 
 <template>
@@ -119,7 +127,17 @@ onMounted(async () => {
         <p class="view-subtitle">Registro y consulta de evoluciones médicas</p>
       </div>
       <Button variant="primary" @click="abrirFormulario" :disabled="!pacienteId" v-show="!showForm">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        <svg
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
         Nueva Evolución
       </Button>
     </div>
@@ -129,7 +147,12 @@ onMounted(async () => {
         <label>Paciente</label>
         <Select
           v-model="pacienteId"
-          :options="admisionStore.pacientes.map(p => ({ value: p.id, label: `${p.apellido}, ${p.nombre} (${p.tipoDocumento} ${p.numeroDocumento})` }))"
+          :options="
+            admisionStore.pacientes.map((p) => ({
+              value: p.id,
+              label: `${p.apellido}, ${p.nombre} (${p.tipoDocumento} ${p.numeroDocumento})`,
+            }))
+          "
           placeholder="Seleccionar paciente"
         />
       </div>
@@ -171,7 +194,18 @@ onMounted(async () => {
           <div class="form-actions">
             <Button variant="secondary" type="button" @click="resetForm">Cancelar</Button>
             <Button variant="primary" type="submit" :loading="hceStore.cargando">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                <polyline points="7 3 7 8 15 8"></polyline>
+              </svg>
               Guardar Evolución
             </Button>
           </div>
@@ -206,7 +240,15 @@ onMounted(async () => {
     </div>
 
     <div v-else class="empty-state">
-      <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="empty-icon">
+      <svg
+        width="64"
+        height="64"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.5"
+        class="empty-icon"
+      >
         <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path>
       </svg>
       <h3>Seleccione un Paciente</h3>
@@ -214,7 +256,6 @@ onMounted(async () => {
     </div>
   </div>
 </template>
-
 
 <style scoped>
 .view-header {

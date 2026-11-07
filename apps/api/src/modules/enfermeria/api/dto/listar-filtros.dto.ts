@@ -18,4 +18,3 @@ export class ListarFiltrosDto {
   @IsUUID()
   internacionId?: string;
 }
-

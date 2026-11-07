@@ -54,4 +54,3 @@ export function mapearCuentaADetalleDto(cuenta: Cuenta): CuentaDetalleDto {
     updatedAt: cuenta.updatedAt.toISOString(),
   };
 }
-

@@ -58,4 +58,3 @@ describe('BuscarPacientesHandler (ADM-02)', () => {
     expect(res).toHaveLength(2);
   });
 });
-

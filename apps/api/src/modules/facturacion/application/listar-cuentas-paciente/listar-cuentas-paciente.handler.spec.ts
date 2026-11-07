@@ -39,4 +39,3 @@ describe('ListarCuentasPacienteHandler', () => {
     expect(lista.map((x) => x.id)).toEqual(expect.arrayContaining([c1.id, c2.id]));
   });
 });
-

@@ -88,4 +88,3 @@ describe('Paciente', () => {
     expect(paciente.actualizadoEn).toEqual(despues);
   });
 });
-

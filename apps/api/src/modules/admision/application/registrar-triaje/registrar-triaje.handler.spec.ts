@@ -80,4 +80,3 @@ describe('RegistrarTriajeHandler (ADM-06)', () => {
     ).rejects.toThrow(PacienteNoEncontrado);
   });
 });
-

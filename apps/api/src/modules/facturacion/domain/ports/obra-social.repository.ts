@@ -7,4 +7,3 @@ export interface ObraSocialRepository {
   guardar(obraSocial: ObraSocial): Promise<void>;
   listarTodas(): Promise<ObraSocial[]>;
 }
-

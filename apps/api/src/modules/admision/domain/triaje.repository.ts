@@ -7,4 +7,3 @@ export interface TriajeRepository {
   buscarPorId(id: string): Promise<Triaje | null>;
   obtenerColaGuardia(): Promise<Triaje[]>;
 }
-

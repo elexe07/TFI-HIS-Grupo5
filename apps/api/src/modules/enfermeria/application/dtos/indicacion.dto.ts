@@ -25,4 +25,3 @@ export const mapearIndicacionADto = (indicacion: Indicacion): IndicacionDto => (
   createdAt: indicacion.createdAt,
   updatedAt: indicacion.updatedAt,
 });
-

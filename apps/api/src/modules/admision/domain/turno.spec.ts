@@ -125,4 +125,3 @@ describe('Turno', () => {
     ).toBe(false);
   });
 });
-

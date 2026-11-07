@@ -58,4 +58,3 @@ describe('ValidarCoberturaHandler', () => {
     expect(res.motivoRechazo).toBeDefined();
   });
 });
-

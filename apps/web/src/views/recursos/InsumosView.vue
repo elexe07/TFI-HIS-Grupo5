@@ -1,75 +1,86 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
-import { useRecursosStore } from '@/stores/recursos'
-import { useToastStore } from '@/stores/toast'
-import { Card, Button, Input, Table, type TableColumn } from '@/components/ui'
-import type { InsumoDTO } from '@/types/api'
+import { ref, onMounted, computed } from 'vue';
+import { useRecursosStore } from '@/stores/recursos';
+import { useToastStore } from '@/stores/toast';
+import { Card, Button, Input, Table, type TableColumn } from '@/components/ui';
+import type { InsumoDTO } from '@/types/api';
 
-const recursosStore = useRecursosStore()
-const toastStore = useToastStore()
+const recursosStore = useRecursosStore();
+const toastStore = useToastStore();
 
-const search = ref('')
-const showModal = ref(false)
-const editingInsumo = ref<InsumoDTO | null>(null)
-const cantidadIngreso = ref('')
+const search = ref('');
+const showModal = ref(false);
+const editingInsumo = ref<InsumoDTO | null>(null);
+const cantidadIngreso = ref('');
 
 const columns: TableColumn<InsumoDTO>[] = [
   { key: 'codigo', label: 'Código', width: '120px' },
   { key: 'nombre', label: 'Nombre' },
-  { key: 'medicamentoAsociado', label: 'Medicamento Asoc.', width: '180px', format: (v: unknown) => (v as string) || '—' },
+  {
+    key: 'medicamentoAsociado',
+    label: 'Medicamento Asoc.',
+    width: '180px',
+    format: (v: unknown) => (v as string) || '—',
+  },
   { key: 'stockActual', label: 'Stock Actual', width: '120px' },
   { key: 'stockMinimo', label: 'Stock Mínimo', width: '120px' },
-  { key: 'updatedAt', label: 'Actualizado', width: '160px', format: (v: unknown) => v ? new Date(v as string).toLocaleString('es-AR') : '—' },
-]
+  {
+    key: 'updatedAt',
+    label: 'Actualizado',
+    width: '160px',
+    format: (v: unknown) => (v ? new Date(v as string).toLocaleString('es-AR') : '—'),
+  },
+];
 
 const insumosFiltrados = computed(() => {
-  if (!search.value.trim()) return recursosStore.insumos
-  const s = search.value.toLowerCase()
-  return recursosStore.insumos.filter(i =>
-    i.codigo.toLowerCase().includes(s) ||
-    i.nombre.toLowerCase().includes(s) ||
-    (i.medicamentoAsociado?.toLowerCase().includes(s) ?? false)
-  )
-})
+  if (!search.value.trim()) return recursosStore.insumos;
+  const s = search.value.toLowerCase();
+  return recursosStore.insumos.filter(
+    (i) =>
+      i.codigo.toLowerCase().includes(s) ||
+      i.nombre.toLowerCase().includes(s) ||
+      (i.medicamentoAsociado?.toLowerCase().includes(s) ?? false),
+  );
+});
 
 function getStockVariant(insumo: InsumoDTO): 'success' | 'warning' | 'danger' {
-  if (insumo.stockActual <= 0) return 'danger'
-  if (insumo.stockActual <= insumo.stockMinimo) return 'warning'
-  return 'success'
+  if (insumo.stockActual <= 0) return 'danger';
+  if (insumo.stockActual <= insumo.stockMinimo) return 'warning';
+  return 'success';
 }
 
 async function cargarInsumos() {
   try {
-    await recursosStore.cargarInsumos()
+    await recursosStore.cargarInsumos();
   } catch (err) {
-    toastStore.error('Error', 'No se pudieron cargar los insumos')
+    toastStore.error('Error', 'No se pudieron cargar los insumos');
   }
 }
 
 function abrirModalIngreso(insumo: InsumoDTO) {
-  editingInsumo.value = insumo
-  cantidadIngreso.value = ''
-  showModal.value = true
+  editingInsumo.value = insumo;
+  cantidadIngreso.value = '';
+  showModal.value = true;
 }
 
 async function registrarIngreso() {
-  if (!editingInsumo.value || !cantidadIngreso.value.trim()) return
-  const cantidad = parseInt(cantidadIngreso.value, 10)
-  if (cantidad <= 0) return
+  if (!editingInsumo.value || !cantidadIngreso.value.trim()) return;
+  const cantidad = parseInt(cantidadIngreso.value, 10);
+  if (cantidad <= 0) return;
   try {
-    await recursosStore.ingresarInsumo(editingInsumo.value.id, cantidad)
-    toastStore.success('Stock actualizado', `Se ingresaron ${cantidad} unidades`)
-    showModal.value = false
-    editingInsumo.value = null
-    cantidadIngreso.value = ''
+    await recursosStore.ingresarInsumo(editingInsumo.value.id, cantidad);
+    toastStore.success('Stock actualizado', `Se ingresaron ${cantidad} unidades`);
+    showModal.value = false;
+    editingInsumo.value = null;
+    cantidadIngreso.value = '';
   } catch (err) {
     // Error manejado en store
   }
 }
 
 onMounted(() => {
-  cargarInsumos()
-})
+  cargarInsumos();
+});
 </script>
 
 <template>
@@ -89,7 +100,17 @@ onMounted(() => {
         class="search-input"
       >
         <template #prefix>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
         </template>
       </Input>
     </Card>
@@ -119,7 +140,17 @@ onMounted(() => {
               @click.stop="abrirModalIngreso(row as unknown as InsumoDTO)"
               title="Registrar ingreso de stock"
             >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
             </Button>
           </div>
         </template>
@@ -132,7 +163,17 @@ onMounted(() => {
         <div class="modal-header">
           <h3>Registrar Ingreso de Stock</h3>
           <button class="modal-close" @click="showModal = false" aria-label="Cerrar">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
           </button>
         </div>
         <div class="modal-body" v-if="editingInsumo">
@@ -163,7 +204,9 @@ onMounted(() => {
         </div>
         <div class="modal-footer">
           <Button variant="secondary" @click="showModal = false">Cancelar</Button>
-          <Button variant="primary" @click="registrarIngreso" :loading="recursosStore.cargando">Confirmar Ingreso</Button>
+          <Button variant="primary" @click="registrarIngreso" :loading="recursosStore.cargando"
+            >Confirmar Ingreso</Button
+          >
         </div>
       </div>
     </div>
@@ -325,12 +368,22 @@ onMounted(() => {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes slideUp {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 </style>

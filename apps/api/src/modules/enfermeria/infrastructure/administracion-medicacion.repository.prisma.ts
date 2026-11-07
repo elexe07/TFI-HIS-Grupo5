@@ -5,9 +5,7 @@ import { AdministracionDeMedicacion } from '../domain/administracion-medicacion'
 import type { AdministracionMedicacionRepository } from '../domain/administracion-medicacion.repository';
 
 @Injectable()
-export class AdministracionMedicacionRepositoryPrisma
-  implements AdministracionMedicacionRepository
-{
+export class AdministracionMedicacionRepositoryPrisma implements AdministracionMedicacionRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async guardar(administracion: AdministracionDeMedicacion): Promise<void> {
@@ -48,4 +46,3 @@ function aDominio(fila: FilaAdministracion): AdministracionDeMedicacion {
     administradaPor: fila.administradaPor,
   });
 }
-

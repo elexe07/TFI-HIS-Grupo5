@@ -5,4 +5,3 @@ export const ESTADOS_INDICACION = {
 } as const;
 
 export type EstadoIndicacion = (typeof ESTADOS_INDICACION)[keyof typeof ESTADOS_INDICACION];
-

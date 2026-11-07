@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { useToastStore } from '@/stores/toast'
-import Toast from './Toast.vue'
+import { useToastStore } from '@/stores/toast';
+import Toast from './Toast.vue';
 
-const toastStore = useToastStore()
+const toastStore = useToastStore();
 </script>
 
 <template>
@@ -20,7 +20,11 @@ const toastStore = useToastStore()
       @close="toastStore.remove"
     >
       <template v-if="toast.action" #action>
-        <Button :variant="toast.type === 'error' ? 'danger' : 'primary'" size="sm" @click="toast.action.onClick">
+        <Button
+          :variant="toast.type === 'error' ? 'danger' : 'primary'"
+          size="sm"
+          @click="toast.action.onClick"
+        >
           {{ toast.action.label }}
         </Button>
       </template>

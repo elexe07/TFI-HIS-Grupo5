@@ -20,4 +20,3 @@ describe('ReporteOcupacionHandler', () => {
     expect(res.porcentajeOcupacion).toBe(60);
   });
 });
-

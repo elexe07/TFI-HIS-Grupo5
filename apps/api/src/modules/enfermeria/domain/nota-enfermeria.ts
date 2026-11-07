@@ -56,4 +56,3 @@ export class NotaDeEnfermeria extends Entity<Id> {
     return new NotaDeEnfermeria(id, props);
   }
 }
-

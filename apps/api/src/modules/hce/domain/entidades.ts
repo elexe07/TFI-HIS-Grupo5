@@ -13,11 +13,22 @@ export class Alergia extends Entity {
     super(id);
   }
 
-  static crear(sustancia: string, severidad: SeveridadAlergia, registradoEn: Date, registradoPor: string): Alergia {
+  static crear(
+    sustancia: string,
+    severidad: SeveridadAlergia,
+    registradoEn: Date,
+    registradoPor: string,
+  ): Alergia {
     return new Alergia(generarId(), sustancia.trim(), severidad, registradoEn, registradoPor);
   }
 
-  static reconstituir(id: string, sustancia: string, severidad: SeveridadAlergia, registradoEn: Date, registradoPor: string): Alergia {
+  static reconstituir(
+    id: string,
+    sustancia: string,
+    severidad: SeveridadAlergia,
+    registradoEn: Date,
+    registradoPor: string,
+  ): Alergia {
     return new Alergia(id, sustancia, severidad, registradoEn, registradoPor);
   }
 }
@@ -33,11 +44,28 @@ export class AntecedenteFamiliar extends Entity {
     super(id);
   }
 
-  static crear(parentesco: string, condicion: string, registradoEn: Date, registradoPor: string): AntecedenteFamiliar {
-    return new AntecedenteFamiliar(generarId(), parentesco.trim(), condicion.trim(), registradoEn, registradoPor);
+  static crear(
+    parentesco: string,
+    condicion: string,
+    registradoEn: Date,
+    registradoPor: string,
+  ): AntecedenteFamiliar {
+    return new AntecedenteFamiliar(
+      generarId(),
+      parentesco.trim(),
+      condicion.trim(),
+      registradoEn,
+      registradoPor,
+    );
   }
 
-  static reconstituir(id: string, parentesco: string, condicion: string, registradoEn: Date, registradoPor: string): AntecedenteFamiliar {
+  static reconstituir(
+    id: string,
+    parentesco: string,
+    condicion: string,
+    registradoEn: Date,
+    registradoPor: string,
+  ): AntecedenteFamiliar {
     return new AntecedenteFamiliar(id, parentesco, condicion, registradoEn, registradoPor);
   }
 }
@@ -87,7 +115,16 @@ export class Evolucion extends Entity {
     turnoId?: string,
     internacionId?: string,
   ): Evolucion {
-    return new Evolucion(id, medicoId, motivo, diagnostico, registradoEn, tratamiento, turnoId, internacionId);
+    return new Evolucion(
+      id,
+      medicoId,
+      motivo,
+      diagnostico,
+      registradoEn,
+      tratamiento,
+      turnoId,
+      internacionId,
+    );
   }
 }
 
@@ -141,7 +178,17 @@ export class Prescripcion extends Entity {
     creadoEn: Date,
     evolucionId?: string,
   ): Prescripcion {
-    return new Prescripcion(id, medicoId, medicamento, dosis, frecuenciaHoras, duracionDias, estado, creadoEn, evolucionId);
+    return new Prescripcion(
+      id,
+      medicoId,
+      medicamento,
+      dosis,
+      frecuenciaHoras,
+      duracionDias,
+      estado,
+      creadoEn,
+      evolucionId,
+    );
   }
 }
 
@@ -168,7 +215,15 @@ export class Estudio extends Entity {
     creadoEn: Date,
     resultado?: string,
   ): Estudio {
-    return new Estudio(generarId(), tipo, descripcion.trim(), fecha, registradoPor, creadoEn, resultado?.trim());
+    return new Estudio(
+      generarId(),
+      tipo,
+      descripcion.trim(),
+      fecha,
+      registradoPor,
+      creadoEn,
+      resultado?.trim(),
+    );
   }
 
   static reconstituir(
@@ -183,4 +238,3 @@ export class Estudio extends Entity {
     return new Estudio(id, tipo, descripcion, fecha, registradoPor, creadoEn, resultado);
   }
 }
-

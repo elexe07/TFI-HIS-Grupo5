@@ -72,4 +72,3 @@ export class ReservarTurnoHandler implements CasoDeUso<ReservarTurnoCommand, Tur
     return aTurnoDto(turno);
   }
 }
-

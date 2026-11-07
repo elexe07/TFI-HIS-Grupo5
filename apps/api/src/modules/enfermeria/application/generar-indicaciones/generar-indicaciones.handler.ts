@@ -11,9 +11,10 @@ import {
 } from './generar-indicaciones.command';
 
 @Injectable()
-export class GenerarIndicacionesHandler
-  implements CasoDeUso<GenerarIndicacionesCommand, GenerarIndicacionesResultado>
-{
+export class GenerarIndicacionesHandler implements CasoDeUso<
+  GenerarIndicacionesCommand,
+  GenerarIndicacionesResultado
+> {
   constructor(
     @Inject(INDICACION_REPOSITORY)
     private readonly indicacionesRepo: IndicacionRepository,
@@ -73,4 +74,3 @@ export class GenerarIndicacionesHandler
     return { nuevas, omitidas };
   }
 }
-

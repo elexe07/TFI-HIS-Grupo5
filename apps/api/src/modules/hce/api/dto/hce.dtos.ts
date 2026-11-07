@@ -127,4 +127,3 @@ export class RegistrarEstudioDto {
   @IsOptional()
   resultado?: string;
 }
-

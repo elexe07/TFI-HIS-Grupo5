@@ -121,6 +121,7 @@ curl -X POST http://localhost:3000/api/cobertura/validar -H "Content-Type: appli
 ```
 
 Respuestas posibles:
+
 - `{ "aprobada": true, "porcentajeCobertura": 80 }` → OSDE cubre el 80%
 - `{ "aprobada": true, "porcentajeCobertura": 100 }` → PAMI cubre el 100%
 - `{ "aprobada": true, "porcentajeCobertura": 0 }` → PARTICULAR, sin cobertura
@@ -149,4 +150,4 @@ curl -X GET http://localhost:3000/api/reportes/ocupacion -H "Authorization: Bear
 | HCE               |             |
 | Enfermería        |             |
 | Recursos y Camas  |             |
-| Facturación       | Ezequías   |
+| Facturación       | Ezequías    |

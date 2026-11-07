@@ -1,83 +1,105 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { useHceStore } from '@/stores/hce'
-import { useAdmisionStore } from '@/stores/admision'
-import { useToastStore } from '@/stores/toast'
-import { Card, Button, Input, Select, Table, Badge, Modal, type TableColumn } from '@/components/ui'
-import type { SeveridadAlergia, AlergiaDTO, EstudioDTO, PrescripcionDTO, TipoEstudio } from '@/types/api'
+import { ref, computed, onMounted, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { useHceStore } from '@/stores/hce';
+import { useAdmisionStore } from '@/stores/admision';
+import { useToastStore } from '@/stores/toast';
+import {
+  Card,
+  Button,
+  Input,
+  Select,
+  Table,
+  Badge,
+  Modal,
+  type TableColumn,
+} from '@/components/ui';
+import type {
+  SeveridadAlergia,
+  AlergiaDTO,
+  EstudioDTO,
+  PrescripcionDTO,
+  TipoEstudio,
+} from '@/types/api';
 
-const route = useRoute()
-const router = useRouter()
-const hceStore = useHceStore()
-const admisionStore = useAdmisionStore()
-const toastStore = useToastStore()
+const route = useRoute();
+const router = useRouter();
+const hceStore = useHceStore();
+const admisionStore = useAdmisionStore();
+const toastStore = useToastStore();
 
-const pacienteId = ref('')
-const activeTab = ref<'resumen' | 'alergias' | 'estudios' | 'prescripciones' | 'timeline'>('resumen')
+const pacienteId = ref('');
+const activeTab = ref<'resumen' | 'alergias' | 'estudios' | 'prescripciones' | 'timeline'>(
+  'resumen',
+);
 
 // Modales y formularios
-const showAlergiaModal = ref(false)
+const showAlergiaModal = ref(false);
 const formAlergia = ref<{ sustancia: string; severidad: SeveridadAlergia }>({
   sustancia: '',
   severidad: 'LEVE',
-})
+});
 
-const showAntecedenteModal = ref(false)
+const showAntecedenteModal = ref(false);
 const formAntecedente = ref<{ parentesco: string; condicion: string }>({
   parentesco: '',
   condicion: '',
-})
+});
 
-const showEstudioModal = ref(false)
-const formEstudio = ref<{ tipo: TipoEstudio; descripcion: string; fecha: string; resultado: string }>({
+const showEstudioModal = ref(false);
+const formEstudio = ref<{
+  tipo: TipoEstudio;
+  descripcion: string;
+  fecha: string;
+  resultado: string;
+}>({
   tipo: 'LABORATORIO',
   descripcion: '',
   fecha: new Date().toISOString().split('T')[0] ?? '',
   resultado: '',
-})
+});
 
 function abrirModalAlergia() {
-  formAlergia.value = { sustancia: '', severidad: 'LEVE' }
-  showAlergiaModal.value = true
+  formAlergia.value = { sustancia: '', severidad: 'LEVE' };
+  showAlergiaModal.value = true;
 }
 
 async function guardarAlergia() {
   if (!formAlergia.value.sustancia.trim()) {
-    toastStore.error('Campo requerido', 'Ingrese la sustancia o alérgeno')
-    return
+    toastStore.error('Campo requerido', 'Ingrese la sustancia o alérgeno');
+    return;
   }
   try {
     await hceStore.crearAlergia({
       sustancia: formAlergia.value.sustancia.trim(),
       severidad: formAlergia.value.severidad,
-    })
-    toastStore.success('Alergia guardada', 'Alergia registrada en la historia clínica')
-    showAlergiaModal.value = false
+    });
+    toastStore.success('Alergia guardada', 'Alergia registrada en la historia clínica');
+    showAlergiaModal.value = false;
   } catch (err) {
-    toastStore.apiError(err, 'Error al registrar alergia')
+    toastStore.apiError(err, 'Error al registrar alergia');
   }
 }
 
 function abrirModalAntecedente() {
-  formAntecedente.value = { parentesco: '', condicion: '' }
-  showAntecedenteModal.value = true
+  formAntecedente.value = { parentesco: '', condicion: '' };
+  showAntecedenteModal.value = true;
 }
 
 async function guardarAntecedente() {
   if (!formAntecedente.value.parentesco.trim() || !formAntecedente.value.condicion.trim()) {
-    toastStore.error('Campos requeridos', 'Parentesco y condición médica son obligatorios')
-    return
+    toastStore.error('Campos requeridos', 'Parentesco y condición médica son obligatorios');
+    return;
   }
   try {
     await hceStore.crearAntecedente({
       parentesco: formAntecedente.value.parentesco.trim(),
       condicion: formAntecedente.value.condicion.trim(),
-    })
-    toastStore.success('Antecedente guardado', 'Antecedente familiar registrado con éxito')
-    showAntecedenteModal.value = false
+    });
+    toastStore.success('Antecedente guardado', 'Antecedente familiar registrado con éxito');
+    showAntecedenteModal.value = false;
   } catch (err) {
-    toastStore.apiError(err, 'Error al registrar antecedente')
+    toastStore.apiError(err, 'Error al registrar antecedente');
   }
 }
 
@@ -87,14 +109,14 @@ function abrirModalEstudio() {
     descripcion: '',
     fecha: new Date().toISOString().split('T')[0] ?? '',
     resultado: '',
-  }
-  showEstudioModal.value = true
+  };
+  showEstudioModal.value = true;
 }
 
 async function guardarEstudio() {
   if (!formEstudio.value.descripcion.trim()) {
-    toastStore.error('Campo requerido', 'Ingrese la descripción del estudio')
-    return
+    toastStore.error('Campo requerido', 'Ingrese la descripción del estudio');
+    return;
   }
   try {
     await hceStore.crearEstudio({
@@ -102,26 +124,36 @@ async function guardarEstudio() {
       descripcion: formEstudio.value.descripcion.trim(),
       fecha: formEstudio.value.fecha || (new Date().toISOString().split('T')[0] ?? ''),
       resultado: formEstudio.value.resultado.trim() || undefined,
-    })
-    toastStore.success('Estudio guardado', 'Estudio complementario registrado')
-    showEstudioModal.value = false
+    });
+    toastStore.success('Estudio guardado', 'Estudio complementario registrado');
+    showEstudioModal.value = false;
   } catch (err) {
-    toastStore.apiError(err, 'Error al registrar estudio')
+    toastStore.apiError(err, 'Error al registrar estudio');
   }
 }
 
 const alergiasColumns: TableColumn<AlergiaDTO>[] = [
   { key: 'sustancia', label: 'Sustancia' },
   { key: 'severidad', label: 'Gravedad', width: '120px' },
-  { key: 'registradoEn', label: 'Registrada', width: '140px', format: (v) => v ? new Date(v as string).toLocaleDateString('es-AR') : '-' },
-]
+  {
+    key: 'registradoEn',
+    label: 'Registrada',
+    width: '140px',
+    format: (v) => (v ? new Date(v as string).toLocaleDateString('es-AR') : '-'),
+  },
+];
 
 const estudiosColumns: TableColumn<EstudioDTO>[] = [
   { key: 'tipo', label: 'Tipo', width: '140px' },
   { key: 'descripcion', label: 'Descripción' },
-  { key: 'fecha', label: 'Fecha', width: '140px', format: (v) => v ? new Date(v as string).toLocaleDateString('es-AR') : '-' },
+  {
+    key: 'fecha',
+    label: 'Fecha',
+    width: '140px',
+    format: (v) => (v ? new Date(v as string).toLocaleDateString('es-AR') : '-'),
+  },
   { key: 'resultado', label: 'Resultado' },
-]
+];
 
 const prescripcionesColumns: TableColumn<PrescripcionDTO>[] = [
   { key: 'medicamento', label: 'Medicamento' },
@@ -129,13 +161,18 @@ const prescripcionesColumns: TableColumn<PrescripcionDTO>[] = [
   { key: 'frecuenciaHoras', label: 'Frecuencia (hrs)', width: '140px' },
   { key: 'duracionDias', label: 'Duración (días)', width: '120px' },
   { key: 'estado', label: 'Estado', width: '120px' },
-  { key: 'createdAt', label: 'Creada', width: '120px', format: (v) => v ? new Date(v as string).toLocaleDateString('es-AR') : '-' },
-]
+  {
+    key: 'createdAt',
+    label: 'Creada',
+    width: '120px',
+    format: (v) => (v ? new Date(v as string).toLocaleDateString('es-AR') : '-'),
+  },
+];
 
 async function cargarHistoria() {
-  if (!pacienteId.value) return
+  if (!pacienteId.value) return;
   try {
-    await hceStore.cargarHistoria(pacienteId.value)
+    await hceStore.cargarHistoria(pacienteId.value);
   } catch (err) {
     // Si aún no tiene HCE creada, se maneja el estado
   }
@@ -143,57 +180,65 @@ async function cargarHistoria() {
 
 watch(pacienteId, (nuevoId) => {
   if (nuevoId) {
-    cargarHistoria()
+    cargarHistoria();
   }
-})
+});
 
-watch(() => admisionStore.pacienteSeleccionado, (paciente) => {
-  if (paciente) {
-    pacienteId.value = paciente.id
-  }
-})
+watch(
+  () => admisionStore.pacienteSeleccionado,
+  (paciente) => {
+    if (paciente) {
+      pacienteId.value = paciente.id;
+    }
+  },
+);
 
 onMounted(async () => {
   if (admisionStore.pacientes.length === 0) {
-    await admisionStore.cargarPacientes()
+    await admisionStore.cargarPacientes();
   }
 
-  const idRuta = route.params.pacienteId as string | undefined
+  const idRuta = route.params.pacienteId as string | undefined;
   if (idRuta) {
-    pacienteId.value = idRuta
+    pacienteId.value = idRuta;
   } else if (admisionStore.pacienteSeleccionado) {
-    pacienteId.value = admisionStore.pacienteSeleccionado.id
+    pacienteId.value = admisionStore.pacienteSeleccionado.id;
   } else if (admisionStore.pacientes.length > 0 && admisionStore.pacientes[0]) {
-    pacienteId.value = admisionStore.pacientes[0].id
+    pacienteId.value = admisionStore.pacientes[0].id;
   }
-})
+});
 
-function getGravedadVariant(gravedad: SeveridadAlergia): 'primary' | 'success' | 'warning' | 'danger' | 'info' {
-  const variants: Record<SeveridadAlergia, 'primary' | 'success' | 'warning' | 'danger' | 'info'> = {
-    LEVE: 'info',
-    MODERADA: 'warning',
-    GRAVE: 'danger',
-  }
-  return variants[gravedad] ?? 'info'
+function getGravedadVariant(
+  gravedad: SeveridadAlergia,
+): 'primary' | 'success' | 'warning' | 'danger' | 'info' {
+  const variants: Record<SeveridadAlergia, 'primary' | 'success' | 'warning' | 'danger' | 'info'> =
+    {
+      LEVE: 'info',
+      MODERADA: 'warning',
+      GRAVE: 'danger',
+    };
+  return variants[gravedad] ?? 'info';
 }
 
-function getEstadoPrescripcionVariant(estado: string): 'primary' | 'success' | 'warning' | 'danger' | 'info' {
+function getEstadoPrescripcionVariant(
+  estado: string,
+): 'primary' | 'success' | 'warning' | 'danger' | 'info' {
   const variants: Record<string, 'primary' | 'success' | 'warning' | 'danger' | 'info'> = {
     ACTIVA: 'success',
     SUSPENDIDA: 'warning',
     FINALIZADA: 'info',
-  }
-  return variants[estado] ?? 'info'
+  };
+  return variants[estado] ?? 'info';
 }
 
 const timelineEventos = computed(() => {
-  const historia = hceStore.historiaActual
-  if (!historia) return []
+  const historia = hceStore.historiaActual;
+  if (!historia) return [];
 
-  const eventos: any[] = []
+  const eventos: any[] = [];
 
   // Apertura de HCE (basado en createdAt o creadoEn)
-  const fechaApertura = historia.createdAt || (historia as any).creadoEn
+  const fechaApertura = historia.createdAt || (historia as any).creadoEn;
   if (fechaApertura) {
     eventos.push({
       id: 'apertura',
@@ -202,7 +247,7 @@ const timelineEventos = computed(() => {
       timestamp: new Date(fechaApertura).getTime(),
       time: new Date(fechaApertura).toLocaleString('es-AR'),
       description: `ID: ${historia.id.slice(-8)} - Apertura inicial de ficha médica`,
-    })
+    });
   }
 
   // Alergias
@@ -214,8 +259,8 @@ const timelineEventos = computed(() => {
       timestamp: new Date(a.registradoEn).getTime(),
       time: new Date(a.registradoEn).toLocaleDateString('es-AR'),
       description: `Severidad: ${a.severidad}`,
-    })
-  })
+    });
+  });
 
   // Antecedentes
   historia.antecedentes?.forEach((ant, i) => {
@@ -226,12 +271,12 @@ const timelineEventos = computed(() => {
       timestamp: new Date(ant.registradoEn).getTime(),
       time: new Date(ant.registradoEn).toLocaleDateString('es-AR'),
       description: `Condición: ${ant.condicion}`,
-    })
-  })
+    });
+  });
 
   // Estudios
   historia.estudios?.forEach((e, i) => {
-    const rawFecha = e.fecha || (e as any).createdAt || (e as any).creadoEn
+    const rawFecha = e.fecha || (e as any).createdAt || (e as any).creadoEn;
     eventos.push({
       id: `estudio-${e.id || i}`,
       type: 'estudio',
@@ -239,12 +284,12 @@ const timelineEventos = computed(() => {
       timestamp: rawFecha ? new Date(rawFecha).getTime() : 0,
       time: e.fecha ? new Date(e.fecha).toLocaleDateString('es-AR') : '-',
       description: `Tipo: ${e.tipo} - Resultado: ${e.resultado || 'Sin resultado informado'}`,
-    })
-  })
+    });
+  });
 
   // Prescripciones
   historia.prescripciones?.forEach((p, i) => {
-    const pFecha = p.createdAt || (p as any).creadoEn
+    const pFecha = p.createdAt || (p as any).creadoEn;
     eventos.push({
       id: `prescripcion-${p.id || i}`,
       type: 'prescripcion',
@@ -252,8 +297,8 @@ const timelineEventos = computed(() => {
       timestamp: pFecha ? new Date(pFecha).getTime() : 0,
       time: pFecha ? new Date(pFecha).toLocaleDateString('es-AR') : '-',
       description: `${p.dosis} - Cada ${p.frecuenciaHoras}hrs x ${p.duracionDias} días - Estado: ${p.estado}`,
-    })
-  })
+    });
+  });
 
   // Evoluciones
   historia.evoluciones?.forEach((e, i) => {
@@ -264,11 +309,11 @@ const timelineEventos = computed(() => {
       timestamp: new Date(e.registradoEn).getTime(),
       time: new Date(e.registradoEn).toLocaleString('es-AR'),
       description: `${e.motivo}: ${e.diagnostico}${e.tratamiento ? ' | Tratamiento: ' + e.tratamiento : ''}`,
-    })
-  })
+    });
+  });
 
-  return eventos.sort((a, b) => b.timestamp - a.timestamp)
-})
+  return eventos.sort((a, b) => b.timestamp - a.timestamp);
+});
 </script>
 
 <template>
@@ -285,7 +330,12 @@ const timelineEventos = computed(() => {
         <label>Paciente</label>
         <Select
           v-model="pacienteId"
-          :options="admisionStore.pacientes.map(p => ({ value: p.id, label: `${p.apellido}, ${p.nombre} (${p.tipoDocumento} ${p.numeroDocumento})` }))"
+          :options="
+            admisionStore.pacientes.map((p) => ({
+              value: p.id,
+              label: `${p.apellido}, ${p.nombre} (${p.tipoDocumento} ${p.numeroDocumento})`,
+            }))
+          "
           placeholder="Seleccionar paciente"
         />
       </div>
@@ -301,7 +351,17 @@ const timelineEventos = computed(() => {
             @click="activeTab = 'resumen'"
             :aria-selected="activeTab === 'resumen'"
           >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+              <polyline points="9 22 9 12 15 12 15 22"></polyline>
+            </svg>
             Resumen
           </button>
           <button
@@ -310,9 +370,24 @@ const timelineEventos = computed(() => {
             @click="activeTab = 'alergias'"
             :aria-selected="activeTab === 'alergias'"
           >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path
+                d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"
+              ></path>
+              <line x1="12" y1="9" x2="12" y2="13"></line>
+              <line x1="12" y1="17" x2="12.01" y2="17"></line>
+            </svg>
             Alergias
-            <span v-if="hceStore.historiaActual?.alergias?.length" class="tab-badge">{{ hceStore.historiaActual.alergias.length }}</span>
+            <span v-if="hceStore.historiaActual?.alergias?.length" class="tab-badge">{{
+              hceStore.historiaActual.alergias.length
+            }}</span>
           </button>
           <button
             role="tab"
@@ -320,9 +395,22 @@ const timelineEventos = computed(() => {
             @click="activeTab = 'estudios'"
             :aria-selected="activeTab === 'estudios'"
           >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="16" x2="12" y2="12"></line>
+              <line x1="12" y1="8" x2="12.01" y2="8"></line>
+            </svg>
             Estudios
-            <span v-if="hceStore.historiaActual?.estudios?.length" class="tab-badge">{{ hceStore.historiaActual.estudios.length }}</span>
+            <span v-if="hceStore.historiaActual?.estudios?.length" class="tab-badge">{{
+              hceStore.historiaActual.estudios.length
+            }}</span>
           </button>
           <button
             role="tab"
@@ -330,9 +418,24 @@ const timelineEventos = computed(() => {
             @click="activeTab = 'prescripciones'"
             :aria-selected="activeTab === 'prescripciones'"
           >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"></path><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"></path><line x1="7" y1="19" x2="7" y2="12"></line><line x1="17" y1="19" x2="17" y2="12"></line><line x1="7" y1="12" x2="17" y2="12"></line></svg>
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"></path>
+              <path d="M3 5v14a2 2 0 0 0 2 2h16v-5"></path>
+              <line x1="7" y1="19" x2="7" y2="12"></line>
+              <line x1="17" y1="19" x2="17" y2="12"></line>
+              <line x1="7" y1="12" x2="17" y2="12"></line>
+            </svg>
             Prescripciones
-            <span v-if="hceStore.historiaActual?.prescripciones?.length" class="tab-badge">{{ hceStore.historiaActual.prescripciones.length }}</span>
+            <span v-if="hceStore.historiaActual?.prescripciones?.length" class="tab-badge">{{
+              hceStore.historiaActual.prescripciones.length
+            }}</span>
           </button>
           <button
             role="tab"
@@ -340,11 +443,37 @@ const timelineEventos = computed(() => {
             @click="activeTab = 'timeline'"
             :aria-selected="activeTab === 'timeline'"
           >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="3" x2="12" y2="21"></line><circle cx="12" cy="12" r="3"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <line x1="12" y1="3" x2="12" y2="21"></line>
+              <circle cx="12" cy="12" r="3"></circle>
+              <circle cx="12" cy="5" r="1"></circle>
+              <circle cx="12" cy="19" r="1"></circle>
+            </svg>
             Línea de Tiempo
           </button>
         </div>
-        <div class="tabs-indicator" :style="{ left: activeTab === 'resumen' ? '0%' : activeTab === 'alergias' ? '20%' : activeTab === 'estudios' ? '40%' : activeTab === 'prescripciones' ? '60%' : '80%' }"></div>
+        <div
+          class="tabs-indicator"
+          :style="{
+            left:
+              activeTab === 'resumen'
+                ? '0%'
+                : activeTab === 'alergias'
+                  ? '20%'
+                  : activeTab === 'estudios'
+                    ? '40%'
+                    : activeTab === 'prescripciones'
+                      ? '60%'
+                      : '80%',
+          }"
+        ></div>
       </div>
 
       <!-- Contenido de tabs -->
@@ -356,14 +485,29 @@ const timelineEventos = computed(() => {
               <div class="card-header-flex">
                 <h3>Antecedentes Familiares</h3>
                 <Button variant="secondary" size="sm" @click="abrirModalAntecedente">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                  </svg>
                   + Antecedente
                 </Button>
               </div>
               <div class="antecedentes-text">
                 <template v-if="hceStore.historiaActual.antecedentes.length > 0">
-                  <div v-for="ant in hceStore.historiaActual.antecedentes" :key="ant.id" class="antecedente-item">
-                    <strong>{{ ant.parentesco }}:</strong> {{ ant.condicion }} <em>({{ new Date(ant.registradoEn).toLocaleDateString('es-AR') }})</em>
+                  <div
+                    v-for="ant in hceStore.historiaActual.antecedentes"
+                    :key="ant.id"
+                    class="antecedente-item"
+                  >
+                    <strong>{{ ant.parentesco }}:</strong> {{ ant.condicion }}
+                    <em>({{ new Date(ant.registradoEn).toLocaleDateString('es-AR') }})</em>
                   </div>
                 </template>
                 <span v-else class="text-muted">Sin antecedentes registrados</span>
@@ -379,10 +523,16 @@ const timelineEventos = computed(() => {
               </div>
               <div class="evolucion-preview">
                 <div class="evolucion-meta">
-                  <span>{{ hceStore.evoluciones[0]?.registradoEn ? new Date(hceStore.evoluciones[0].registradoEn).toLocaleString('es-AR') : '-' }}</span>
+                  <span>{{
+                    hceStore.evoluciones[0]?.registradoEn
+                      ? new Date(hceStore.evoluciones[0].registradoEn).toLocaleString('es-AR')
+                      : '-'
+                  }}</span>
                   <span>por Dr. {{ hceStore.evoluciones[0]?.medicoNombre ?? 'Desconocido' }}</span>
                 </div>
-                <p class="evolucion-texto">{{ hceStore.evoluciones[0]?.motivo }} - {{ hceStore.evoluciones[0]?.diagnostico }}</p>
+                <p class="evolucion-texto">
+                  {{ hceStore.evoluciones[0]?.motivo }} - {{ hceStore.evoluciones[0]?.diagnostico }}
+                </p>
               </div>
             </Card>
 
@@ -390,15 +540,21 @@ const timelineEventos = computed(() => {
               <h3>Estadísticas Rápidas</h3>
               <div class="stats-grid">
                 <div class="stat-item">
-                  <span class="stat-value">{{ hceStore.historiaActual?.alergias?.length ?? 0 }}</span>
+                  <span class="stat-value">{{
+                    hceStore.historiaActual?.alergias?.length ?? 0
+                  }}</span>
                   <span class="stat-label">Alergias</span>
                 </div>
                 <div class="stat-item">
-                  <span class="stat-value">{{ hceStore.historiaActual?.estudios?.length ?? 0 }}</span>
+                  <span class="stat-value">{{
+                    hceStore.historiaActual?.estudios?.length ?? 0
+                  }}</span>
                   <span class="stat-label">Estudios</span>
                 </div>
                 <div class="stat-item">
-                  <span class="stat-value">{{ hceStore.historiaActual?.prescripciones?.length ?? 0 }}</span>
+                  <span class="stat-value">{{
+                    hceStore.historiaActual?.prescripciones?.length ?? 0
+                  }}</span>
                   <span class="stat-label">Prescripciones</span>
                 </div>
                 <div class="stat-item">
@@ -416,7 +572,17 @@ const timelineEventos = computed(() => {
             <div class="panel-header">
               <h3>Alergias Registradas</h3>
               <Button variant="primary" size="sm" @click="abrirModalAlergia">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
                 + Registrar Alergia
               </Button>
             </div>
@@ -429,7 +595,9 @@ const timelineEventos = computed(() => {
               emptyText="No hay alergias registradas para este paciente."
             >
               <template #cell-severidad="{ value }">
-                <Badge :variant="getGravedadVariant(value as SeveridadAlergia)" size="sm">{{ value }}</Badge>
+                <Badge :variant="getGravedadVariant(value as SeveridadAlergia)" size="sm">{{
+                  value
+                }}</Badge>
               </template>
             </Table>
           </div>
@@ -441,7 +609,17 @@ const timelineEventos = computed(() => {
             <div class="panel-header">
               <h3>Estudios Solicitados</h3>
               <Button variant="primary" size="sm" @click="abrirModalEstudio">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
                 + Registrar Estudio
               </Button>
             </div>
@@ -466,7 +644,17 @@ const timelineEventos = computed(() => {
             <div class="panel-header">
               <h3>Prescripciones</h3>
               <Button variant="primary" size="sm" @click="router.push('/hce/prescripciones')">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
                 + Nueva Prescripción
               </Button>
             </div>
@@ -479,14 +667,12 @@ const timelineEventos = computed(() => {
               emptyText="No hay prescripciones registradas para este paciente."
             >
               <template #cell-estado="{ value }">
-                <Badge :variant="getEstadoPrescripcionVariant(value as string)" size="sm">{{ value }}</Badge>
+                <Badge :variant="getEstadoPrescripcionVariant(value as string)" size="sm">{{
+                  value
+                }}</Badge>
               </template>
-              <template #cell-frecuenciaHoras="{ value }">
-                {{ value }} hrs
-              </template>
-              <template #cell-duracionDias="{ value }">
-                {{ value }} días
-              </template>
+              <template #cell-frecuenciaHoras="{ value }"> {{ value }} hrs </template>
+              <template #cell-duracionDias="{ value }"> {{ value }} días </template>
             </Table>
           </div>
         </div>
@@ -506,7 +692,19 @@ const timelineEventos = computed(() => {
                 </div>
               </div>
               <div v-if="timelineEventos.length === 0" class="empty-timeline">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="12" y1="3" x2="12" y2="21"></line><circle cx="12" cy="12" r="3"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
+                <svg
+                  width="48"
+                  height="48"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                >
+                  <line x1="12" y1="3" x2="12" y2="21"></line>
+                  <circle cx="12" cy="12" r="3"></circle>
+                  <circle cx="12" cy="5" r="1"></circle>
+                  <circle cx="12" cy="19" r="1"></circle>
+                </svg>
                 <p>No hay eventos en la línea de tiempo.</p>
               </div>
             </div>
@@ -516,7 +714,15 @@ const timelineEventos = computed(() => {
     </div>
 
     <div v-else class="empty-state">
-      <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="empty-icon">
+      <svg
+        width="64"
+        height="64"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.5"
+        class="empty-icon"
+      >
         <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"></path>
         <path d="M3 5v14a2 2 0 0 0 2 2h16v-5"></path>
         <line x1="7" y1="19" x2="7" y2="12"></line>
@@ -528,10 +734,20 @@ const timelineEventos = computed(() => {
     </div>
 
     <!-- Modal Registrar Alergia -->
-    <Modal v-model="showAlergiaModal" title="Registrar Alergia" size="md" @close="showAlergiaModal = false">
+    <Modal
+      v-model="showAlergiaModal"
+      title="Registrar Alergia"
+      size="md"
+      @close="showAlergiaModal = false"
+    >
       <div class="form-grid">
         <div class="form-row">
-          <Input v-model="formAlergia.sustancia" label="Sustancia o Medicamento" placeholder="Ej: Penicilina, Ibuprofeno, Maní..." required />
+          <Input
+            v-model="formAlergia.sustancia"
+            label="Sustancia o Medicamento"
+            placeholder="Ej: Penicilina, Ibuprofeno, Maní..."
+            required
+          />
         </div>
         <div class="form-row">
           <Select
@@ -553,13 +769,28 @@ const timelineEventos = computed(() => {
     </Modal>
 
     <!-- Modal Registrar Antecedente -->
-    <Modal v-model="showAntecedenteModal" title="Registrar Antecedente Familiar" size="md" @close="showAntecedenteModal = false">
+    <Modal
+      v-model="showAntecedenteModal"
+      title="Registrar Antecedente Familiar"
+      size="md"
+      @close="showAntecedenteModal = false"
+    >
       <div class="form-grid">
         <div class="form-row">
-          <Input v-model="formAntecedente.parentesco" label="Parentesco" placeholder="Ej: Padre, Madre, Abuela materna..." required />
+          <Input
+            v-model="formAntecedente.parentesco"
+            label="Parentesco"
+            placeholder="Ej: Padre, Madre, Abuela materna..."
+            required
+          />
         </div>
         <div class="form-row">
-          <Input v-model="formAntecedente.condicion" label="Condición médica / Diagnóstico" placeholder="Ej: Diabetes mellitus tipo 2, Hipertensión arterial..." required />
+          <Input
+            v-model="formAntecedente.condicion"
+            label="Condición médica / Diagnóstico"
+            placeholder="Ej: Diabetes mellitus tipo 2, Hipertensión arterial..."
+            required
+          />
         </div>
       </div>
       <div class="form-actions">
@@ -569,7 +800,12 @@ const timelineEventos = computed(() => {
     </Modal>
 
     <!-- Modal Registrar Estudio -->
-    <Modal v-model="showEstudioModal" title="Registrar Estudio Complementario" size="md" @close="showEstudioModal = false">
+    <Modal
+      v-model="showEstudioModal"
+      title="Registrar Estudio Complementario"
+      size="md"
+      @close="showEstudioModal = false"
+    >
       <div class="form-grid">
         <div class="form-row">
           <Select
@@ -584,13 +820,22 @@ const timelineEventos = computed(() => {
           />
         </div>
         <div class="form-row">
-          <Input v-model="formEstudio.descripcion" label="Descripción del estudio" placeholder="Ej: Hemograma completo, Radiografía de tórax..." required />
+          <Input
+            v-model="formEstudio.descripcion"
+            label="Descripción del estudio"
+            placeholder="Ej: Hemograma completo, Radiografía de tórax..."
+            required
+          />
         </div>
         <div class="form-row">
           <Input v-model="formEstudio.fecha" label="Fecha del estudio" type="date" required />
         </div>
         <div class="form-row">
-          <Input v-model="formEstudio.resultado" label="Resultado / Informe (opcional)" placeholder="Ej: Glucosa 95 mg/dl, Sin particularidades..." />
+          <Input
+            v-model="formEstudio.resultado"
+            label="Resultado / Informe (opcional)"
+            placeholder="Ej: Glucosa 95 mg/dl, Sin particularidades..."
+          />
         </div>
       </div>
       <div class="form-actions">
@@ -600,7 +845,6 @@ const timelineEventos = computed(() => {
     </Modal>
   </div>
 </template>
-
 
 <style scoped>
 .view-header {
@@ -715,8 +959,14 @@ const timelineEventos = computed(() => {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(4px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .card-header-flex {
@@ -911,12 +1161,24 @@ const timelineEventos = computed(() => {
   flex-shrink: 0;
 }
 
-.timeline-marker.hce { background-color: var(--color-primary); }
-.timeline-marker.alergia { background-color: var(--color-danger); }
-.timeline-marker.antecedente { background-color: var(--color-warning); }
-.timeline-marker.estudio { background-color: var(--color-info); }
-.timeline-marker.prescripcion { background-color: var(--color-success); }
-.timeline-marker.evolucion { background-color: #8b5cf6; }
+.timeline-marker.hce {
+  background-color: var(--color-primary);
+}
+.timeline-marker.alergia {
+  background-color: var(--color-danger);
+}
+.timeline-marker.antecedente {
+  background-color: var(--color-warning);
+}
+.timeline-marker.estudio {
+  background-color: var(--color-info);
+}
+.timeline-marker.prescripcion {
+  background-color: var(--color-success);
+}
+.timeline-marker.evolucion {
+  background-color: #8b5cf6;
+}
 
 .form-grid {
   display: flex;

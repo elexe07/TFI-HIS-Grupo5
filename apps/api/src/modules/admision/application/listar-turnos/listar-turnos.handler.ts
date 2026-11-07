@@ -18,4 +18,3 @@ export class ListarTurnosHandler implements CasoDeUso<ListarTurnosQuery, TurnoDt
     return lista.map(aTurnoDto);
   }
 }
-

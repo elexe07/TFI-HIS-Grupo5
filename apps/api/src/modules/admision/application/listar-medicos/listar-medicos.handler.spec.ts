@@ -26,4 +26,3 @@ describe('ListarMedicosHandler', () => {
     expect(res[0]?.matricula).toBe('M1');
   });
 });
-

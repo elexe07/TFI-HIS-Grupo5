@@ -60,4 +60,3 @@ function aDominio(fila: FilaSignosVitales): SignosVitales {
     registradoPor: fila.registradoPor,
   });
 }
-

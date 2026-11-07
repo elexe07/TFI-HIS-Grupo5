@@ -22,4 +22,3 @@ export class ListarTurnosDto {
   @IsDateString()
   hasta?: string;
 }
-

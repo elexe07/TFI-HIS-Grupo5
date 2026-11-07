@@ -38,4 +38,3 @@ export class ObraSocial extends Entity<Id> {
     return new ObraSocial(id, codigo, nombre, porcentajeCobertura);
   }
 }
-

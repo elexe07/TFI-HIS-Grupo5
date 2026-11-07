@@ -12,4 +12,3 @@ export interface ResumenOcupacion {
 export interface ConsultorDeOcupacion {
   consultarOcupacion(): Promise<ResumenOcupacion>;
 }
-

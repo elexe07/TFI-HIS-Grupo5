@@ -2,10 +2,15 @@
  * Router principal con guards de navegación
  * Vue Router 4 + TypeScript
  */
-import { createRouter, createWebHistory, type RouteLocationNormalized, type NavigationGuardNext } from 'vue-router'
-import { useAuthStore } from '@/stores/auth'
-import { useToastStore } from '@/stores/toast'
-import type { Permiso } from '@/types/api'
+import {
+  createRouter,
+  createWebHistory,
+  type RouteLocationNormalized,
+  type NavigationGuardNext,
+} from 'vue-router';
+import { useAuthStore } from '@/stores/auth';
+import { useToastStore } from '@/stores/toast';
+import type { Permiso } from '@/types/api';
 
 // ============================================================================
 // TIPOS PARA META DE RUTAS
@@ -14,11 +19,11 @@ import type { Permiso } from '@/types/api'
 // Extender RouteMeta para TypeScript
 declare module 'vue-router' {
   interface RouteMeta {
-    requiresAuth?: boolean
-    permisos?: Permiso[]
-    permisosMode?: 'any' | 'all' // 'any' = al menos uno, 'all' = todos
-    title?: string
-    layout?: 'default' | 'auth' | 'empty'
+    requiresAuth?: boolean;
+    permisos?: Permiso[];
+    permisosMode?: 'any' | 'all'; // 'any' = al menos uno, 'all' = todos
+    title?: string;
+    layout?: 'default' | 'auth' | 'empty';
   }
 }
 
@@ -26,7 +31,7 @@ declare module 'vue-router' {
 // RUTAS
 // ============================================================================
 
-import type { RouteRecordRaw } from 'vue-router'
+import type { RouteRecordRaw } from 'vue-router';
 
 const routes: RouteRecordRaw[] = [
   // --- AUTENTICACIÓN ---
@@ -108,7 +113,7 @@ const routes: RouteRecordRaw[] = [
         meta: {
           permisos: ['triaje:registrar', 'guardia:leer'] as Permiso[],
           permisosMode: 'any',
-          title: 'Triaje y Guardia'
+          title: 'Triaje y Guardia',
         },
       },
     ],
@@ -319,7 +324,7 @@ const routes: RouteRecordRaw[] = [
       title: 'Página no encontrada',
     },
   },
-]
+];
 
 // ============================================================================
 // CREAR ROUTER
@@ -330,71 +335,81 @@ const router = createRouter({
   routes,
   scrollBehavior(_to, _from, savedPosition) {
     if (savedPosition) {
-      return savedPosition
+      return savedPosition;
     }
-    return { top: 0 }
+    return { top: 0 };
   },
-})
+});
 
 // ============================================================================
 // GUARDS DE NAVEGACIÓN
 // ============================================================================
 
-router.beforeEach(async (to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
-  const authStore = useAuthStore()
-  const toastStore = useToastStore()
+router.beforeEach(
+  async (
+    to: RouteLocationNormalized,
+    _from: RouteLocationNormalized,
+    next: NavigationGuardNext,
+  ) => {
+    const authStore = useAuthStore();
+    const toastStore = useToastStore();
 
-  // Inicializar auth si no está hecho
-  if (!authStore.usuario && authStore.token) {
-    await authStore.initAuth()
-  }
+    // Inicializar auth si no está hecho
+    if (!authStore.usuario && authStore.token) {
+      await authStore.initAuth();
+    }
 
-  const requiresAuth = to.meta.requiresAuth ?? true
-  const requiredPermisos = (to.meta.permisos ?? []) as Permiso[]
-  const permisosMode = to.meta.permisosMode ?? 'all'
+    const requiresAuth = to.meta.requiresAuth ?? true;
+    const requiredPermisos = (to.meta.permisos ?? []) as Permiso[];
+    const permisosMode = to.meta.permisosMode ?? 'all';
 
-  // 1. Verificar autenticación
-  if (requiresAuth && !authStore.isAuthenticated) {
-    toastStore.warning('Debe iniciar sesión para acceder a esta página')
-    return next({ name: 'login', query: { redirect: to.fullPath } })
-  }
+    // 1. Verificar autenticación
+    if (requiresAuth && !authStore.isAuthenticated) {
+      toastStore.warning('Debe iniciar sesión para acceder a esta página');
+      return next({ name: 'login', query: { redirect: to.fullPath } });
+    }
 
-  // 2. Si ya está autenticado e intenta ir a login, redirigir a dashboard
-  if (to.name === 'login' && authStore.isAuthenticated) {
-    return next({ name: 'dashboard' })
-  }
+    // 2. Si ya está autenticado e intenta ir a login, redirigir a dashboard
+    if (to.name === 'login' && authStore.isAuthenticated) {
+      return next({ name: 'dashboard' });
+    }
 
-  // 3. Verificar permisos
-  if (requiresAuth && requiredPermisos.length > 0) {
-    if (authStore.esAdmin) {
-      if (to.meta.title) {
-        document.title = `${to.meta.title} - HIS`
+    // 3. Verificar permisos
+    if (requiresAuth && requiredPermisos.length > 0) {
+      if (authStore.esAdmin) {
+        if (to.meta.title) {
+          document.title = `${to.meta.title} - HIS`;
+        }
+        return next();
       }
-      return next()
+
+      const tienePermiso =
+        permisosMode === 'any'
+          ? authStore.tieneCualquierPermiso(requiredPermisos)
+          : authStore.tieneTodosLosPermisos(requiredPermisos);
+
+      if (!tienePermiso) {
+        toastStore.error(
+          'No tiene permisos para acceder a esta página',
+          'Permisos requeridos: ' + requiredPermisos.join(', '),
+        );
+        return next({ name: 'dashboard' });
+      }
     }
 
-    const tienePermiso = permisosMode === 'any'
-      ? authStore.tieneCualquierPermiso(requiredPermisos)
-      : authStore.tieneTodosLosPermisos(requiredPermisos)
-
-    if (!tienePermiso) {
-      toastStore.error('No tiene permisos para acceder a esta página', 'Permisos requeridos: ' + requiredPermisos.join(', '))
-      return next({ name: 'dashboard' })
+    // 4. Actualizar título del documento
+    if (to.meta.title) {
+      document.title = `${to.meta.title} - HIS`;
     }
-  }
 
-  // 4. Actualizar título del documento
-  if (to.meta.title) {
-    document.title = `${to.meta.title} - HIS`
-  }
-
-  next()
-})
+    next();
+  },
+);
 
 // Guard después de cada navegación (para analytics, etc.)
 router.afterEach((to) => {
   // Aquí se podría agregar tracking de páginas, etc.
-  console.log(`[Router] Navegado a: ${String(to.name)}`, to.params)
-})
+  console.log(`[Router] Navegado a: ${String(to.name)}`, to.params);
+});
 
-export default router
+export default router;

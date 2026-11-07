@@ -40,4 +40,3 @@ export const PRIORIDAD_TRIAJE: Readonly<Record<NivelTriaje, number>> = {
   [NivelTriaje.VERDE]: 4,
   [NivelTriaje.AZUL]: 5,
 };
-

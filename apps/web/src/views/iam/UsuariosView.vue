@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import { onMounted, ref, computed } from 'vue'
-import { useAuthStore } from '@/stores/auth'
-import { useToastStore } from '@/stores/toast'
-import { Card, Button, Input, Table, Badge, type TableColumn } from '@/components/ui'
-import type { UsuarioAutenticado, NombreRol } from '@/types/api'
+import { onMounted, ref, computed } from 'vue';
+import { useAuthStore } from '@/stores/auth';
+import { useToastStore } from '@/stores/toast';
+import { Card, Button, Input, Table, Badge, type TableColumn } from '@/components/ui';
+import type { UsuarioAutenticado, NombreRol } from '@/types/api';
 
-const authStore = useAuthStore()
-const toastStore = useToastStore()
+const authStore = useAuthStore();
+const toastStore = useToastStore();
 
-const search = ref('')
+const search = ref('');
 
 const columns: TableColumn<UsuarioAutenticado>[] = [
   { key: 'id', label: 'ID', width: '80px', format: (v) => (v as string).slice(-8) },
@@ -16,17 +16,18 @@ const columns: TableColumn<UsuarioAutenticado>[] = [
   { key: 'email', label: 'Email', width: '200px' },
   { key: 'rol', label: 'Rol', width: '140px' },
   { key: 'permisos', label: 'Permisos', width: '200px', format: (v) => (v as string[]).join(', ') },
-]
+];
 
 const usuariosFiltrados = computed(() => {
-  if (!search.value.trim()) return authStore.usuariosSistema
-  const s = search.value.toLowerCase()
-  return authStore.usuariosSistema.filter(u =>
-    u.nombre.toLowerCase().includes(s) ||
-    u.email.toLowerCase().includes(s) ||
-    u.rol.toLowerCase().includes(s)
-  )
-})
+  if (!search.value.trim()) return authStore.usuariosSistema;
+  const s = search.value.toLowerCase();
+  return authStore.usuariosSistema.filter(
+    (u) =>
+      u.nombre.toLowerCase().includes(s) ||
+      u.email.toLowerCase().includes(s) ||
+      u.rol.toLowerCase().includes(s),
+  );
+});
 
 function getRolVariant(rol: NombreRol): 'primary' | 'success' | 'warning' | 'danger' | 'info' {
   const variants: Record<NombreRol, 'primary' | 'success' | 'warning' | 'danger' | 'info'> = {
@@ -35,21 +36,21 @@ function getRolVariant(rol: NombreRol): 'primary' | 'success' | 'warning' | 'dan
     ENFERMERO: 'success',
     RECEPCIONISTA: 'warning',
     PACIENTE: 'info',
-  }
-  return variants[rol] ?? 'info'
+  };
+  return variants[rol] ?? 'info';
 }
 
 async function cargarUsuarios() {
   try {
-    await authStore.cargarUsuariosSistema()
+    await authStore.cargarUsuariosSistema();
   } catch (err) {
-    toastStore.error('Error', 'No se pudieron cargar los usuarios')
+    toastStore.error('Error', 'No se pudieron cargar los usuarios');
   }
 }
 
 onMounted(() => {
-  cargarUsuarios()
-})
+  cargarUsuarios();
+});
 </script>
 
 <template>
@@ -69,7 +70,17 @@ onMounted(() => {
         class="search-input"
       >
         <template #prefix>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
         </template>
       </Input>
     </Card>
@@ -89,7 +100,17 @@ onMounted(() => {
         <template #cell-actions="{ row: _row }">
           <div class="action-buttons">
             <Button size="sm" variant="ghost" @click.stop="() => {}" title="Ver">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
             </Button>
           </div>
         </template>

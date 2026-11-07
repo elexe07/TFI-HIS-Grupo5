@@ -28,4 +28,3 @@ export class SignosVitalesRepositoryEnMemoria implements SignosVitalesRepository
     this.items.length = 0;
   }
 }
-

@@ -29,4 +29,3 @@ export function aAgendaDto(agenda: AgendaMedico): AgendaDto {
     franjas: agenda.obtenerFranjas().map(aFranjaAgendaDto),
   };
 }
-

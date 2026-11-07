@@ -1,9 +1,7 @@
 import type { AdministracionDeMedicacion } from '../domain/administracion-medicacion';
 import type { AdministracionMedicacionRepository } from '../domain/administracion-medicacion.repository';
 
-export class AdministracionMedicacionRepositoryEnMemoria
-  implements AdministracionMedicacionRepository
-{
+export class AdministracionMedicacionRepositoryEnMemoria implements AdministracionMedicacionRepository {
   private readonly items = new Map<string, AdministracionDeMedicacion>();
 
   async guardar(administracion: AdministracionDeMedicacion): Promise<void> {
@@ -11,9 +9,7 @@ export class AdministracionMedicacionRepositoryEnMemoria
   }
 
   async buscarPorIndicacionId(indicacionId: string): Promise<AdministracionDeMedicacion | null> {
-    return (
-      Array.from(this.items.values()).find((a) => a.indicacionId === indicacionId) ?? null
-    );
+    return Array.from(this.items.values()).find((a) => a.indicacionId === indicacionId) ?? null;
   }
 
   async listarPorPaciente(pacienteId: string): Promise<AdministracionDeMedicacion[]> {
@@ -26,4 +22,3 @@ export class AdministracionMedicacionRepositoryEnMemoria
     this.items.clear();
   }
 }
-

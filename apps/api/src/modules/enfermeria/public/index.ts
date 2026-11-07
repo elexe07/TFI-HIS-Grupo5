@@ -27,7 +27,8 @@ export class MedicacionAdministradaEvent extends DomainEventBase {
   ) {
     super(ocurridoEn);
     const data =
-      'payload' in propsOrPayload && (propsOrPayload as { payload?: PropsMedicacionAdministrada }).payload
+      'payload' in propsOrPayload &&
+      (propsOrPayload as { payload?: PropsMedicacionAdministrada }).payload
         ? (propsOrPayload as { payload: PropsMedicacionAdministrada }).payload
         : (propsOrPayload as PropsMedicacionAdministrada);
 

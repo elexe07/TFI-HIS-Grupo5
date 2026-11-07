@@ -14,4 +14,3 @@ export class DefinirAgendaCommand {
     this.franjas = datos.franjas;
   }
 }
-

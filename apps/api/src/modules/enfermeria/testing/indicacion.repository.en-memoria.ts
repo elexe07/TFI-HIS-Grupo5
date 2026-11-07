@@ -40,15 +40,16 @@ export class IndicacionRepositoryEnMemoria implements IndicacionRepository {
       const fin = new Date(filtros.fecha);
       fin.setUTCHours(23, 59, 59, 999);
 
-      resultado = resultado.filter(
-        (i) => i.programadaPara >= inicio && i.programadaPara <= fin,
-      );
+      resultado = resultado.filter((i) => i.programadaPara >= inicio && i.programadaPara <= fin);
     }
 
     return resultado.sort((a, b) => a.programadaPara.getTime() - b.programadaPara.getTime());
   }
 
-  async existePorPrescripcionYFecha(prescripcionId: string, programadaPara: Date): Promise<boolean> {
+  async existePorPrescripcionYFecha(
+    prescripcionId: string,
+    programadaPara: Date,
+  ): Promise<boolean> {
     return Array.from(this.items.values()).some(
       (i) =>
         i.prescripcionId === prescripcionId &&
@@ -60,4 +61,3 @@ export class IndicacionRepositoryEnMemoria implements IndicacionRepository {
     this.items.clear();
   }
 }
-

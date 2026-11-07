@@ -33,4 +33,3 @@ export class ObraSocialRepositoryEnMemoria implements ObraSocialRepository {
     );
   }
 }
-

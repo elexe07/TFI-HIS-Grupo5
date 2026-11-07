@@ -1,37 +1,52 @@
 <script setup lang="ts">
-import { onMounted, ref, computed, watch } from 'vue'
-import { useFacturacionStore } from '@/stores/facturacion'
-import { useToastStore } from '@/stores/toast'
-import { useRouter, useRoute } from 'vue-router'
-import { Card, Button, Badge, Table, Modal } from '@/components/ui'
-import type { TableColumn } from '@/components/ui/Table.types'
-import type { CuentaDTO, EstadoCuenta } from '@/types/api'
+import { onMounted, ref, computed, watch } from 'vue';
+import { useFacturacionStore } from '@/stores/facturacion';
+import { useToastStore } from '@/stores/toast';
+import { useRouter, useRoute } from 'vue-router';
+import { Card, Button, Badge, Table, Modal } from '@/components/ui';
+import type { TableColumn } from '@/components/ui/Table.types';
+import type { CuentaDTO, EstadoCuenta } from '@/types/api';
 
-const facturacionStore = useFacturacionStore()
-const toastStore = useToastStore()
-const router = useRouter()
-const route = useRoute()
+const facturacionStore = useFacturacionStore();
+const toastStore = useToastStore();
+const router = useRouter();
+const route = useRoute();
 
-const cuentaId = computed(() => route.params.id as string)
-const cuenta = ref<CuentaDTO | null>(null)
-const cargando = ref(false)
-const showModalPago = ref(false)
-const pagoForm = ref({ monto: 0, metodoPago: 'EFECTIVO', observaciones: '' })
+const cuentaId = computed(() => route.params.id as string);
+const cuenta = ref<CuentaDTO | null>(null);
+const cargando = ref(false);
+const showModalPago = ref(false);
+const pagoForm = ref({ monto: 0, metodoPago: 'EFECTIVO', observaciones: '' });
 
 const columns: TableColumn[] = [
   { key: 'tipo', label: 'Tipo', width: '120px' },
   { key: 'descripcion', label: 'Descripción', width: '300px' },
   { key: 'cantidad', label: 'Cant.', width: '70px' },
-  { key: 'precioUnitario', label: 'Precio Unit.', width: '120px', format: (v) => `$${Number(v).toLocaleString('es-AR', { minimumFractionDigits: 2 })}` },
-  { key: 'subtotal', label: 'Subtotal', width: '120px', format: (v) => `$${Number(v).toLocaleString('es-AR', { minimumFractionDigits: 2 })}` },
-]
+  {
+    key: 'precioUnitario',
+    label: 'Precio Unit.',
+    width: '120px',
+    format: (v) => `$${Number(v).toLocaleString('es-AR', { minimumFractionDigits: 2 })}`,
+  },
+  {
+    key: 'subtotal',
+    label: 'Subtotal',
+    width: '120px',
+    format: (v) => `$${Number(v).toLocaleString('es-AR', { minimumFractionDigits: 2 })}`,
+  },
+];
 
 const pagosColumns: TableColumn[] = [
-  { key: 'fecha', label: 'Fecha', width: '160px', format: (v) => new Date(v as string).toLocaleString('es-AR') },
+  {
+    key: 'fecha',
+    label: 'Fecha',
+    width: '160px',
+    format: (v) => new Date(v as string).toLocaleString('es-AR'),
+  },
   { key: 'metodoPago', label: 'Método', width: '160px' },
   { key: 'monto', label: 'Monto', width: '140px' },
   { key: 'observaciones', label: 'Observaciones', width: '300px' },
-]
+];
 
 const metodosPago = [
   { value: 'EFECTIVO', label: 'Efectivo' },
@@ -40,35 +55,37 @@ const metodosPago = [
   { value: 'TRANSFERENCIA', label: 'Transferencia' },
   { value: 'CHEQUE', label: 'Cheque' },
   { value: 'OTRO', label: 'Otro' },
-]
+];
 
 async function cargarCuenta() {
-  cargando.value = true
+  cargando.value = true;
   try {
-    const data = await facturacionStore.obtenerCuenta(cuentaId.value)
-    cuenta.value = data
+    const data = await facturacionStore.obtenerCuenta(cuentaId.value);
+    cuenta.value = data;
   } catch (err) {
-    toastStore.error('Error', 'No se pudo cargar la cuenta')
-    await router.push({ name: 'facturacion.cuentas' })
+    toastStore.error('Error', 'No se pudo cargar la cuenta');
+    await router.push({ name: 'facturacion.cuentas' });
   } finally {
-    cargando.value = false
+    cargando.value = false;
   }
 }
 
-function getEstadoVariant(estado: EstadoCuenta): 'primary' | 'success' | 'warning' | 'danger' | 'info' {
+function getEstadoVariant(
+  estado: EstadoCuenta,
+): 'primary' | 'success' | 'warning' | 'danger' | 'info' {
   const variants: Record<EstadoCuenta, 'primary' | 'success' | 'warning' | 'danger' | 'info'> = {
     ABIERTA: 'primary',
     CERRADA: 'success',
-  }
-  return variants[estado] ?? 'info'
+  };
+  return variants[estado] ?? 'info';
 }
 
 function getEstadoLabel(estado: EstadoCuenta): string {
   const labels: Record<EstadoCuenta, string> = {
     ABIERTA: 'Abierta',
     CERRADA: 'Cerrada',
-  }
-  return labels[estado] ?? estado
+  };
+  return labels[estado] ?? estado;
 }
 
 function getTipoLabel(tipo: string): string {
@@ -80,8 +97,8 @@ function getTipoLabel(tipo: string): string {
     INSUMO: 'Insumo',
     PROCEDIMIENTO: 'Procedimiento',
     OTRO: 'Otro',
-  }
-  return labels[tipo] ?? tipo
+  };
+  return labels[tipo] ?? tipo;
 }
 
 function getTipoBadgeVariant(tipo: string): 'primary' | 'success' | 'warning' | 'danger' | 'info' {
@@ -93,8 +110,8 @@ function getTipoBadgeVariant(tipo: string): 'primary' | 'success' | 'warning' | 
     INSUMO: 'success',
     PROCEDIMIENTO: 'danger',
     OTRO: 'primary',
-  }
-  return variants[tipo] ?? 'primary'
+  };
+  return variants[tipo] ?? 'primary';
 }
 
 function getMetodoPagoLabel(metodo: string): string {
@@ -105,14 +122,14 @@ function getMetodoPagoLabel(metodo: string): string {
     TRANSFERENCIA: 'Transferencia',
     CHEQUE: 'Cheque',
     OTRO: 'Otro',
-  }
-  return labels[metodo] ?? metodo
+  };
+  return labels[metodo] ?? metodo;
 }
 
 async function registrarPago() {
   if (!pagoForm.value.monto || pagoForm.value.monto <= 0) {
-    toastStore.error('Monto inválido', 'Ingrese un monto mayor a cero')
-    return
+    toastStore.error('Monto inválido', 'Ingrese un monto mayor a cero');
+    return;
   }
 
   try {
@@ -120,32 +137,38 @@ async function registrarPago() {
       monto: pagoForm.value.monto,
       metodoPago: pagoForm.value.metodoPago,
       observaciones: pagoForm.value.observaciones,
-    })
-    toastStore.success('Pago registrado', `Se registró pago de $${pagoForm.value.monto.toLocaleString('es-AR', { minimumFractionDigits: 2 })}`)
-    showModalPago.value = false
-    pagoForm.value = { monto: 0, metodoPago: 'EFECTIVO', observaciones: '' }
-    await cargarCuenta()
+    });
+    toastStore.success(
+      'Pago registrado',
+      `Se registró pago de $${pagoForm.value.monto.toLocaleString('es-AR', { minimumFractionDigits: 2 })}`,
+    );
+    showModalPago.value = false;
+    pagoForm.value = { monto: 0, metodoPago: 'EFECTIVO', observaciones: '' };
+    await cargarCuenta();
   } catch (err) {
     // Error manejado en store
   }
 }
 
 function volver() {
-  router.push({ name: 'facturacion.cuentas' })
+  router.push({ name: 'facturacion.cuentas' });
 }
 
 function imprimirCuenta() {
   // TODO: implementar impresión
-  toastStore.info('Próximamente', 'Función de impresión en desarrollo')
+  toastStore.info('Próximamente', 'Función de impresión en desarrollo');
 }
 
 onMounted(() => {
-  cargarCuenta()
-})
+  cargarCuenta();
+});
 
-watch(() => route.params.id, () => {
-  cargarCuenta()
-})
+watch(
+  () => route.params.id,
+  () => {
+    cargarCuenta();
+  },
+);
 </script>
 
 <template>
@@ -159,17 +182,43 @@ watch(() => route.params.id, () => {
       <div class="view-header">
         <div class="header-actions">
           <Button variant="secondary" @click="volver">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <line x1="19" y1="12" x2="5" y2="12"></line>
+              <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
             Volver
           </Button>
           <Button variant="ghost" @click="imprimirCuenta">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <polyline points="6 9 6 2 18 2 18 9"></polyline>
+              <path
+                d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"
+              ></path>
+              <rect x="6" y="14" width="12" height="8"></rect>
+            </svg>
             Imprimir
           </Button>
         </div>
         <div>
           <h2>Cuenta N° {{ cuenta.numero }}</h2>
-          <p class="view-subtitle">{{ cuenta.paciente?.apellido }}, {{ cuenta.paciente?.nombre }} - {{ new Date(cuenta.fecha).toLocaleDateString('es-AR') }}</p>
+          <p class="view-subtitle">
+            {{ cuenta.paciente?.apellido }}, {{ cuenta.paciente?.nombre }} -
+            {{ new Date(cuenta.fecha).toLocaleDateString('es-AR') }}
+          </p>
         </div>
       </div>
 
@@ -178,20 +227,28 @@ watch(() => route.params.id, () => {
         <div class="resumen-item">
           <div class="resumen-label">Estado</div>
           <div class="resumen-value">
-            <Badge :variant="getEstadoVariant(cuenta.estado)">{{ getEstadoLabel(cuenta.estado) }}</Badge>
+            <Badge :variant="getEstadoVariant(cuenta.estado)">{{
+              getEstadoLabel(cuenta.estado)
+            }}</Badge>
           </div>
         </div>
         <div class="resumen-item">
           <div class="resumen-label">Total</div>
-          <div class="resumen-value resumen-total">${{ Number(cuenta.total).toLocaleString('es-AR', { minimumFractionDigits: 2 }) }}</div>
+          <div class="resumen-value resumen-total">
+            ${{ Number(cuenta.total).toLocaleString('es-AR', { minimumFractionDigits: 2 }) }}
+          </div>
         </div>
         <div class="resumen-item">
           <div class="resumen-label">Pagado</div>
-          <div class="resumen-value resumen-pagado">${{ Number(cuenta.pagado).toLocaleString('es-AR', { minimumFractionDigits: 2 }) }}</div>
+          <div class="resumen-value resumen-pagado">
+            ${{ Number(cuenta.pagado).toLocaleString('es-AR', { minimumFractionDigits: 2 }) }}
+          </div>
         </div>
         <div class="resumen-item">
           <div class="resumen-label">Saldo</div>
-          <div class="resumen-value resumen-saldo">${{ Number(cuenta.saldo).toLocaleString('es-AR', { minimumFractionDigits: 2 }) }}</div>
+          <div class="resumen-value resumen-saldo">
+            ${{ Number(cuenta.saldo).toLocaleString('es-AR', { minimumFractionDigits: 2 }) }}
+          </div>
         </div>
         <div class="resumen-item">
           <div class="resumen-label">Cobertura</div>
@@ -208,8 +265,23 @@ watch(() => route.params.id, () => {
         <template #header>
           <div class="card-header-flex">
             <h3>Detalles de la Cuenta</h3>
-            <Button v-if="cuenta.estado === 'ABIERTA'" variant="primary" size="sm" @click="showModalPago = true">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            <Button
+              v-if="cuenta.estado === 'ABIERTA'"
+              variant="primary"
+              size="sm"
+              @click="showModalPago = true"
+            >
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
               Registrar Pago
             </Button>
           </div>
@@ -223,15 +295,21 @@ watch(() => route.params.id, () => {
           emptyText="No hay ítems en esta cuenta"
         >
           <template #cell-tipo="{ value }">
-            <Badge :variant="getTipoBadgeVariant(String(value))" size="sm">{{ getTipoLabel(String(value)) }}</Badge>
+            <Badge :variant="getTipoBadgeVariant(String(value))" size="sm">{{
+              getTipoLabel(String(value))
+            }}</Badge>
           </template>
 
           <template #cell-precioUnitario="{ value }">
-            <span class="monto">${{ Number(value).toLocaleString('es-AR', { minimumFractionDigits: 2 }) }}</span>
+            <span class="monto"
+              >${{ Number(value).toLocaleString('es-AR', { minimumFractionDigits: 2 }) }}</span
+            >
           </template>
 
           <template #cell-subtotal="{ value }">
-            <span class="monto">${{ Number(value).toLocaleString('es-AR', { minimumFractionDigits: 2 }) }}</span>
+            <span class="monto"
+              >${{ Number(value).toLocaleString('es-AR', { minimumFractionDigits: 2 }) }}</span
+            >
           </template>
         </Table>
       </Card>
@@ -251,7 +329,9 @@ watch(() => route.params.id, () => {
             <Badge variant="info" size="sm">{{ getMetodoPagoLabel(String(value)) }}</Badge>
           </template>
           <template #cell-monto="{ value }">
-            <span class="monto">${{ Number(value).toLocaleString('es-AR', { minimumFractionDigits: 2 }) }}</span>
+            <span class="monto"
+              >${{ Number(value).toLocaleString('es-AR', { minimumFractionDigits: 2 }) }}</span
+            >
           </template>
         </Table>
       </Card>
@@ -271,40 +351,65 @@ watch(() => route.params.id, () => {
                 class="input-monto"
                 required
               />
-              <span class="form-hint" v-if="cuenta">Saldo disponible: ${{ Number(cuenta.saldo).toLocaleString('es-AR', { minimumFractionDigits: 2 }) }}</span>
+              <span class="form-hint" v-if="cuenta"
+                >Saldo disponible: ${{
+                  Number(cuenta.saldo).toLocaleString('es-AR', { minimumFractionDigits: 2 })
+                }}</span
+              >
             </div>
           </div>
           <div class="form-row">
             <div class="form-field">
               <label>Método de Pago *</label>
               <select v-model="pagoForm.metodoPago" class="select-input" required>
-                <option v-for="m in metodosPago" :key="m.value" :value="m.value">{{ m.label }}</option>
+                <option v-for="m in metodosPago" :key="m.value" :value="m.value">
+                  {{ m.label }}
+                </option>
               </select>
             </div>
           </div>
           <div class="form-row">
             <div class="form-field">
               <label>Observaciones</label>
-              <textarea v-model="pagoForm.observaciones" rows="3" placeholder="Referencia, número de comprobante, etc." class="textarea-input"></textarea>
+              <textarea
+                v-model="pagoForm.observaciones"
+                rows="3"
+                placeholder="Referencia, número de comprobante, etc."
+                class="textarea-input"
+              ></textarea>
             </div>
           </div>
           <div class="form-actions">
-            <Button variant="secondary" type="button" @click="showModalPago = false">Cancelar</Button>
-            <Button variant="primary" type="submit" :loading="facturacionStore.cargando">Registrar Pago</Button>
+            <Button variant="secondary" type="button" @click="showModalPago = false"
+              >Cancelar</Button
+            >
+            <Button variant="primary" type="submit" :loading="facturacionStore.cargando"
+              >Registrar Pago</Button
+            >
           </div>
         </form>
       </Modal>
     </div>
 
     <div v-else class="empty-state">
-      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+      <svg
+        width="48"
+        height="48"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.5"
+      >
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
       <h3>Cuenta no encontrada</h3>
       <p>La cuenta solicitada no existe o ha sido eliminada.</p>
       <Button variant="primary" @click="volver">Volver a la lista</Button>
     </div>
   </div>
 </template>
-
 
 <style scoped>
 .loading-state {
@@ -327,7 +432,9 @@ watch(() => route.params.id, () => {
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .view-header {
@@ -384,9 +491,15 @@ watch(() => route.params.id, () => {
   color: var(--color-text);
 }
 
-.resumen-total { color: var(--color-primary); }
-.resumen-pagado { color: var(--color-success); }
-.resumen-saldo { color: var(--color-danger); }
+.resumen-total {
+  color: var(--color-primary);
+}
+.resumen-pagado {
+  color: var(--color-success);
+}
+.resumen-saldo {
+  color: var(--color-danger);
+}
 
 .card-header-flex {
   display: flex;

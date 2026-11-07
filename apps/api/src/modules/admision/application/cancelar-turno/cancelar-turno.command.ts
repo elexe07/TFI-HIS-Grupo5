@@ -15,4 +15,3 @@ export class CancelarTurnoCommand {
     this.esPaciente = datos.esPaciente ?? false;
   }
 }
-

@@ -15,4 +15,3 @@ export interface NotaEnfermeriaRepository {
   guardar(nota: NotaDeEnfermeria): Promise<void>;
   listar(filtros: FiltrosNotasEnfermeria): Promise<NotaDeEnfermeria[]>;
 }
-

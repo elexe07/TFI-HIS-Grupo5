@@ -39,4 +39,3 @@ export class TarifaRepositoryPrisma implements TarifaRepository {
     return Tarifa.rehidratar(fila.id, fila.concepto as ConceptoCargo, Number(fila.monto));
   }
 }
-

@@ -75,4 +75,3 @@ describe('DefinirAgendaHandler (ADM-03)', () => {
     ).rejects.toThrow(MedicoNoEncontrado);
   });
 });
-

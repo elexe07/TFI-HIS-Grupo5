@@ -21,4 +21,3 @@ export class RegistrarMedicoCommand {
     this.especialidad = datos.especialidad;
   }
 }
-

@@ -8,15 +8,15 @@ Información médica centralizada e **inmutable** del paciente: ficha, alergias,
 
 ## Casos de uso (ROADMAP §6)
 
-| ID     | Caso de uso                                      | Handler                         | Tests mínimos                                              |
-| ------ | ------------------------------------------------ | ------------------------------- | ---------------------------------------------------------- |
-| HCE-01 | Abrir historia (por evento `PacienteRegistrado`) | `AbrirHistoriaHandler`          | no duplica si llega dos veces                              |
-| HCE-02 | Registrar evolución                              | `RegistrarEvolucionHandler`     | inmutable; emite `EvolucionRegistrada`                     |
-| HCE-03 | Registrar alergia                                | `RegistrarAlergiaHandler`       | duplicada falla                                            |
-| HCE-04 | Registrar antecedente familiar                   | `RegistrarAntecedenteHandler`   | registra parentesco y condición                            |
-| HCE-05 | Crear prescripción                               | `CrearPrescripcionHandler`      | alergia al medicamento bloquea; emite `PrescripcionCreada` |
-| HCE-06 | Registrar estudio                                | `RegistrarEstudioHandler`       | tipo, fecha, descripción y resultado                       |
-| HCE-07 | Consultar historia                               | `ConsultarHistoriaHandler`      | paciente solo ve la propia                                 |
+| ID     | Caso de uso                                      | Handler                       | Tests mínimos                                              |
+| ------ | ------------------------------------------------ | ----------------------------- | ---------------------------------------------------------- |
+| HCE-01 | Abrir historia (por evento `PacienteRegistrado`) | `AbrirHistoriaHandler`        | no duplica si llega dos veces                              |
+| HCE-02 | Registrar evolución                              | `RegistrarEvolucionHandler`   | inmutable; emite `EvolucionRegistrada`                     |
+| HCE-03 | Registrar alergia                                | `RegistrarAlergiaHandler`     | duplicada falla                                            |
+| HCE-04 | Registrar antecedente familiar                   | `RegistrarAntecedenteHandler` | registra parentesco y condición                            |
+| HCE-05 | Crear prescripción                               | `CrearPrescripcionHandler`    | alergia al medicamento bloquea; emite `PrescripcionCreada` |
+| HCE-06 | Registrar estudio                                | `RegistrarEstudioHandler`     | tipo, fecha, descripción y resultado                       |
+| HCE-07 | Consultar historia                               | `ConsultarHistoriaHandler`    | paciente solo ve la propia                                 |
 
 ## Regla clave: inmutabilidad (ADR-008)
 

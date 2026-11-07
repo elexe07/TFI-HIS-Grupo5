@@ -12,4 +12,3 @@ export class ListarMedicosHandler implements CasoDeUso<void, MedicoDto[]> {
     return lista.map(aMedicoDto);
   }
 }
-

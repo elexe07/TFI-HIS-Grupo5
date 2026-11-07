@@ -25,7 +25,10 @@ export class RegistrarEvolucionCommand {
 }
 
 @Injectable()
-export class RegistrarEvolucionHandler implements CasoDeUso<RegistrarEvolucionCommand, { id: string }> {
+export class RegistrarEvolucionHandler implements CasoDeUso<
+  RegistrarEvolucionCommand,
+  { id: string }
+> {
   constructor(
     @Inject(HISTORIA_CLINICA_REPOSITORY)
     private readonly repo: HistoriaClinicaRepository,
@@ -58,4 +61,3 @@ export class RegistrarEvolucionHandler implements CasoDeUso<RegistrarEvolucionCo
     return { id: evolucion.id };
   }
 }
-

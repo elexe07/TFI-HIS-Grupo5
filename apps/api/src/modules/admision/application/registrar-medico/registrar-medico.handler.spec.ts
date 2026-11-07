@@ -54,4 +54,3 @@ describe('RegistrarMedicoHandler', () => {
     ).rejects.toThrow(MedicoYaExiste);
   });
 });
-

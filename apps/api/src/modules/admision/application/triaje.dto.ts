@@ -24,4 +24,3 @@ export function aTriajeDto(t: Triaje): TriajeDto {
     registradoPor: t.registradoPor,
   };
 }
-

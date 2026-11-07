@@ -171,4 +171,3 @@ export class Cuenta extends AggregateRoot<Id> {
     return Number(Math.max(0, aPagar).toFixed(2));
   }
 }
-

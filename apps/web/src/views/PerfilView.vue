@@ -1,11 +1,9 @@
-
-
 <script setup lang="ts">
-import { useAuthStore } from '@/stores/auth'
-import { Card } from '@/components/ui'
-import { Badge } from '@/components/ui'
+import { useAuthStore } from '@/stores/auth';
+import { Card } from '@/components/ui';
+import { Badge } from '@/components/ui';
 
-const authStore = useAuthStore()
+const authStore = useAuthStore();
 
 function getRolColor(rol: string): 'primary' | 'success' | 'warning' | 'danger' | 'info' {
   const colors: Record<string, 'primary' | 'success' | 'warning' | 'danger' | 'info'> = {
@@ -14,8 +12,8 @@ function getRolColor(rol: string): 'primary' | 'success' | 'warning' | 'danger' 
     ENFERMERO: 'success',
     RECEPCIONISTA: 'warning',
     PACIENTE: 'info',
-  }
-  return colors[rol] ?? 'primary'
+  };
+  return colors[rol] ?? 'primary';
 }
 
 function getRolLabel(rol: string): string {
@@ -25,21 +23,21 @@ function getRolLabel(rol: string): string {
     ENFERMERO: 'Enfermero',
     RECEPCIONISTA: 'Recepcionista',
     PACIENTE: 'Paciente',
-  }
-  return labels[rol] ?? rol
+  };
+  return labels[rol] ?? rol;
 }
 
 function formatoPermiso(permiso: string): string {
   return permiso
     .split(':')
-    .map(p => p.charAt(0).toUpperCase() + p.slice(1).toLowerCase())
-    .join(' / ')
+    .map((p) => p.charAt(0).toUpperCase() + p.slice(1).toLowerCase())
+    .join(' / ');
 }
 
 function truncateToken(token: string | null): string {
-  if (!token) return 'No disponible'
-  if (token.length <= 20) return token
-  return token.slice(0, 20) + '...'
+  if (!token) return 'No disponible';
+  if (token.length <= 20) return token;
+  return token.slice(0, 20) + '...';
 }
 </script>
 
@@ -101,8 +99,6 @@ function truncateToken(token: string | null): string {
     </div>
   </div>
 </template>
-
-
 
 <style scoped>
 .view-header {

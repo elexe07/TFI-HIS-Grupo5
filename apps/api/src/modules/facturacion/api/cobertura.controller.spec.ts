@@ -35,4 +35,3 @@ describe('CoberturaController', () => {
     expect(res.porcentajeCobertura).toBe(80);
   });
 });
-

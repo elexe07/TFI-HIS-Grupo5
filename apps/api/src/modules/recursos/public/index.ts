@@ -34,4 +34,3 @@ export class PacienteDadoDeAlta extends DomainEventBase {
     super(ocurridoEn);
   }
 }
-

@@ -1,18 +1,18 @@
 <script setup lang="ts">
-import { onMounted, ref, computed } from 'vue'
-import { useAdmisionStore } from '@/stores/admision'
-import { useToastStore } from '@/stores/toast'
-import { useRouter, useRoute } from 'vue-router'
-import { Card, Button, Input, Select } from '@/components/ui'
-import type { CrearPacienteRequest } from '@/types/api'
+import { onMounted, ref, computed } from 'vue';
+import { useAdmisionStore } from '@/stores/admision';
+import { useToastStore } from '@/stores/toast';
+import { useRouter, useRoute } from 'vue-router';
+import { Card, Button, Input, Select } from '@/components/ui';
+import type { CrearPacienteRequest } from '@/types/api';
 
-const admisionStore = useAdmisionStore()
-const toastStore = useToastStore()
-const router = useRouter()
-const route = useRoute()
+const admisionStore = useAdmisionStore();
+const toastStore = useToastStore();
+const router = useRouter();
+const route = useRoute();
 
-const isEditing = computed(() => !!route.params.id)
-const pacienteId = computed(() => route.params.id as string)
+const isEditing = computed(() => !!route.params.id);
+const pacienteId = computed(() => route.params.id as string);
 
 const form = ref<CrearPacienteRequest>({
   tipoDocumento: 'DNI',
@@ -25,24 +25,24 @@ const form = ref<CrearPacienteRequest>({
   email: '',
   obraSocialCodigo: '',
   numeroAfiliado: '',
-})
+});
 
 const docTypes = [
   { value: 'DNI', label: 'DNI' },
   { value: 'PASAPORTE', label: 'Pasaporte' },
   { value: 'OTRO', label: 'Otro' },
-]
+];
 
 const sexoOptions = [
   { value: 'F', label: 'Femenino' },
   { value: 'M', label: 'Masculino' },
   { value: 'X', label: 'Otro' },
-]
+];
 
 async function cargarPaciente() {
   if (isEditing.value && pacienteId.value) {
     try {
-      const paciente = await admisionStore.obtenerPaciente(pacienteId.value)
+      const paciente = await admisionStore.obtenerPaciente(pacienteId.value);
       if (paciente) {
         form.value = {
           tipoDocumento: paciente.tipoDocumento,
@@ -55,42 +55,47 @@ async function cargarPaciente() {
           email: paciente.email ?? '',
           obraSocialCodigo: paciente.obraSocialCodigo ?? '',
           numeroAfiliado: paciente.numeroAfiliado ?? '',
-        }
+        };
       }
     } catch (err) {
-      toastStore.error('Error', 'No se pudo cargar el paciente')
-      await router.push({ name: 'admision.pacientes' })
+      toastStore.error('Error', 'No se pudo cargar el paciente');
+      await router.push({ name: 'admision.pacientes' });
     }
   }
 }
 
 async function handleSave() {
-  if (!form.value.numeroDocumento.trim() || !form.value.nombre.trim() || !form.value.apellido.trim() || !form.value.fechaNacimiento) {
-    toastStore.error('Campos requeridos', 'Complete todos los campos obligatorios')
-    return
+  if (
+    !form.value.numeroDocumento.trim() ||
+    !form.value.nombre.trim() ||
+    !form.value.apellido.trim() ||
+    !form.value.fechaNacimiento
+  ) {
+    toastStore.error('Campos requeridos', 'Complete todos los campos obligatorios');
+    return;
   }
 
   try {
     if (isEditing.value) {
-      await admisionStore.actualizarPaciente(pacienteId.value, form.value)
-      toastStore.success('Paciente actualizado', `${form.value.nombre} ${form.value.apellido}`)
+      await admisionStore.actualizarPaciente(pacienteId.value, form.value);
+      toastStore.success('Paciente actualizado', `${form.value.nombre} ${form.value.apellido}`);
     } else {
-      await admisionStore.crearPaciente(form.value)
-      toastStore.success('Paciente creado', `${form.value.nombre} ${form.value.apellido}`)
+      await admisionStore.crearPaciente(form.value);
+      toastStore.success('Paciente creado', `${form.value.nombre} ${form.value.apellido}`);
     }
-    await router.push({ name: 'admision.pacientes' })
+    await router.push({ name: 'admision.pacientes' });
   } catch (err) {
-    toastStore.apiError(err, isEditing.value ? 'Error al actualizar' : 'Error al crear paciente')
+    toastStore.apiError(err, isEditing.value ? 'Error al actualizar' : 'Error al crear paciente');
   }
 }
 
 function volver() {
-  router.push({ name: 'admision.pacientes' })
+  router.push({ name: 'admision.pacientes' });
 }
 
 onMounted(() => {
-  cargarPaciente()
-})
+  cargarPaciente();
+});
 </script>
 
 <template>
@@ -98,13 +103,29 @@ onMounted(() => {
     <div class="view-header">
       <div class="header-actions">
         <Button variant="secondary" @click="volver">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
           Volver
         </Button>
       </div>
       <div>
         <h2>{{ isEditing ? 'Editar Paciente' : 'Nuevo Paciente' }}</h2>
-        <p class="view-subtitle">{{ isEditing ? 'Modifique los datos del paciente' : 'Registre un nuevo paciente en el sistema' }}</p>
+        <p class="view-subtitle">
+          {{
+            isEditing
+              ? 'Modifique los datos del paciente'
+              : 'Registre un nuevo paciente en el sistema'
+          }}
+        </p>
       </div>
     </div>
 
@@ -131,33 +152,13 @@ onMounted(() => {
         </div>
 
         <div class="form-row">
-          <Input
-            v-model="form.nombre"
-            label="Nombre(s)"
-            placeholder="Juan Carlos"
-            required
-          />
-          <Input
-            v-model="form.apellido"
-            label="Apellido(s)"
-            placeholder="Pérez"
-            required
-          />
+          <Input v-model="form.nombre" label="Nombre(s)" placeholder="Juan Carlos" required />
+          <Input v-model="form.apellido" label="Apellido(s)" placeholder="Pérez" required />
         </div>
 
         <div class="form-row">
-          <Input
-            v-model="form.fechaNacimiento"
-            label="Fecha de Nacimiento"
-            type="date"
-            required
-          />
-          <Select
-            v-model="form.sexo"
-            label="Sexo"
-            :options="sexoOptions"
-            required
-          />
+          <Input v-model="form.fechaNacimiento" label="Fecha de Nacimiento" type="date" required />
+          <Select v-model="form.sexo" label="Sexo" :options="sexoOptions" required />
         </div>
 
         <div class="form-row">
@@ -167,12 +168,7 @@ onMounted(() => {
             placeholder="+54 11 1234-5678"
             type="tel"
           />
-          <Input
-            v-model="form.email"
-            label="Email"
-            placeholder="juan@email.com"
-            type="email"
-          />
+          <Input v-model="form.email" label="Email" placeholder="juan@email.com" type="email" />
         </div>
       </Card>
 
@@ -187,11 +183,7 @@ onMounted(() => {
             label="Código Obra Social"
             placeholder="OSDE, PAMI, etc."
           />
-          <Input
-            v-model="form.numeroAfiliado"
-            label="Número de Afiliado"
-            placeholder="123456789"
-          />
+          <Input v-model="form.numeroAfiliado" label="Número de Afiliado" placeholder="123456789" />
         </div>
       </Card>
 

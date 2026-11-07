@@ -34,4 +34,3 @@ describe('Documento', () => {
     expect(doc1.equals(doc3)).toBe(false);
   });
 });
-

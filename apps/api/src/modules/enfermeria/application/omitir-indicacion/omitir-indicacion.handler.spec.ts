@@ -80,4 +80,3 @@ describe('OmitirIndicacionHandler', () => {
     ).rejects.toThrow(IndicacionNoEstaPendiente);
   });
 });
-

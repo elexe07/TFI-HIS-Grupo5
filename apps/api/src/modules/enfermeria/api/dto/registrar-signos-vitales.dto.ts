@@ -1,12 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import {
-  IsNumber,
-  IsOptional,
-  IsUUID,
-  Max,
-  Min,
-} from 'class-validator';
+import { IsNumber, IsOptional, IsUUID, Max, Min } from 'class-validator';
 
 export class RegistrarSignosVitalesDto {
   @ApiProperty({
@@ -79,4 +73,3 @@ export class RegistrarSignosVitalesDto {
   @Max(100)
   saturacionO2?: number;
 }
-

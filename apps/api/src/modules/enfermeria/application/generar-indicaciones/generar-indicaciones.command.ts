@@ -36,4 +36,3 @@ export interface GenerarIndicacionesResultado {
   readonly generadas: number;
   readonly omitidasPorExistentes: number;
 }
-

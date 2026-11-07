@@ -1,9 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import {
-  type CasoDeUso,
-  CLOCK,
-  type Clock,
-} from '../../../../building-blocks/application';
+import { type CasoDeUso, CLOCK, type Clock } from '../../../../building-blocks/application';
 import { HistoriaClinicaNoEncontrada } from '../../domain/errores';
 import {
   HISTORIA_CLINICA_REPOSITORY,
@@ -20,7 +16,10 @@ export class RegistrarAntecedenteCommand {
 }
 
 @Injectable()
-export class RegistrarAntecedenteHandler implements CasoDeUso<RegistrarAntecedenteCommand, { id: string }> {
+export class RegistrarAntecedenteHandler implements CasoDeUso<
+  RegistrarAntecedenteCommand,
+  { id: string }
+> {
   constructor(
     @Inject(HISTORIA_CLINICA_REPOSITORY)
     private readonly repo: HistoriaClinicaRepository,
@@ -45,4 +44,3 @@ export class RegistrarAntecedenteHandler implements CasoDeUso<RegistrarAnteceden
     return { id: antecedente.id };
   }
 }
-

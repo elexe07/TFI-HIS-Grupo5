@@ -6,4 +6,3 @@ export interface AgendaRepository {
   guardar(agenda: AgendaMedico): Promise<void>;
   buscarPorMedicoId(medicoId: string): Promise<AgendaMedico | null>;
 }
-

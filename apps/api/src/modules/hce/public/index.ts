@@ -9,4 +9,8 @@ export type {
   EvolucionRegistradaPayload,
   PrescripcionCreadaPayload,
 } from '../domain/events/hce-events';
-export type { HistoriaClinicaDto, EvolucionDto, PrescripcionDto } from '../application/historia-clinica.dto';
+export type {
+  HistoriaClinicaDto,
+  EvolucionDto,
+  PrescripcionDto,
+} from '../application/historia-clinica.dto';

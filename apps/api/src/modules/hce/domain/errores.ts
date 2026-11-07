@@ -1,8 +1,16 @@
-import { Conflicto, ErrorDeValidacion, NoEncontrado, Prohibido } from '../../../building-blocks/domain';
+import {
+  Conflicto,
+  ErrorDeValidacion,
+  NoEncontrado,
+  Prohibido,
+} from '../../../building-blocks/domain';
 
 export class HistoriaClinicaNoEncontrada extends NoEncontrado {
   constructor(criterio = '') {
-    super(`No se encontró la historia clínica ${criterio}`.trim(), 'HISTORIA_CLINICA_NO_ENCONTRADA');
+    super(
+      `No se encontró la historia clínica ${criterio}`.trim(),
+      'HISTORIA_CLINICA_NO_ENCONTRADA',
+    );
   }
 }
 
@@ -14,13 +22,19 @@ export class HistoriaClinicaYaExiste extends Conflicto {
 
 export class AlergiaDuplicada extends Conflicto {
   constructor(sustancia: string) {
-    super(`La sustancia '${sustancia}' ya está registrada como alergia en esta historia`, 'ALERGIA_DUPLICADA');
+    super(
+      `La sustancia '${sustancia}' ya está registrada como alergia en esta historia`,
+      'ALERGIA_DUPLICADA',
+    );
   }
 }
 
 export class PacienteAlergicoAMedicamento extends Conflicto {
   constructor(medicamento: string) {
-    super(`No se puede prescribir: el paciente presenta alergia a '${medicamento}'`, 'PACIENTE_ALERGICO');
+    super(
+      `No se puede prescribir: el paciente presenta alergia a '${medicamento}'`,
+      'PACIENTE_ALERGICO',
+    );
   }
 }
 
@@ -35,4 +49,3 @@ export class AccesoProhibidoHistoria extends Prohibido {
     super('No tiene permisos para acceder a esta historia clínica', 'HCE_ACCESO_PROHIBIDO');
   }
 }
-

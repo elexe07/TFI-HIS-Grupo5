@@ -15,4 +15,3 @@ export interface SignosVitalesRepository {
   guardar(signosVitales: SignosVitales): Promise<void>;
   listar(filtros: FiltrosSignosVitales): Promise<SignosVitales[]>;
 }
-

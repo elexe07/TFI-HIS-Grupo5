@@ -81,4 +81,3 @@ export class Cargo extends Entity<Id> {
     );
   }
 }
-

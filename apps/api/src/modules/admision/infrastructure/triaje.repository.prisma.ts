@@ -53,4 +53,3 @@ function aDominio(fila: TriajePrisma): Triaje {
     registradoPor: fila.registradoPor,
   });
 }
-

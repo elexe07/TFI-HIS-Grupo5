@@ -36,4 +36,3 @@ describe('ObtenerAgendaHandler', () => {
     expect(res.franjas[0]?.horaInicio).toBe('08:00');
   });
 });
-

@@ -1,72 +1,77 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
-import { useRecursosStore } from '@/stores/recursos'
-import { useToastStore } from '@/stores/toast'
-import { Card, Button, Select, Badge, Modal } from '@/components/ui'
-import type { CamaDTO, EstadoCama } from '@/types/api'
+import { ref, onMounted, computed } from 'vue';
+import { useRecursosStore } from '@/stores/recursos';
+import { useToastStore } from '@/stores/toast';
+import { Card, Button, Select, Badge, Modal } from '@/components/ui';
+import type { CamaDTO, EstadoCama } from '@/types/api';
 
-const recursosStore = useRecursosStore()
-const toastStore = useToastStore()
+const recursosStore = useRecursosStore();
+const toastStore = useToastStore();
 
-const showModal = ref(false)
-const editingCama = ref<CamaDTO | null>(null)
-const nuevoEstado = ref<EstadoCama>('LIBRE')
+const showModal = ref(false);
+const editingCama = ref<CamaDTO | null>(null);
+const nuevoEstado = ref<EstadoCama>('LIBRE');
 
-const sectorFilter = ref('')
-const estadoFilter = ref<EstadoCama | ''>('')
+const sectorFilter = ref('');
+const estadoFilter = ref<EstadoCama | ''>('');
 
-const allCamas = computed(() => recursosStore.habitaciones.flatMap(h => h.camas))
+const allCamas = computed(() => recursosStore.habitaciones.flatMap((h) => h.camas));
 const sectores = computed(() => {
   const sects = allCamas.value
-    .map(c => c.habitacion?.sector)
-    .filter((s): s is string => typeof s === 'string' && s.length > 0)
-  return [...new Set(sects)]
-})
+    .map((c) => c.habitacion?.sector)
+    .filter((s): s is string => typeof s === 'string' && s.length > 0);
+  return [...new Set(sects)];
+});
 
 const sectorOptions = computed(() => [
   { value: '', label: 'Todos los sectores' },
   ...sectores.value.map((s: string) => ({ value: s, label: s })),
-])
+]);
 
-function getEstadoVariant(estado: EstadoCama): 'primary' | 'success' | 'warning' | 'danger' | 'info' {
+function getEstadoVariant(
+  estado: EstadoCama,
+): 'primary' | 'success' | 'warning' | 'danger' | 'info' {
   const variants: Record<EstadoCama, 'primary' | 'success' | 'warning' | 'danger' | 'info'> = {
     LIBRE: 'success',
     OCUPADA: 'danger',
     EN_LIMPIEZA: 'warning',
     BLOQUEADA: 'info',
-  }
-  return variants[estado] ?? 'info'
+  };
+  return variants[estado] ?? 'info';
 }
 
 async function cargarDatos() {
   try {
-    await recursosStore.cargarMapaCamas()
+    await recursosStore.cargarMapaCamas();
   } catch (err) {
-    toastStore.error('Error', 'No se pudo cargar el mapa de camas')
+    toastStore.error('Error', 'No se pudo cargar el mapa de camas');
   }
 }
 
 function abrirModalCambiarEstado(cama: CamaDTO) {
-  editingCama.value = cama
-  nuevoEstado.value = cama.estado
-  showModal.value = true
+  editingCama.value = cama;
+  nuevoEstado.value = cama.estado;
+  showModal.value = true;
 }
 
 async function cambiarEstado() {
-  if (!editingCama.value) return
+  if (!editingCama.value) return;
   try {
-    await recursosStore.cambiarEstadoCama(editingCama.value.id, nuevoEstado.value)
-    toastStore.success('Estado actualizado', `Cama ${editingCama.value.codigo} ahora está ${nuevoEstado.value}`)
-    showModal.value = false
-    editingCama.value = null
+    await recursosStore.cambiarEstadoCama(editingCama.value.id, nuevoEstado.value);
+    toastStore.success(
+      'Estado actualizado',
+      `Cama ${editingCama.value.codigo} ahora está ${nuevoEstado.value}`,
+    );
+    showModal.value = false;
+    editingCama.value = null;
   } catch (err) {
     // Error manejado en store
   }
 }
 
 onMounted(() => {
-  cargarDatos()
-})
+  cargarDatos();
+});
 </script>
 
 <template>
@@ -132,7 +137,11 @@ onMounted(() => {
 
     <!-- Mapa por Habitación -->
     <div class="habitaciones-grid">
-      <Card v-for="habitacion in recursosStore.habitaciones" :key="habitacion.id" class="habitacion-card">
+      <Card
+        v-for="habitacion in recursosStore.habitaciones"
+        :key="habitacion.id"
+        class="habitacion-card"
+      >
         <div class="habitacion-header">
           <h4>{{ habitacion.sector }} - {{ habitacion.numero }}</h4>
           <span class="habitacion-count">{{ habitacion.camas.length }} camas</span>
@@ -147,7 +156,8 @@ onMounted(() => {
             <div class="cama-codigo">{{ cama.codigo }}</div>
             <div class="cama-estado">{{ cama.estado }}</div>
             <div v-if="cama.internacionActiva" class="cama-paciente">
-              {{ cama.internacionActiva.paciente?.apellido }}, {{ cama.internacionActiva.paciente?.nombre }}
+              {{ cama.internacionActiva.paciente?.apellido }},
+              {{ cama.internacionActiva.paciente?.nombre }}
             </div>
             <div v-else class="cama-paciente empty">Sin paciente</div>
           </div>
@@ -156,7 +166,15 @@ onMounted(() => {
     </div>
 
     <div v-if="recursosStore.habitaciones.length === 0" class="empty-state">
-      <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="empty-icon">
+      <svg
+        width="64"
+        height="64"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.5"
+        class="empty-icon"
+      >
         <path d="M2 4v16a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V4"></path>
         <path d="M2 8h18"></path>
         <path d="M2 16h18"></path>
@@ -170,11 +188,17 @@ onMounted(() => {
       <div v-if="editingCama" class="form-grid">
         <div class="form-field">
           <label class="label">Cama</label>
-          <input class="input" :value="`${editingCama.habitacion?.sector} - ${editingCama.habitacion?.numero} / ${editingCama.codigo}`" readonly />
+          <input
+            class="input"
+            :value="`${editingCama.habitacion?.sector} - ${editingCama.habitacion?.numero} / ${editingCama.codigo}`"
+            readonly
+          />
         </div>
         <div class="form-field">
           <label class="label">Estado Actual</label>
-          <Badge :variant="getEstadoVariant(editingCama.estado)" size="md">{{ editingCama.estado }}</Badge>
+          <Badge :variant="getEstadoVariant(editingCama.estado)" size="md">{{
+            editingCama.estado
+          }}</Badge>
         </div>
         <div class="form-field">
           <label class="label">Nuevo Estado *</label>
@@ -192,7 +216,9 @@ onMounted(() => {
       </div>
       <template #footer>
         <Button variant="secondary" @click="showModal = false">Cancelar</Button>
-        <Button variant="primary" @click="cambiarEstado" :loading="recursosStore.cargando">Confirmar Cambio</Button>
+        <Button variant="primary" @click="cambiarEstado" :loading="recursosStore.cargando"
+          >Confirmar Cambio</Button
+        >
       </template>
     </Modal>
   </div>
@@ -272,11 +298,21 @@ onMounted(() => {
   color: var(--color-text);
 }
 
-.resumen-card.success .resumen-value { color: var(--color-success); }
-.resumen-card.danger .resumen-value { color: var(--color-danger); }
-.resumen-card.warning .resumen-value { color: var(--color-warning); }
-.resumen-card.info .resumen-value { color: var(--color-info); }
-.resumen-card.primary .resumen-value { color: var(--color-primary); }
+.resumen-card.success .resumen-value {
+  color: var(--color-success);
+}
+.resumen-card.danger .resumen-value {
+  color: var(--color-danger);
+}
+.resumen-card.warning .resumen-value {
+  color: var(--color-warning);
+}
+.resumen-card.info .resumen-value {
+  color: var(--color-info);
+}
+.resumen-card.primary .resumen-value {
+  color: var(--color-primary);
+}
 
 .habitaciones-grid {
   display: grid;
@@ -334,10 +370,22 @@ onMounted(() => {
   box-shadow: var(--shadow-md);
 }
 
-.cama-card.success { border-color: var(--color-success); background-color: var(--color-success-light); }
-.cama-card.danger { border-color: var(--color-danger); background-color: var(--color-danger-light); }
-.cama-card.warning { border-color: var(--color-warning); background-color: var(--color-warning-light); }
-.cama-card.info { border-color: var(--color-info); background-color: var(--color-info-light); }
+.cama-card.success {
+  border-color: var(--color-success);
+  background-color: var(--color-success-light);
+}
+.cama-card.danger {
+  border-color: var(--color-danger);
+  background-color: var(--color-danger-light);
+}
+.cama-card.warning {
+  border-color: var(--color-warning);
+  background-color: var(--color-warning-light);
+}
+.cama-card.info {
+  border-color: var(--color-info);
+  background-color: var(--color-info-light);
+}
 
 .cama-codigo {
   font-weight: 700;

@@ -1,24 +1,18 @@
 import { Inject, Injectable } from '@nestjs/common';
-import {
-  type CasoDeUso,
-  CLOCK,
-  type Clock,
-} from '../../../../building-blocks/application';
+import { type CasoDeUso, CLOCK, type Clock } from '../../../../building-blocks/application';
 import { SignosVitales } from '../../domain/signos-vitales';
 import {
   SIGNOS_VITALES_REPOSITORY,
   type SignosVitalesRepository,
 } from '../../domain/signos-vitales.repository';
-import {
-  mapearSignosVitalesADto,
-  type SignosVitalesDto,
-} from '../dtos/signos-vitales.dto';
+import { mapearSignosVitalesADto, type SignosVitalesDto } from '../dtos/signos-vitales.dto';
 import { RegistrarSignosVitalesCommand } from './registrar-signos-vitales.command';
 
 @Injectable()
-export class RegistrarSignosVitalesHandler
-  implements CasoDeUso<RegistrarSignosVitalesCommand, SignosVitalesDto>
-{
+export class RegistrarSignosVitalesHandler implements CasoDeUso<
+  RegistrarSignosVitalesCommand,
+  SignosVitalesDto
+> {
   constructor(
     @Inject(SIGNOS_VITALES_REPOSITORY)
     private readonly repository: SignosVitalesRepository,
@@ -44,4 +38,3 @@ export class RegistrarSignosVitalesHandler
     return mapearSignosVitalesADto(signosVitales);
   }
 }
-

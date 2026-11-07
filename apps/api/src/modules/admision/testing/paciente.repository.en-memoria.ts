@@ -39,4 +39,3 @@ export class PacienteRepositoryEnMemoria implements PacienteRepository {
     return Promise.resolve(resultado);
   }
 }
-

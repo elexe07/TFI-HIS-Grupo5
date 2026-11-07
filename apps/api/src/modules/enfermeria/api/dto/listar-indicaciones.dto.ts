@@ -26,4 +26,3 @@ export class ListarIndicacionesDto {
   @IsDateString()
   fecha?: string;
 }
-

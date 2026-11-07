@@ -47,4 +47,3 @@ export class ObraSocialRepositoryPrisma implements ObraSocialRepository {
     );
   }
 }
-

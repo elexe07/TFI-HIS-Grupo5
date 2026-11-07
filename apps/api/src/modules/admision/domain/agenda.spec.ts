@@ -67,4 +67,3 @@ describe('AgendaMedico', () => {
     expect(agenda.permiteTurno(turnoMartesInicio, turnoMartesFin, true)).toBe(false);
   });
 });
-

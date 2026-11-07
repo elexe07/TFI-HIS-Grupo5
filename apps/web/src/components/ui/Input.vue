@@ -1,42 +1,42 @@
 <script setup lang="ts">
-import { computed, withDefaults } from 'vue'
-import type { InputProps } from './Input.types'
+import { computed, withDefaults } from 'vue';
+import type { InputProps } from './Input.types';
 
 const props = withDefaults(defineProps<InputProps>(), {
   error: undefined,
   hint: undefined,
   size: 'md',
-})
+});
 
 const emit = defineEmits<{
-  'update:modelValue': [value: string]
-  blur: [event: FocusEvent]
-  focus: [event: FocusEvent]
-  enter: []
-}>()
+  'update:modelValue': [value: string];
+  blur: [event: FocusEvent];
+  focus: [event: FocusEvent];
+  enter: [];
+}>();
 
-const inputId = `input-${Math.random().toString(36).slice(2, 9)}`
+const inputId = `input-${Math.random().toString(36).slice(2, 9)}`;
 
-const hasError = Boolean(props.error)
+const hasError = Boolean(props.error);
 
 const ariaDescribedBy = computed((): string | undefined => {
-  if (hasError) return `${inputId}-error`
-  if (props.hint) return `${inputId}-hint`
-  return undefined
-})
+  if (hasError) return `${inputId}-error`;
+  if (props.hint) return `${inputId}-hint`;
+  return undefined;
+});
 
 const inputClasses = computed((): string => {
-  const size = (props.size as string) ?? 'md'
-  return 'form-input form-input-' + size
-})
+  const size = (props.size as string) ?? 'md';
+  return 'form-input form-input-' + size;
+});
 
 function onInput(event: Event) {
-  const target = event.target as HTMLInputElement
-  emit('update:modelValue', target.value)
+  const target = event.target as HTMLInputElement;
+  emit('update:modelValue', target.value);
 }
 
 function onEnter() {
-  emit('enter')
+  emit('enter');
 }
 </script>
 
@@ -47,7 +47,10 @@ function onEnter() {
       <span v-if="required" class="text-danger" aria-hidden="true">*</span>
     </label>
 
-    <div class="input-wrapper" :class="{ 'has-error': hasError, 'has-icon': !!$slots.prefix || !!$slots.suffix }">
+    <div
+      class="input-wrapper"
+      :class="{ 'has-error': hasError, 'has-icon': !!$slots.prefix || !!$slots.suffix }"
+    >
       <slot name="prefix" class="input-prefix" />
       <input
         :id="inputId"
@@ -91,7 +94,9 @@ function onEnter() {
   color: var(--color-text);
 }
 
-.text-danger { color: var(--color-danger); }
+.text-danger {
+  color: var(--color-danger);
+}
 
 .input-wrapper {
   position: relative;
@@ -152,8 +157,12 @@ function onEnter() {
   pointer-events: none;
 }
 
-.input-prefix { left: var(--space-sm); }
-.input-suffix { right: var(--space-sm); }
+.input-prefix {
+  left: var(--space-sm);
+}
+.input-suffix {
+  right: var(--space-sm);
+}
 
 .has-icon .form-input {
   padding-left: 40px;

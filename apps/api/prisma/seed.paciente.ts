@@ -20,7 +20,9 @@ async function main(): Promise<void> {
   });
 
   if (existente) {
-    console.log(`Paciente de prueba ya existe: ${existente.nombre} ${existente.apellido} (${existente.id})`);
+    console.log(
+      `Paciente de prueba ya existe: ${existente.nombre} ${existente.apellido} (${existente.id})`,
+    );
     return;
   }
 

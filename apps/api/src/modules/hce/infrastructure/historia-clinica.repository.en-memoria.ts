@@ -34,4 +34,3 @@ export class HistoriaClinicaRepositoryEnMemoria implements HistoriaClinicaReposi
     return Promise.resolve(null);
   }
 }
-

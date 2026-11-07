@@ -48,4 +48,3 @@ export class TurnoRepositoryEnMemoria implements TurnoRepository {
     return Promise.resolve(resultado);
   }
 }
-

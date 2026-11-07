@@ -87,7 +87,11 @@ export class Indicacion extends AggregateRoot<Id> {
     return new Indicacion(id, props);
   }
 
-  administrar(administradaPor: string, administradaEn: Date, administracionId?: string): AdministracionDeMedicacion {
+  administrar(
+    administradaPor: string,
+    administradaEn: Date,
+    administracionId?: string,
+  ): AdministracionDeMedicacion {
     if (this._estado !== ESTADOS_INDICACION.PENDIENTE) {
       throw new IndicacionNoEstaPendiente(this.id, this._estado);
     }

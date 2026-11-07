@@ -45,4 +45,3 @@ describe('RegistrarSignosVitalesHandler', () => {
     expect(await repo.listar({ pacienteId: 'pac-1' })).toHaveLength(0);
   });
 });
-

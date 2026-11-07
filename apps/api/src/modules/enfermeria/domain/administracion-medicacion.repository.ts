@@ -11,4 +11,3 @@ export interface AdministracionMedicacionRepository {
   buscarPorIndicacionId(indicacionId: string): Promise<AdministracionDeMedicacion | null>;
   listarPorPaciente(pacienteId: string): Promise<AdministracionDeMedicacion[]>;
 }
-

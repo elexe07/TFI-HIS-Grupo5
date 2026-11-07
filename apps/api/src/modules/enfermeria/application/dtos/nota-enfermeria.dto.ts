@@ -17,4 +17,3 @@ export const mapearNotaADto = (nota: NotaDeEnfermeria): NotaEnfermeriaDto => ({
   registradoEn: nota.registradoEn,
   registradoPor: nota.registradoPor,
 });
-

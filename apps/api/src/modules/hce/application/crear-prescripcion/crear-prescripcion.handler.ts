@@ -26,7 +26,10 @@ export class CrearPrescripcionCommand {
 }
 
 @Injectable()
-export class CrearPrescripcionHandler implements CasoDeUso<CrearPrescripcionCommand, { id: string }> {
+export class CrearPrescripcionHandler implements CasoDeUso<
+  CrearPrescripcionCommand,
+  { id: string }
+> {
   constructor(
     @Inject(HISTORIA_CLINICA_REPOSITORY)
     private readonly repo: HistoriaClinicaRepository,
@@ -60,4 +63,3 @@ export class CrearPrescripcionHandler implements CasoDeUso<CrearPrescripcionComm
     return { id: prescripcion.id };
   }
 }
-

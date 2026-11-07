@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import { ref, watch, onMounted } from 'vue'
-import { useEnfermeriaStore } from '@/stores/enfermeria'
-import { useAdmisionStore } from '@/stores/admision'
-import { useToastStore } from '@/stores/toast'
-import { Card, Button, Input, Badge, Select, Table, type TableColumn } from '@/components/ui'
+import { ref, watch, onMounted } from 'vue';
+import { useEnfermeriaStore } from '@/stores/enfermeria';
+import { useAdmisionStore } from '@/stores/admision';
+import { useToastStore } from '@/stores/toast';
+import { Card, Button, Input, Badge, Select, Table, type TableColumn } from '@/components/ui';
 
-const enfermeriaStore = useEnfermeriaStore()
-const admisionStore = useAdmisionStore()
-const toastStore = useToastStore()
+const enfermeriaStore = useEnfermeriaStore();
+const admisionStore = useAdmisionStore();
+const toastStore = useToastStore();
 
-const pacienteId = ref('')
+const pacienteId = ref('');
 
 const form = ref({
   temperatura: '',
@@ -17,29 +17,63 @@ const form = ref({
   presionDiastolica: '',
   frecuenciaCardiaca: '',
   saturacionO2: '',
-})
+});
 
 const columns: TableColumn[] = [
-  { key: 'registradoEn', label: 'Fecha y Hora', width: '180px', format: (value) => value ? new Date(value as string).toLocaleString('es-AR') : '-' },
-  { key: 'temperatura', label: 'Temp. (°C)', width: '100px', format: (value) => value !== null ? `${value} °C` : '-' },
-  { key: 'presionSistolica', label: 'PA (mmHg)', width: '130px', format: (_value, row) => row.presionSistolica && row.presionDiastolica ? `${row.presionSistolica}/${row.presionDiastolica}` : '-' },
-  { key: 'frecuenciaCardiaca', label: 'FC (lpm)', width: '100px', format: (value) => value !== null ? `${value} lpm` : '-' },
-  { key: 'saturacionO2', label: 'SpO₂ (%)', width: '100px', format: (value) => value !== null ? `${value}%` : '-' },
-]
+  {
+    key: 'registradoEn',
+    label: 'Fecha y Hora',
+    width: '180px',
+    format: (value) => (value ? new Date(value as string).toLocaleString('es-AR') : '-'),
+  },
+  {
+    key: 'temperatura',
+    label: 'Temp. (°C)',
+    width: '100px',
+    format: (value) => (value !== null ? `${value} °C` : '-'),
+  },
+  {
+    key: 'presionSistolica',
+    label: 'PA (mmHg)',
+    width: '130px',
+    format: (_value, row) =>
+      row.presionSistolica && row.presionDiastolica
+        ? `${row.presionSistolica}/${row.presionDiastolica}`
+        : '-',
+  },
+  {
+    key: 'frecuenciaCardiaca',
+    label: 'FC (lpm)',
+    width: '100px',
+    format: (value) => (value !== null ? `${value} lpm` : '-'),
+  },
+  {
+    key: 'saturacionO2',
+    label: 'SpO₂ (%)',
+    width: '100px',
+    format: (value) => (value !== null ? `${value}%` : '-'),
+  },
+];
 
 async function guardarSignos() {
   const data = {
     pacienteId: pacienteId.value,
     internacionId: undefined,
     temperatura: form.value.temperatura ? parseFloat(form.value.temperatura) : undefined,
-    presionSistolica: form.value.presionSistolica ? parseInt(form.value.presionSistolica) : undefined,
-    presionDiastolica: form.value.presionDiastolica ? parseInt(form.value.presionDiastolica) : undefined,
-    frecuenciaCardiaca: form.value.frecuenciaCardiaca ? parseInt(form.value.frecuenciaCardiaca) : undefined,
+    presionSistolica: form.value.presionSistolica
+      ? parseInt(form.value.presionSistolica)
+      : undefined,
+    presionDiastolica: form.value.presionDiastolica
+      ? parseInt(form.value.presionDiastolica)
+      : undefined,
+    frecuenciaCardiaca: form.value.frecuenciaCardiaca
+      ? parseInt(form.value.frecuenciaCardiaca)
+      : undefined,
     saturacionO2: form.value.saturacionO2 ? parseInt(form.value.saturacionO2) : undefined,
-  }
-  await enfermeriaStore.registrarSignosVitales(data)
-  toastStore.success('Signos vitales guardados', 'Registrados correctamente')
-  resetForm()
+  };
+  await enfermeriaStore.registrarSignosVitales(data);
+  toastStore.success('Signos vitales guardados', 'Registrados correctamente');
+  resetForm();
 }
 
 function resetForm() {
@@ -49,39 +83,47 @@ function resetForm() {
     presionDiastolica: '',
     frecuenciaCardiaca: '',
     saturacionO2: '',
-  }
+  };
 }
 
 function getUnidad(parametro: string): string {
   const unidades: Record<string, string> = {
-    'Temperatura': '°C',
+    Temperatura: '°C',
     'Presión Sistólica': 'mmHg',
     'Frecuencia Cardíaca': 'lpm',
     'SpO₂': '%',
-  }
-  return unidades[parametro] ?? ''
+  };
+  return unidades[parametro] ?? '';
 }
 
 function getAlertaClass(alerta: any): 'danger' | 'warning' {
-  if (alerta.mensaje.includes('Fiebre') || alerta.mensaje.includes('Taquicardia') || alerta.mensaje.includes('Hipertensión')) return 'danger'
-  return 'warning'
+  if (
+    alerta.mensaje.includes('Fiebre') ||
+    alerta.mensaje.includes('Taquicardia') ||
+    alerta.mensaje.includes('Hipertensión')
+  )
+    return 'danger';
+  return 'warning';
 }
 
-watch(() => admisionStore.pacienteSeleccionado, (paciente) => {
-  if (paciente) {
-    pacienteId.value = paciente.id
-    enfermeriaStore.setContexto(paciente.id)
-    enfermeriaStore.cargarDatos()
-  }
-})
+watch(
+  () => admisionStore.pacienteSeleccionado,
+  (paciente) => {
+    if (paciente) {
+      pacienteId.value = paciente.id;
+      enfermeriaStore.setContexto(paciente.id);
+      enfermeriaStore.cargarDatos();
+    }
+  },
+);
 
 onMounted(() => {
   if (admisionStore.pacienteSeleccionado) {
-    pacienteId.value = admisionStore.pacienteSeleccionado.id
-    enfermeriaStore.setContexto(pacienteId.value)
-    enfermeriaStore.cargarDatos()
+    pacienteId.value = admisionStore.pacienteSeleccionado.id;
+    enfermeriaStore.setContexto(pacienteId.value);
+    enfermeriaStore.cargarDatos();
   }
-})
+});
 </script>
 
 <template>
@@ -98,7 +140,12 @@ onMounted(() => {
         <label>Paciente</label>
         <Select
           v-model="pacienteId"
-          :options="admisionStore.pacientes.map(p => ({ value: p.id, label: `${p.apellido}, ${p.nombre} (${p.tipoDocumento} ${p.numeroDocumento})` }))"
+          :options="
+            admisionStore.pacientes.map((p) => ({
+              value: p.id,
+              label: `${p.apellido}, ${p.nombre} (${p.tipoDocumento} ${p.numeroDocumento})`,
+            }))
+          "
           placeholder="Seleccionar paciente"
         />
       </div>
@@ -108,7 +155,13 @@ onMounted(() => {
     <div v-if="enfermeriaStore.alertasSignosVitales.length" class="alertas-section">
       <h3>⚠️ Alertas Activas</h3>
       <div class="alertas-grid">
-        <Card v-for="alerta in enfermeriaStore.alertasSignosVitales" :key="alerta.parametro" class="alerta-card" :class="`alerta-${getAlertaClass(alerta)}`" bordered>
+        <Card
+          v-for="alerta in enfermeriaStore.alertasSignosVitales"
+          :key="alerta.parametro"
+          class="alerta-card"
+          :class="`alerta-${getAlertaClass(alerta)}`"
+          bordered
+        >
           <div class="alerta-content">
             <div class="alerta-param">{{ alerta.parametro }}</div>
             <div class="alerta-valor">{{ alerta.valor }}{{ getUnidad(alerta.parametro) }}</div>
@@ -171,7 +224,18 @@ onMounted(() => {
 
         <div class="form-actions">
           <Button variant="primary" type="submit" :loading="enfermeriaStore.cargando">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+              <polyline points="17 21 17 13 7 13 7 21"></polyline>
+              <polyline points="7 3 7 8 15 8"></polyline>
+            </svg>
             Guardar Signos Vitales
           </Button>
         </div>
@@ -195,7 +259,6 @@ onMounted(() => {
     </Card>
   </div>
 </template>
-
 
 <style scoped>
 .view-header {

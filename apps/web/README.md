@@ -155,15 +155,15 @@ server: {
 
 ### Estado Global (Pinia)
 
-| Store | Responsabilidad |
-|-------|-----------------|
-| `auth` | JWT, usuario, roles, permisos, persistencia |
-| `admision` | Pacientes, profesionales, agenda, turnos, triaje |
-| `hce` | Historia clínica, evoluciones, alergias, prescripciones, estudios |
-| `enfermeria` | Indicaciones, signos vitales, notas, alertas |
-| `recursos` | Camas, internaciones, insumos, movimientos |
-| `facturacion` | Cuentas, coberturas, planes, reportes |
-| `toast` | Notificaciones globales (success/error/warning/info) |
+| Store         | Responsabilidad                                                   |
+| ------------- | ----------------------------------------------------------------- |
+| `auth`        | JWT, usuario, roles, permisos, persistencia                       |
+| `admision`    | Pacientes, profesionales, agenda, turnos, triaje                  |
+| `hce`         | Historia clínica, evoluciones, alergias, prescripciones, estudios |
+| `enfermeria`  | Indicaciones, signos vitales, notas, alertas                      |
+| `recursos`    | Camas, internaciones, insumos, movimientos                        |
+| `facturacion` | Cuentas, coberturas, planes, reportes                             |
+| `toast`       | Notificaciones globales (success/error/warning/info)              |
 
 ### API Service (Axios)
 
@@ -175,13 +175,13 @@ server: {
 
 ```ts
 // Uso básico
-const { data, loading, error, execute } = useApi(() => api.admision.getPacientes())
+const { data, loading, error, execute } = useApi(() => api.admision.getPacientes());
 
 // Lista con paginación
-const { data, loading, fetchPage } = useApiList(() => api.admision.getPacientes({ page: 1 }))
+const { data, loading, fetchPage } = useApiList(() => api.admision.getPacientes({ page: 1 }));
 
 // Formularios reactivos
-const { form, errors, validate, submit } = useForm(initialData, validationSchema, onSubmit)
+const { form, errors, validate, submit } = useForm(initialData, validationSchema, onSubmit);
 ```
 
 ### Router Guards
@@ -198,6 +198,7 @@ meta: {
 ```
 
 Guards implementados:
+
 1. **Auth**: Redirige a `/login` si no autenticado
 2. **RBAC**: Verifica permisos contra `authStore.permisos`
 3. **Título**: Actualiza `document.title`
@@ -235,10 +236,10 @@ Todos los componentes siguen convención consistente:
 <!-- Props tipadas con TypeScript -->
 <script setup lang="ts">
 interface Props {
-  variant?: 'primary' | 'secondary' | 'success' | 'warning' | 'danger' | 'ghost'
-  size?: 'sm' | 'md' | 'lg'
-  loading?: boolean
-  disabled?: boolean
+  variant?: 'primary' | 'secondary' | 'success' | 'warning' | 'danger' | 'ghost';
+  size?: 'sm' | 'md' | 'lg';
+  loading?: boolean;
+  disabled?: boolean;
 }
 </script>
 
@@ -262,59 +263,65 @@ interface Props {
 
 ### Roles del Sistema
 
-| Rol | Permisos Principales |
-|-----|---------------------|
-| `ADMINISTRADOR` | Acceso total + gestión usuarios |
-| `MEDICO` | HCE, evoluciones, prescripciones, agenda |
-| `ENFERMERO` | Indicaciones, signos vitales, notas |
-| `RECEPCIONISTA` | Pacientes, turnos, triaje, admisión |
-| `PACIENTE` | Portal paciente (solo lectura propia) |
+| Rol             | Permisos Principales                     |
+| --------------- | ---------------------------------------- |
+| `ADMINISTRADOR` | Acceso total + gestión usuarios          |
+| `MEDICO`        | HCE, evoluciones, prescripciones, agenda |
+| `ENFERMERO`     | Indicaciones, signos vitales, notas      |
+| `RECEPCIONISTA` | Pacientes, turnos, triaje, admisión      |
+| `PACIENTE`      | Portal paciente (solo lectura propia)    |
 
 ### Permisos por Módulo
 
 ```ts
 // Ejemplos de permisos (ver types/api.ts)
-'pacientes:leer' | 'pacientes:registrar' | 'pacientes:actualizar'
-'agenda:definir' | 'turnos:reservar' | 'turnos:cancelar'
-'triaje:registrar' | 'guardia:leer'
-'hce:leer' | 'hce:escribir'
-'prescripciones:crear' | 'estudios:solicitar'
-'enfermeria:indicaciones:leer' | 'enfermeria:signos:crear'
-'camas:leer' | 'camas:actualizar' | 'internaciones:gestionar'
-'insumos:gestionar' | 'movimientos:registrar'
-'facturacion:leer' | 'cobertura:validar' | 'reportes:leer'
-'iam:usuarios:leer' | 'iam:usuarios:crear' | 'iam:roles:gestionar'
+'pacientes:leer' | 'pacientes:registrar' | 'pacientes:actualizar';
+'agenda:definir' | 'turnos:reservar' | 'turnos:cancelar';
+'triaje:registrar' | 'guardia:leer';
+'hce:leer' | 'hce:escribir';
+'prescripciones:crear' | 'estudios:solicitar';
+'enfermeria:indicaciones:leer' | 'enfermeria:signos:crear';
+'camas:leer' | 'camas:actualizar' | 'internaciones:gestionar';
+'insumos:gestionar' | 'movimientos:registrar';
+'facturacion:leer' | 'cobertura:validar' | 'reportes:leer';
+'iam:usuarios:leer' | 'iam:usuarios:crear' | 'iam:roles:gestionar';
 ```
 
 ## 📦 Módulos Funcionales
 
 ### 1. Admisión (`/admision`)
+
 - **Pacientes**: CRUD + búsqueda por documento/apellido
 - **Agenda Médica**: Horarios por profesional + vista de disponibilidad
 - **Turnos**: Búsqueda avanzada + cambio de estados (PENDIENTE→CONFIRMADO→EN_ATENCION→FINALIZADO)
 - **Triaje**: Clasificación por urgencia (ROJO→NARANJA→AMARILLO→VERDE→AZUL) + resumen por nivel
 
 ### 2. HCE (`/hce`)
+
 - **Historia Clínica**: Vista unificada con tabs (Resumen, Alergias, Estudios, Prescripciones, Timeline)
 - **Evoluciones**: Formulario rico + historial cronológico
 - **Prescripciones**: CRUD + gestión de estados (ACTIVA/SUSPENDIDA/FINALIZADA)
 
 ### 3. Enfermería (`/enfermeria`)
+
 - **Indicaciones**: Generación desde prescripción + administración/omisión con motivos
 - **Signos Vitales**: Formulario validado + historial tabular + alertas automáticas
 - **Notas**: Registro libre + timeline por paciente
 
 ### 4. Recursos (`/recursos`)
+
 - **Mapa de Camas**: Grid visual por sector con estados codificados por color
 - **Internaciones**: Ingreso/alta/traslado + asignación de cama
 - **Insumos**: Stock con umbrales (normal/bajo/crítico/agotado) + movimientos entrada/salida
 
 ### 5. Facturación (`/facturacion`)
+
 - **Cuentas**: Ciclo de vida (ABIERTA→CERRADA→FACTURADA→COBRADA)
 - **Coberturas**: Obras sociales/prepagas + planes con copagos y autorizaciones
 - **Reportes**: 4 tipos exportables a CSV (facturación, cobertura, deuda, vencimientos)
 
 ### 6. Administración (`/admin`)
+
 - **Usuarios**: CRUD + roles + reset password + activación/desactivación
 
 ## 🧪 Testing
@@ -332,18 +339,18 @@ pnpm test:coverage
 
 ## 📋 Criterios de Evaluación Cumplidos
 
-| # | Criterio | Implementación |
-|---|----------|----------------|
-| 1 | Estructura de proyecto | Monorepo, Vite, TypeScript strict, ESLint, Prettier |
-| 2 | Directivas Vue | v-if, v-for, v-model, v-show, v-slot, v-bind, v-on |
-| 3 | Comunicación componentes | Props tipadas, emits tipados, slots nombrados, provide/inject (stores) |
-| 4 | Vue Router + Guards | 20+ rutas anidadas, meta permisos, auth guard, RBAC guard, lazy loading |
-| 5 | Composables | `useApi`, `useApiList`, `useForm` reutilizables |
-| 6 | Pinia | 7 stores modulares, persistencia, actions async, getters computados |
-| 7 | API Integration | Axios interceptors (JWT, errors, loading), métodos tipados por módulo |
-| 8 | UX/UI | Design system CSS, responsive, sidebar collapsible, toasts, loading states |
-| 9 | Creatividad/Funcionalidad | Mapa camas visual, triaje con colores, alertas signos vitales, timeline HCE |
-| 10 | Documentación | Este README + comentarios en código + tipos TypeScript |
+| #   | Criterio                  | Implementación                                                              |
+| --- | ------------------------- | --------------------------------------------------------------------------- |
+| 1   | Estructura de proyecto    | Monorepo, Vite, TypeScript strict, ESLint, Prettier                         |
+| 2   | Directivas Vue            | v-if, v-for, v-model, v-show, v-slot, v-bind, v-on                          |
+| 3   | Comunicación componentes  | Props tipadas, emits tipados, slots nombrados, provide/inject (stores)      |
+| 4   | Vue Router + Guards       | 20+ rutas anidadas, meta permisos, auth guard, RBAC guard, lazy loading     |
+| 5   | Composables               | `useApi`, `useApiList`, `useForm` reutilizables                             |
+| 6   | Pinia                     | 7 stores modulares, persistencia, actions async, getters computados         |
+| 7   | API Integration           | Axios interceptors (JWT, errors, loading), métodos tipados por módulo       |
+| 8   | UX/UI                     | Design system CSS, responsive, sidebar collapsible, toasts, loading states  |
+| 9   | Creatividad/Funcionalidad | Mapa camas visual, triaje con colores, alertas signos vitales, timeline HCE |
+| 10  | Documentación             | Este README + comentarios en código + tipos TypeScript                      |
 
 ## 🚀 Deploy
 

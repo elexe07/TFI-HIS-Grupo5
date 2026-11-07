@@ -29,4 +29,3 @@ export class MedicoRepositoryEnMemoria implements MedicoRepository {
     return Promise.resolve([...this.medicos.values()]);
   }
 }
-

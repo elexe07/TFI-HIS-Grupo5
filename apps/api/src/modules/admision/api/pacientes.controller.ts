@@ -70,4 +70,3 @@ export class PacientesController {
     return this.buscarPorId.ejecutar(new BuscarPacientePorIdQuery(id));
   }
 }
-

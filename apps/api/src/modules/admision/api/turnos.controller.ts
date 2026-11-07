@@ -99,4 +99,3 @@ export class TurnosController {
     return this.listarTurnos.ejecutar(new ListarTurnosQuery(dto));
   }
 }
-

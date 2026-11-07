@@ -27,4 +27,3 @@ export class DefinirAgendaHandler implements CasoDeUso<DefinirAgendaCommand, Age
     return aAgendaDto(agenda);
   }
 }
-

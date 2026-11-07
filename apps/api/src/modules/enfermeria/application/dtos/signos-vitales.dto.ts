@@ -25,4 +25,3 @@ export const mapearSignosVitalesADto = (sv: SignosVitales): SignosVitalesDto => 
   registradoEn: sv.registradoEn,
   registradoPor: sv.registradoPor,
 });
-

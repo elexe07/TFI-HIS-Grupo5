@@ -13,4 +13,3 @@ export class AgendaRepositoryEnMemoria implements AgendaRepository {
     return Promise.resolve(this.agendas.get(medicoId) ?? null);
   }
 }
-

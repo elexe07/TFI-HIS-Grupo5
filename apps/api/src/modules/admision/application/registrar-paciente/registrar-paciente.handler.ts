@@ -54,4 +54,3 @@ export class RegistrarPacienteHandler implements CasoDeUso<RegistrarPacienteComm
     return aPacienteDto(paciente);
   }
 }
-

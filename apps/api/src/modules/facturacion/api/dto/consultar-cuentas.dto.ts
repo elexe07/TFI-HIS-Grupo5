@@ -7,4 +7,3 @@ export class ConsultarCuentasDto {
   @IsUUID()
   pacienteId?: string;
 }
-

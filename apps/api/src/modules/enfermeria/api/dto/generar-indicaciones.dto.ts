@@ -3,7 +3,10 @@ import { Type } from 'class-transformer';
 import { IsDateString, IsInt, IsNotEmpty, IsPositive, IsString, IsUUID } from 'class-validator';
 
 export class GenerarIndicacionesDto {
-  @ApiProperty({ example: 'c0000000-0000-0000-0000-000000000001', description: 'ID de la prescripción' })
+  @ApiProperty({
+    example: 'c0000000-0000-0000-0000-000000000001',
+    description: 'ID de la prescripción',
+  })
   @IsUUID()
   prescripcionId!: string;
 
@@ -11,7 +14,10 @@ export class GenerarIndicacionesDto {
   @IsUUID()
   pacienteId!: string;
 
-  @ApiProperty({ example: 'b0000000-0000-0000-0000-000000000001', description: 'ID de la internación' })
+  @ApiProperty({
+    example: 'b0000000-0000-0000-0000-000000000001',
+    description: 'ID de la internación',
+  })
   @IsUUID()
   internacionId!: string;
 
@@ -37,8 +43,10 @@ export class GenerarIndicacionesDto {
   @IsPositive()
   duracionDias!: number;
 
-  @ApiProperty({ example: '2026-10-23T08:00:00Z', description: 'Fecha y hora de inicio de administración' })
+  @ApiProperty({
+    example: '2026-10-23T08:00:00Z',
+    description: 'Fecha y hora de inicio de administración',
+  })
   @IsDateString()
   inicioEn!: string;
 }
-

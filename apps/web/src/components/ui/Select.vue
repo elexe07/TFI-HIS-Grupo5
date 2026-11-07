@@ -1,29 +1,26 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import type { SelectProps } from './Select.types'
+import { computed } from 'vue';
+import type { SelectProps } from './Select.types';
 
 const props = withDefaults(defineProps<SelectProps>(), {
   size: 'md',
-})
+});
 
 const emit = defineEmits<{
-  'update:modelValue': [value: string | number | null]
-  blur: [event: FocusEvent]
-  focus: [event: FocusEvent]
-}>()
+  'update:modelValue': [value: string | number | null];
+  blur: [event: FocusEvent];
+  focus: [event: FocusEvent];
+}>();
 
-const selectId = `select-${Math.random().toString(36).slice(2, 9)}`
+const selectId = `select-${Math.random().toString(36).slice(2, 9)}`;
 
-const hasError = computed(() => props.error !== undefined && props.error !== '')
+const hasError = computed(() => props.error !== undefined && props.error !== '');
 
-const selectClasses = computed(() => [
-  'form-select',
-  `form-select-${props.size}`,
-].join(' '))
+const selectClasses = computed(() => ['form-select', `form-select-${props.size}`].join(' '));
 
 function onInput(event: Event) {
-  const target = event.target as HTMLSelectElement
-  emit('update:modelValue', target.value !== '' ? target.value : null)
+  const target = event.target as HTMLSelectElement;
+  emit('update:modelValue', target.value !== '' ? target.value : null);
 }
 </script>
 
@@ -53,7 +50,16 @@ function onInput(event: Event) {
         </option>
       </select>
 
-      <svg class="select-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+      <svg
+        class="select-arrow"
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        aria-hidden="true"
+      >
         <polyline points="6 9 12 15 18 9"></polyline>
       </svg>
     </div>
@@ -81,7 +87,9 @@ function onInput(event: Event) {
   color: var(--color-text);
 }
 
-.text-danger { color: var(--color-danger); }
+.text-danger {
+  color: var(--color-danger);
+}
 
 .select-wrapper {
   position: relative;
@@ -109,7 +117,7 @@ function onInput(event: Event) {
 .form-select:disabled {
   background-color: var(--color-bg);
   color: var(--color-text-muted);
-  cursor: not-allowed.
+  cursor: not-allowed.;
 }
 
 .form-select-sm {

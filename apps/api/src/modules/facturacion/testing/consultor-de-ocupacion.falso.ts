@@ -23,4 +23,3 @@ export class ConsultorDeOcupacionFalso implements ConsultorDeOcupacion {
     this.resumen = { ...nuevo };
   }
 }
-

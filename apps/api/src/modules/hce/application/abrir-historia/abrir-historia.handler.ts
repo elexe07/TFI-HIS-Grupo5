@@ -1,9 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import {
-  type CasoDeUso,
-  CLOCK,
-  type Clock,
-} from '../../../../building-blocks/application';
+import { type CasoDeUso, CLOCK, type Clock } from '../../../../building-blocks/application';
 import { HistoriaClinica } from '../../domain/historia-clinica';
 import {
   HISTORIA_CLINICA_REPOSITORY,
@@ -50,4 +46,3 @@ export class AbrirHistoriaHandler implements CasoDeUso<AbrirHistoriaCommand, { i
     return { id: historia.id };
   }
 }
-

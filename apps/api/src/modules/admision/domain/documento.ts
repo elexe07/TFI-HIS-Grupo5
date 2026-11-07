@@ -43,4 +43,3 @@ export class Documento extends ValueObject<DocumentoProps> {
     return `${this.tipo} ${this.numero}`;
   }
 }
-

@@ -28,4 +28,3 @@ export class NotaEnfermeriaRepositoryEnMemoria implements NotaEnfermeriaReposito
     this.items.length = 0;
   }
 }
-

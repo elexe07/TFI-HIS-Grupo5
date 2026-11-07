@@ -15,7 +15,12 @@ import {
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
-import { PERMISOS, RequierePermiso, UsuarioActual, type UsuarioAutenticado } from '../../iam/public';
+import {
+  PERMISOS,
+  RequierePermiso,
+  UsuarioActual,
+  type UsuarioAutenticado,
+} from '../../iam/public';
 import {
   ConsultarHistoriaHandler,
   ConsultarHistoriaQuery,
@@ -113,12 +118,7 @@ export class HceController {
     @UsuarioActual() usuario: UsuarioAutenticado,
   ): Promise<{ id: string }> {
     return this.registrarAlergia.ejecutar(
-      new RegistrarAlergiaCommand(
-        pacienteId,
-        dto.sustancia,
-        dto.severidad,
-        usuario.id,
-      ),
+      new RegistrarAlergiaCommand(pacienteId, dto.sustancia, dto.severidad, usuario.id),
     );
   }
 
@@ -133,12 +133,7 @@ export class HceController {
     @UsuarioActual() usuario: UsuarioAutenticado,
   ): Promise<{ id: string }> {
     return this.registrarAntecedente.ejecutar(
-      new RegistrarAntecedenteCommand(
-        pacienteId,
-        dto.parentesco,
-        dto.condicion,
-        usuario.id,
-      ),
+      new RegistrarAntecedenteCommand(pacienteId, dto.parentesco, dto.condicion, usuario.id),
     );
   }
 
@@ -188,4 +183,3 @@ export class HceController {
     );
   }
 }
-

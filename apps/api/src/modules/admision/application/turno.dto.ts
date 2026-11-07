@@ -28,4 +28,3 @@ export function aTurnoDto(t: Turno): TurnoDto {
     updatedAt: t.updatedAt.toISOString(),
   };
 }
-

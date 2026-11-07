@@ -26,4 +26,3 @@ describe('NotaDeEnfermeria', () => {
     ).toThrow(TextoNotaRequerido);
   });
 });
-

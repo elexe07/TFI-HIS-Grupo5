@@ -18,4 +18,3 @@ export class RegistrarNotaEnfermeriaCommand {
     this.internacionId = props.internacionId ?? null;
   }
 }
-

@@ -1,6 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
-import { AbrirHistoriaCommand, AbrirHistoriaHandler } from '../abrir-historia/abrir-historia.handler';
+import {
+  AbrirHistoriaCommand,
+  AbrirHistoriaHandler,
+} from '../abrir-historia/abrir-historia.handler';
 
 interface PacienteRegistradoPayload {
   eventoId: string;
@@ -18,4 +21,3 @@ export class AbrirHistoriaAlRegistrarPacienteHandler {
     );
   }
 }
-

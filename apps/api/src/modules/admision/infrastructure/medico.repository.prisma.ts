@@ -57,4 +57,3 @@ function aDominio(fila: MedicoPrisma): Medico {
     creadoEn: fila.createdAt,
   });
 }
-

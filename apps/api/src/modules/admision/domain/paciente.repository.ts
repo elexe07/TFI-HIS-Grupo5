@@ -15,4 +15,3 @@ export interface PacienteRepository {
   buscarPorUsuarioId(usuarioId: string): Promise<Paciente | null>;
   buscar(filtros: FiltrosBuscarPaciente): Promise<Paciente[]>;
 }
-

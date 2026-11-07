@@ -12,4 +12,3 @@ export class BuscarPacientesDto {
   @IsString()
   apellido?: string;
 }
-

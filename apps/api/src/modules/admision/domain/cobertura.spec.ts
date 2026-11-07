@@ -28,4 +28,3 @@ describe('Cobertura', () => {
     expect(c1.equals(c3)).toBe(false);
   });
 });
-

@@ -1,30 +1,51 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import { useRoute } from 'vue-router'
-import { useAuthStore } from '@/stores/auth'
-import type { Permiso } from '@/types/api'
+import { computed } from 'vue';
+import { useRoute } from 'vue-router';
+import { useAuthStore } from '@/stores/auth';
+import type { Permiso } from '@/types/api';
 
-const route = useRoute()
-const authStore = useAuthStore()
+const route = useRoute();
+const authStore = useAuthStore();
 
 defineProps<{
-  title?: string
-}>()
+  title?: string;
+}>();
 
 const tabs = computed(() => [
-  { path: '/recursos', label: 'Mapa de Camas', icon: BedIcon, permisos: ['camas:leer'] as Permiso[] },
-  { path: '/recursos/internaciones', label: 'Internaciones', icon: UserPlusIcon, permisos: ['internaciones:gestionar'] as Permiso[] },
-  { path: '/recursos/insumos', label: 'Insumos', icon: BoxIcon, permisos: ['insumos:gestionar'] as Permiso[] },
-])
+  {
+    path: '/recursos',
+    label: 'Mapa de Camas',
+    icon: BedIcon,
+    permisos: ['camas:leer'] as Permiso[],
+  },
+  {
+    path: '/recursos/internaciones',
+    label: 'Internaciones',
+    icon: UserPlusIcon,
+    permisos: ['internaciones:gestionar'] as Permiso[],
+  },
+  {
+    path: '/recursos/insumos',
+    label: 'Insumos',
+    icon: BoxIcon,
+    permisos: ['insumos:gestionar'] as Permiso[],
+  },
+]);
 
 function isActiveTab(path: string): boolean {
-  return route.path === path || (path !== '/recursos' && route.path.startsWith(path))
+  return route.path === path || (path !== '/recursos' && route.path.startsWith(path));
 }
 
 // Icons
-const BedIcon = { template: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 4v16a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V4"></path><path d="M2 8h18"></path><path d="M2 16h18"></path></svg>` }
-const UserPlusIcon = { template: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></path><line x1="19" y1="8" x2="19" y2="14"></line><line x1="22" y1="11" x2="16" y2="11"></line></svg>` }
-const BoxIcon = { template: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>` }
+const BedIcon = {
+  template: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 4v16a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V4"></path><path d="M2 8h18"></path><path d="M2 16h18"></path></svg>`,
+};
+const UserPlusIcon = {
+  template: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></path><line x1="19" y1="8" x2="19" y2="14"></line><line x1="22" y1="11" x2="16" y2="11"></line></svg>`,
+};
+const BoxIcon = {
+  template: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>`,
+};
 </script>
 
 <template>
@@ -32,7 +53,9 @@ const BoxIcon = { template: `<svg width="18" height="18" viewBox="0 0 24 24" fil
     <div class="module-header">
       <div>
         <h1 class="module-title">{{ title || 'Recursos y Camas' }}</h1>
-        <p class="module-subtitle">Mapa de camas, gestión de internaciones e inventario de insumos</p>
+        <p class="module-subtitle">
+          Mapa de camas, gestión de internaciones e inventario de insumos
+        </p>
       </div>
     </div>
 

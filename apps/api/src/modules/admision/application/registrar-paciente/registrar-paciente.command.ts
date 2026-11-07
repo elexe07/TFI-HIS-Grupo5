@@ -41,4 +41,3 @@ export class RegistrarPacienteCommand {
     this.numeroAfiliado = datos.numeroAfiliado ?? null;
   }
 }
-

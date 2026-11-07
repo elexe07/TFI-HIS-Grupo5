@@ -13,4 +13,3 @@ export interface ValidadorDeCobertura {
     numeroAfiliado: string,
   ): Promise<ResultadoValidacionCobertura>;
 }
-

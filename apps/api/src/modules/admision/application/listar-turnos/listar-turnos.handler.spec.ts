@@ -43,4 +43,3 @@ describe('ListarTurnosHandler', () => {
     expect(todos).toHaveLength(2);
   });
 });
-

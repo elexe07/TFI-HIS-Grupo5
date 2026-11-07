@@ -8,14 +8,14 @@ Control de signos vitales, administración de medicación prescrita, ejecución 
 
 ## Casos de uso (ROADMAP §6)
 
-| ID     | Caso de uso                                            | Implementación                                                              | Tests                                      |
-| ------ | ------------------------------------------------------ | --------------------------------------------------------------------------- | ------------------------------------------ |
-| ENF-01 | Generar indicaciones (por evento `PrescripcionCreada`) | cantidad = (24 / frecuencia) × duración; idempotente                        | Unitario en application + E2E + Handler    |
-| ENF-02 | Registrar signos vitales                               | rangos biológicos (Temp 30–45 °C, SpO₂ 50–100%, TA, FC); inmutable         | Unitario en domain + application + E2E     |
-| ENF-03 | Administrar medicación                                 | requiere indicación pendiente; no se repite; emite `MedicacionAdministrada` | Unitario en domain + application + E2E     |
-| ENF-04 | Omitir indicación                                      | motivo obligatorio; pasa a estado `OMITIDA`                                 | Unitario en domain + application + E2E     |
-| ENF-05 | Registrar nota de enfermería                           | texto obligatorio; inmutable                                                | Unitario en domain + application + E2E     |
-| ENF-06 | Indicaciones del día                                   | filtro por internación, paciente y fecha                                    | Unitario en application + E2E              |
+| ID     | Caso de uso                                            | Implementación                                                              | Tests                                   |
+| ------ | ------------------------------------------------------ | --------------------------------------------------------------------------- | --------------------------------------- |
+| ENF-01 | Generar indicaciones (por evento `PrescripcionCreada`) | cantidad = (24 / frecuencia) × duración; idempotente                        | Unitario en application + E2E + Handler |
+| ENF-02 | Registrar signos vitales                               | rangos biológicos (Temp 30–45 °C, SpO₂ 50–100%, TA, FC); inmutable          | Unitario en domain + application + E2E  |
+| ENF-03 | Administrar medicación                                 | requiere indicación pendiente; no se repite; emite `MedicacionAdministrada` | Unitario en domain + application + E2E  |
+| ENF-04 | Omitir indicación                                      | motivo obligatorio; pasa a estado `OMITIDA`                                 | Unitario en domain + application + E2E  |
+| ENF-05 | Registrar nota de enfermería                           | texto obligatorio; inmutable                                                | Unitario en domain + application + E2E  |
+| ENF-06 | Indicaciones del día                                   | filtro por internación, paciente y fecha                                    | Unitario en application + E2E           |
 
 ## Dominio
 
@@ -26,8 +26,8 @@ Control de signos vitales, administración de medicación prescrita, ejecución 
 
 ## Eventos
 
-| Consume                                         | Publica                                                                                                                                              |
-| ----------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Consume                                         | Publica                                                                                                                                                   |
+| ----------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `hce.prescripcion-creada` → genera indicaciones | `enfermeria.medicacion-administrada { administracionId, indicacionId, pacienteId, internacionId, medicamento, administradaPor }` → Recursos y Facturación |
 
 ## Tablas (MODELO-DE-DATOS §2.4)

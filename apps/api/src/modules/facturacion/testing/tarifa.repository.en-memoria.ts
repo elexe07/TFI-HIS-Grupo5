@@ -27,4 +27,3 @@ export class TarifaRepositoryEnMemoria implements TarifaRepository {
     );
   }
 }
-

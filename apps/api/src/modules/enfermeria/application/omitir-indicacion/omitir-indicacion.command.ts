@@ -5,4 +5,3 @@ export class OmitirIndicacionCommand {
     readonly omitidaPor: string,
   ) {}
 }
-

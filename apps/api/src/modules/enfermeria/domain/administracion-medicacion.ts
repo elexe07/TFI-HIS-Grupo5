@@ -28,7 +28,10 @@ export class AdministracionDeMedicacion extends Entity<Id> {
     this.administradaPor = props.administradaPor;
   }
 
-  static crear(props: PropsAdministracionMedicacion, id: Id = generarId()): AdministracionDeMedicacion {
+  static crear(
+    props: PropsAdministracionMedicacion,
+    id: Id = generarId(),
+  ): AdministracionDeMedicacion {
     return new AdministracionDeMedicacion(id, props);
   }
 
@@ -36,4 +39,3 @@ export class AdministracionDeMedicacion extends Entity<Id> {
     return new AdministracionDeMedicacion(id, props);
   }
 }
-

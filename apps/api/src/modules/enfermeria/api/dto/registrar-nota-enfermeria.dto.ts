@@ -25,4 +25,3 @@ export class RegistrarNotaEnfermeriaDto {
   @IsNotEmpty()
   texto!: string;
 }
-

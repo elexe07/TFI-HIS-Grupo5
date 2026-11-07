@@ -34,4 +34,3 @@ export class CancelarTurnoHandler implements CasoDeUso<CancelarTurnoCommand, Tur
     return aTurnoDto(turno);
   }
 }
-

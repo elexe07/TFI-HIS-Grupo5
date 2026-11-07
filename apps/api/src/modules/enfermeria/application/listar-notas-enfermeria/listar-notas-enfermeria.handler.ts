@@ -4,10 +4,7 @@ import {
   NOTA_ENFERMERIA_REPOSITORY,
   type NotaEnfermeriaRepository,
 } from '../../domain/nota-enfermeria.repository';
-import {
-  mapearNotaADto,
-  type NotaEnfermeriaDto,
-} from '../dtos/nota-enfermeria.dto';
+import { mapearNotaADto, type NotaEnfermeriaDto } from '../dtos/nota-enfermeria.dto';
 
 export class ListarNotasEnfermeriaQuery {
   constructor(
@@ -19,9 +16,10 @@ export class ListarNotasEnfermeriaQuery {
 }
 
 @Injectable()
-export class ListarNotasEnfermeriaHandler
-  implements CasoDeUso<ListarNotasEnfermeriaQuery, NotaEnfermeriaDto[]>
-{
+export class ListarNotasEnfermeriaHandler implements CasoDeUso<
+  ListarNotasEnfermeriaQuery,
+  NotaEnfermeriaDto[]
+> {
   constructor(
     @Inject(NOTA_ENFERMERIA_REPOSITORY)
     private readonly repository: NotaEnfermeriaRepository,
@@ -32,4 +30,3 @@ export class ListarNotasEnfermeriaHandler
     return listado.map(mapearNotaADto);
   }
 }
-

@@ -34,4 +34,3 @@ export class RegistrarMedicoHandler implements CasoDeUso<RegistrarMedicoCommand,
     return aMedicoDto(medico);
   }
 }
-

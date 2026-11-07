@@ -25,4 +25,3 @@ export class GuardiaController {
     return this.obtenerCola.ejecutar();
   }
 }
-

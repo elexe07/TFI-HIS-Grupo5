@@ -48,4 +48,3 @@ describe('ListarIndicacionesHandler', () => {
     expect(resultadoDia23Pac1[0]?.id).toBe(ind1.id);
   });
 });
-

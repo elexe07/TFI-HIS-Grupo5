@@ -20,4 +20,3 @@ export class RegistrarTriajeCommand {
     this.registradoPor = datos.registradoPor;
   }
 }
-

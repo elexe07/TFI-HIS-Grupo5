@@ -16,7 +16,10 @@ export class ConsultarHistoriaQuery {
 }
 
 @Injectable()
-export class ConsultarHistoriaHandler implements CasoDeUso<ConsultarHistoriaQuery, HistoriaClinicaDto> {
+export class ConsultarHistoriaHandler implements CasoDeUso<
+  ConsultarHistoriaQuery,
+  HistoriaClinicaDto
+> {
   constructor(
     @Inject(HISTORIA_CLINICA_REPOSITORY)
     private readonly repo: HistoriaClinicaRepository,
@@ -90,4 +93,3 @@ export class ConsultarHistoriaHandler implements CasoDeUso<ConsultarHistoriaQuer
     };
   }
 }
-

@@ -1,44 +1,47 @@
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue'
-import { useEnfermeriaStore } from '@/stores/enfermeria'
-import { useAdmisionStore } from '@/stores/admision'
-import { useToastStore } from '@/stores/toast'
-import { Card } from '@/components/ui'
-import { Button } from '@/components/ui'
+import { ref, onMounted, watch } from 'vue';
+import { useEnfermeriaStore } from '@/stores/enfermeria';
+import { useAdmisionStore } from '@/stores/admision';
+import { useToastStore } from '@/stores/toast';
+import { Card } from '@/components/ui';
+import { Button } from '@/components/ui';
 
-const enfermeriaStore = useEnfermeriaStore()
-const admisionStore = useAdmisionStore()
-const toastStore = useToastStore()
+const enfermeriaStore = useEnfermeriaStore();
+const admisionStore = useAdmisionStore();
+const toastStore = useToastStore();
 
-const pacienteId = ref('')
-const notaTexto = ref('')
+const pacienteId = ref('');
+const notaTexto = ref('');
 
 async function guardarNota() {
-  if (!notaTexto.value.trim()) return
+  if (!notaTexto.value.trim()) return;
   await enfermeriaStore.crearNota({
     pacienteId: pacienteId.value,
     internacionId: undefined,
     texto: notaTexto.value.trim(),
-  })
-  toastStore.success('Nota guardada', 'Nota de enfermería registrada')
-  notaTexto.value = ''
+  });
+  toastStore.success('Nota guardada', 'Nota de enfermería registrada');
+  notaTexto.value = '';
 }
 
-watch(() => admisionStore.pacienteSeleccionado, (paciente) => {
-  if (paciente) {
-    pacienteId.value = paciente.id
-    enfermeriaStore.setContexto(paciente.id)
-    enfermeriaStore.cargarDatos()
-  }
-})
+watch(
+  () => admisionStore.pacienteSeleccionado,
+  (paciente) => {
+    if (paciente) {
+      pacienteId.value = paciente.id;
+      enfermeriaStore.setContexto(paciente.id);
+      enfermeriaStore.cargarDatos();
+    }
+  },
+);
 
 onMounted(() => {
   if (admisionStore.pacienteSeleccionado) {
-    pacienteId.value = admisionStore.pacienteSeleccionado.id
-    enfermeriaStore.setContexto(pacienteId.value)
-    enfermeriaStore.cargarDatos()
+    pacienteId.value = admisionStore.pacienteSeleccionado.id;
+    enfermeriaStore.setContexto(pacienteId.value);
+    enfermeriaStore.cargarDatos();
   }
-})
+});
 </script>
 
 <template>
@@ -55,7 +58,12 @@ onMounted(() => {
         <label>Paciente</label>
         <Select
           v-model="pacienteId"
-          :options="admisionStore.pacientes.map(p => ({ value: p.id, label: `${p.apellido}, ${p.nombre} (${p.tipoDocumento} ${p.numeroDocumento})` }))"
+          :options="
+            admisionStore.pacientes.map((p) => ({
+              value: p.id,
+              label: `${p.apellido}, ${p.nombre} (${p.tipoDocumento} ${p.numeroDocumento})`,
+            }))
+          "
           placeholder="Seleccionar paciente"
         />
       </div>
@@ -80,8 +88,24 @@ onMounted(() => {
         </div>
 
         <div class="form-actions">
-          <Button variant="primary" type="submit" :loading="enfermeriaStore.cargando" :disabled="!notaTexto.trim()">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+          <Button
+            variant="primary"
+            type="submit"
+            :loading="enfermeriaStore.cargando"
+            :disabled="!notaTexto.trim()"
+          >
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+              <polyline points="17 21 17 13 7 13 7 21"></polyline>
+              <polyline points="7 3 7 8 15 8"></polyline>
+            </svg>
             Guardar Nota
           </Button>
         </div>
@@ -95,7 +119,15 @@ onMounted(() => {
       </template>
 
       <div v-if="enfermeriaStore.notas.length === 0" class="empty-state">
-        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="empty-icon">
+        <svg
+          width="48"
+          height="48"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          class="empty-icon"
+        >
           <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
           <polyline points="14 2 14 8 20 8"></polyline>
           <line x1="16" y1="13" x2="8" y2="13"></line>
@@ -110,7 +142,9 @@ onMounted(() => {
         <div v-for="nota in enfermeriaStore.notas" :key="nota.id" class="nota-item">
           <div class="nota-header">
             <div class="nota-meta">
-              <span class="nota-fecha">{{ new Date(nota.registradoEn).toLocaleString('es-AR') }}</span>
+              <span class="nota-fecha">{{
+                new Date(nota.registradoEn).toLocaleString('es-AR')
+              }}</span>
               <span class="nota-usuario">por {{ nota.registradoPor }}</span>
             </div>
           </div>

@@ -1,13 +1,34 @@
 import { EventBusEnMemoria, RelojFijo } from '../../../building-blocks/testing';
 import { HistoriaClinica } from '../domain/historia-clinica';
 import { HistoriaClinicaRepositoryEnMemoria } from '../infrastructure/historia-clinica.repository.en-memoria';
-import { AbrirHistoriaCommand, AbrirHistoriaHandler } from './abrir-historia/abrir-historia.handler';
-import { ConsultarHistoriaHandler, ConsultarHistoriaQuery } from './consultar-historia/consultar-historia.handler';
-import { CrearPrescripcionCommand, CrearPrescripcionHandler } from './crear-prescripcion/crear-prescripcion.handler';
-import { RegistrarAlergiaCommand, RegistrarAlergiaHandler } from './registrar-alergia/registrar-alergia.handler';
-import { RegistrarAntecedenteCommand, RegistrarAntecedenteHandler } from './registrar-antecedente/registrar-antecedente.handler';
-import { RegistrarEstudioCommand, RegistrarEstudioHandler } from './registrar-estudio/registrar-estudio.handler';
-import { RegistrarEvolucionCommand, RegistrarEvolucionHandler } from './registrar-evolucion/registrar-evolucion.handler';
+import {
+  AbrirHistoriaCommand,
+  AbrirHistoriaHandler,
+} from './abrir-historia/abrir-historia.handler';
+import {
+  ConsultarHistoriaHandler,
+  ConsultarHistoriaQuery,
+} from './consultar-historia/consultar-historia.handler';
+import {
+  CrearPrescripcionCommand,
+  CrearPrescripcionHandler,
+} from './crear-prescripcion/crear-prescripcion.handler';
+import {
+  RegistrarAlergiaCommand,
+  RegistrarAlergiaHandler,
+} from './registrar-alergia/registrar-alergia.handler';
+import {
+  RegistrarAntecedenteCommand,
+  RegistrarAntecedenteHandler,
+} from './registrar-antecedente/registrar-antecedente.handler';
+import {
+  RegistrarEstudioCommand,
+  RegistrarEstudioHandler,
+} from './registrar-estudio/registrar-estudio.handler';
+import {
+  RegistrarEvolucionCommand,
+  RegistrarEvolucionHandler,
+} from './registrar-evolucion/registrar-evolucion.handler';
 
 describe('Casos de Uso HCE (Fase 4 ROADMAP)', () => {
   let repo: HistoriaClinicaRepositoryEnMemoria;
@@ -69,8 +90,10 @@ describe('Casos de Uso HCE (Fase 4 ROADMAP)', () => {
       );
 
       await expect(
-        handler.ejecutar(new RegistrarAlergiaCommand(pacienteId, 'amoxicilina', 'MODERADA', medicoId)),
-      ).rejects.toThrow('La sustancia \'amoxicilina\' ya está registrada');
+        handler.ejecutar(
+          new RegistrarAlergiaCommand(pacienteId, 'amoxicilina', 'MODERADA', medicoId),
+        ),
+      ).rejects.toThrow("La sustancia 'amoxicilina' ya está registrada");
     });
   });
 
@@ -97,14 +120,7 @@ describe('Casos de Uso HCE (Fase 4 ROADMAP)', () => {
 
       await expect(
         handler.ejecutar(
-          new CrearPrescripcionCommand(
-            pacienteId,
-            medicoId,
-            'Penicilina G',
-            '1000 UI',
-            12,
-            7,
-          ),
+          new CrearPrescripcionCommand(pacienteId, medicoId, 'Penicilina G', '1000 UI', 12, 7),
         ),
       ).rejects.toThrow('el paciente presenta alergia');
     });
@@ -114,14 +130,7 @@ describe('Casos de Uso HCE (Fase 4 ROADMAP)', () => {
 
       const handler = new CrearPrescripcionHandler(repo, bus, reloj);
       const res = await handler.ejecutar(
-        new CrearPrescripcionCommand(
-          pacienteId,
-          medicoId,
-          'Loratadina',
-          '10 mg',
-          24,
-          10,
-        ),
+        new CrearPrescripcionCommand(pacienteId, medicoId, 'Loratadina', '10 mg', 24, 10),
       );
 
       expect(res.id).toBeDefined();
@@ -184,4 +193,3 @@ describe('Casos de Uso HCE (Fase 4 ROADMAP)', () => {
     });
   });
 });
-

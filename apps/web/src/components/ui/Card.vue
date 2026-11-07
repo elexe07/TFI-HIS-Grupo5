@@ -1,21 +1,25 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import type { CardProps } from './Card.types'
+import { computed } from 'vue';
+import type { CardProps } from './Card.types';
 
-const props = defineProps<CardProps>()
+const props = defineProps<CardProps>();
 
 defineSlots<{
-  default: () => any
-  header: () => any
-  footer: () => any
-}>()
+  default: () => any;
+  header: () => any;
+  footer: () => any;
+}>();
 
-const cardClasses = computed(() => [
-  'card',
-  { 'card-hover': props.hoverable },
-  { 'card-bordered': props.bordered !== false },
-  props.class,
-].filter(Boolean).join(' '))
+const cardClasses = computed(() =>
+  [
+    'card',
+    { 'card-hover': props.hoverable },
+    { 'card-bordered': props.bordered !== false },
+    props.class,
+  ]
+    .filter(Boolean)
+    .join(' '),
+);
 </script>
 
 <template>
@@ -49,7 +53,9 @@ const cardClasses = computed(() => [
 }
 
 .card-hover {
-  transition: box-shadow var(--transition-normal), transform var(--transition-normal);
+  transition:
+    box-shadow var(--transition-normal),
+    transform var(--transition-normal);
 }
 
 .card-hover:hover {

@@ -10,4 +10,3 @@ export class OmitirIndicacionDto {
   @IsNotEmpty()
   motivo!: string;
 }
-

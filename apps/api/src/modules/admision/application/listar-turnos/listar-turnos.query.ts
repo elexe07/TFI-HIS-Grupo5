@@ -16,4 +16,3 @@ export class ListarTurnosQuery {
     this.hasta = filtros?.hasta ? new Date(filtros.hasta) : undefined;
   }
 }
-

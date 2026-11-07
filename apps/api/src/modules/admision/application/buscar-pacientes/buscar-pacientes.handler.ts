@@ -17,4 +17,3 @@ export class BuscarPacientesHandler implements CasoDeUso<BuscarPacientesQuery, P
     return lista.map(aPacienteDto);
   }
 }
-

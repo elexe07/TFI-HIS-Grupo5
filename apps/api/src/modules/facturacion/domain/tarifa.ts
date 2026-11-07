@@ -21,4 +21,3 @@ export class Tarifa extends Entity<Id> {
     return new Tarifa(id, concepto, monto);
   }
 }
-

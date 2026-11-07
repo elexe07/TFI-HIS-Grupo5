@@ -1,9 +1,9 @@
 /**
  * Store de HCE - Historia Clínica Electrónica (Pinia)
  */
-import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
-import { hceApi } from '@/services/api'
+import { defineStore } from 'pinia';
+import { ref, computed } from 'vue';
+import { hceApi } from '@/services/api';
 import type {
   HistoriaClinicaDTO,
   CrearEvolucionRequest,
@@ -11,32 +11,30 @@ import type {
   CrearAntecedenteRequest,
   CrearPrescripcionRequest,
   CrearEstudioRequest,
-} from '@/types/api'
+} from '@/types/api';
 
 export const useHceStore = defineStore('hce', () => {
   // --- STATE ---
-  const historiaActual = ref<HistoriaClinicaDTO | null>(null)
-  const cargando = ref(false)
-  const error = ref<string | null>(null)
+  const historiaActual = ref<HistoriaClinicaDTO | null>(null);
+  const cargando = ref(false);
+  const error = ref<string | null>(null);
 
   // --- GETTERS ---
-  const evoluciones = computed(() => historiaActual.value?.evoluciones ?? [])
-  const alergias = computed(() => historiaActual.value?.alergias ?? [])
-  const antecedentes = computed(() => historiaActual.value?.antecedentes ?? [])
-  const prescripciones = computed(() => historiaActual.value?.prescripciones ?? [])
-  const estudios = computed(() => historiaActual.value?.estudios ?? [])
+  const evoluciones = computed(() => historiaActual.value?.evoluciones ?? []);
+  const alergias = computed(() => historiaActual.value?.alergias ?? []);
+  const antecedentes = computed(() => historiaActual.value?.antecedentes ?? []);
+  const prescripciones = computed(() => historiaActual.value?.prescripciones ?? []);
+  const estudios = computed(() => historiaActual.value?.estudios ?? []);
 
   const prescripcionesActivas = computed(() =>
     prescripciones.value.filter((p) => p.estado === 'ACTIVA'),
-  )
+  );
 
-  const hayAlergiasGraves = computed(() =>
-    alergias.value.some((a) => a.severidad === 'GRAVE'),
-  )
+  const hayAlergiasGraves = computed(() => alergias.value.some((a) => a.severidad === 'GRAVE'));
 
   // Timeline combinado y ordenado por fecha
   const timeline = computed(() => {
-    const items: Array<{ tipo: string; fecha: string; data: unknown; titulo: string }> = []
+    const items: Array<{ tipo: string; fecha: string; data: unknown; titulo: string }> = [];
 
     evoluciones.value.forEach((e) => {
       items.push({
@@ -44,8 +42,8 @@ export const useHceStore = defineStore('hce', () => {
         fecha: e.registradoEn,
         data: e,
         titulo: `Evolución - ${e.diagnostico}`,
-      })
-    })
+      });
+    });
 
     alergias.value.forEach((a) => {
       items.push({
@@ -53,8 +51,8 @@ export const useHceStore = defineStore('hce', () => {
         fecha: a.registradoEn,
         data: a,
         titulo: `Alergia: ${a.sustancia} (${a.severidad})`,
-      })
-    })
+      });
+    });
 
     antecedentes.value.forEach((ant) => {
       items.push({
@@ -62,8 +60,8 @@ export const useHceStore = defineStore('hce', () => {
         fecha: ant.registradoEn,
         data: ant,
         titulo: `Antecedente: ${ant.parentesco} - ${ant.condicion}`,
-      })
-    })
+      });
+    });
 
     prescripciones.value.forEach((p) => {
       items.push({
@@ -71,8 +69,8 @@ export const useHceStore = defineStore('hce', () => {
         fecha: p.createdAt,
         data: p,
         titulo: `Prescripción: ${p.medicamento} ${p.dosis}`,
-      })
-    })
+      });
+    });
 
     estudios.value.forEach((e) => {
       items.push({
@@ -80,129 +78,129 @@ export const useHceStore = defineStore('hce', () => {
         fecha: e.createdAt,
         data: e,
         titulo: `Estudio: ${e.tipo} - ${e.descripcion}`,
-      })
-    })
+      });
+    });
 
-    return items.sort((a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime())
-  })
+    return items.sort((a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime());
+  });
 
   // --- ACTIONS ---
   async function cargarHistoria(pacienteId: string) {
-    cargando.value = true
-    error.value = null
+    cargando.value = true;
+    error.value = null;
     try {
-      historiaActual.value = await hceApi.obtenerHistoria(pacienteId)
+      historiaActual.value = await hceApi.obtenerHistoria(pacienteId);
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Error al cargar historia clínica'
-      throw err
+      error.value = err instanceof Error ? err.message : 'Error al cargar historia clínica';
+      throw err;
     } finally {
-      cargando.value = false
+      cargando.value = false;
     }
   }
 
   function limpiarHistoria() {
-    historiaActual.value = null
+    historiaActual.value = null;
   }
 
   async function crearEvolucion(data: CrearEvolucionRequest) {
-    cargando.value = true
-    error.value = null
+    cargando.value = true;
+    error.value = null;
     try {
-      const pId = historiaActual.value?.pacienteId
-      if (!pId) throw new Error('No hay historia clínica activa para registrar la evolución')
-      const { historiaId, ...payload } = data as any
-      const nueva = await hceApi.crearEvolucion(pId, payload)
-      await cargarHistoria(pId)
-      return nueva
+      const pId = historiaActual.value?.pacienteId;
+      if (!pId) throw new Error('No hay historia clínica activa para registrar la evolución');
+      const { historiaId, ...payload } = data as any;
+      const nueva = await hceApi.crearEvolucion(pId, payload);
+      await cargarHistoria(pId);
+      return nueva;
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Error al crear evolución'
-      throw err
+      error.value = err instanceof Error ? err.message : 'Error al crear evolución';
+      throw err;
     } finally {
-      cargando.value = false
+      cargando.value = false;
     }
   }
 
   async function crearAlergia(data: CrearAlergiaRequest) {
-    cargando.value = true
-    error.value = null
+    cargando.value = true;
+    error.value = null;
     try {
-      const pId = historiaActual.value?.pacienteId
-      if (!pId) throw new Error('No hay historia clínica activa para registrar la alergia')
-      const { historiaId, ...payload } = data as any
-      const nueva = await hceApi.crearAlergia(pId, payload)
-      await cargarHistoria(pId)
-      return nueva
+      const pId = historiaActual.value?.pacienteId;
+      if (!pId) throw new Error('No hay historia clínica activa para registrar la alergia');
+      const { historiaId, ...payload } = data as any;
+      const nueva = await hceApi.crearAlergia(pId, payload);
+      await cargarHistoria(pId);
+      return nueva;
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Error al registrar alergia'
-      throw err
+      error.value = err instanceof Error ? err.message : 'Error al registrar alergia';
+      throw err;
     } finally {
-      cargando.value = false
+      cargando.value = false;
     }
   }
 
   async function crearAntecedente(data: CrearAntecedenteRequest) {
-    cargando.value = true
-    error.value = null
+    cargando.value = true;
+    error.value = null;
     try {
-      const pId = historiaActual.value?.pacienteId
-      if (!pId) throw new Error('No hay historia clínica activa para registrar el antecedente')
-      const { historiaId, ...payload } = data as any
-      const nuevo = await hceApi.crearAntecedente(pId, payload)
-      await cargarHistoria(pId)
-      return nuevo
+      const pId = historiaActual.value?.pacienteId;
+      if (!pId) throw new Error('No hay historia clínica activa para registrar el antecedente');
+      const { historiaId, ...payload } = data as any;
+      const nuevo = await hceApi.crearAntecedente(pId, payload);
+      await cargarHistoria(pId);
+      return nuevo;
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Error al registrar antecedente'
-      throw err
+      error.value = err instanceof Error ? err.message : 'Error al registrar antecedente';
+      throw err;
     } finally {
-      cargando.value = false
+      cargando.value = false;
     }
   }
 
   async function crearPrescripcion(data: CrearPrescripcionRequest) {
-    cargando.value = true
-    error.value = null
+    cargando.value = true;
+    error.value = null;
     try {
-      const pId = historiaActual.value?.pacienteId
-      if (!pId) throw new Error('No hay historia clínica activa para registrar la prescripción')
-      const { historiaId, ...payload } = data as any
-      const nueva = await hceApi.crearPrescripcion(pId, payload)
-      await cargarHistoria(pId)
-      return nueva
+      const pId = historiaActual.value?.pacienteId;
+      if (!pId) throw new Error('No hay historia clínica activa para registrar la prescripción');
+      const { historiaId, ...payload } = data as any;
+      const nueva = await hceApi.crearPrescripcion(pId, payload);
+      await cargarHistoria(pId);
+      return nueva;
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Error al crear prescripción'
-      throw err
+      error.value = err instanceof Error ? err.message : 'Error al crear prescripción';
+      throw err;
     } finally {
-      cargando.value = false
+      cargando.value = false;
     }
   }
 
   async function crearEstudio(data: CrearEstudioRequest) {
-    cargando.value = true
-    error.value = null
+    cargando.value = true;
+    error.value = null;
     try {
-      const pId = historiaActual.value?.pacienteId
-      if (!pId) throw new Error('No hay historia clínica activa para registrar el estudio')
-      const { historiaId, ...payload } = data as any
-      const nuevo = await hceApi.crearEstudio(pId, payload)
-      await cargarHistoria(pId)
-      return nuevo
+      const pId = historiaActual.value?.pacienteId;
+      if (!pId) throw new Error('No hay historia clínica activa para registrar el estudio');
+      const { historiaId, ...payload } = data as any;
+      const nuevo = await hceApi.crearEstudio(pId, payload);
+      await cargarHistoria(pId);
+      return nuevo;
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Error al registrar estudio'
-      throw err
+      error.value = err instanceof Error ? err.message : 'Error al registrar estudio';
+      throw err;
     } finally {
-      cargando.value = false
+      cargando.value = false;
     }
   }
 
   function clearError() {
-    error.value = null
+    error.value = null;
   }
 
   // Helpers para validaciones en UI
   function verificarAlergia(medicamento: string): boolean {
-    return alergias.value.some(
-      (a) => a.sustancia.toLowerCase().includes(medicamento.toLowerCase()),
-    )
+    return alergias.value.some((a) =>
+      a.sustancia.toLowerCase().includes(medicamento.toLowerCase()),
+    );
   }
 
   return {
@@ -229,5 +227,5 @@ export const useHceStore = defineStore('hce', () => {
     crearEstudio,
     clearError,
     verificarAlergia,
-  }
-})
+  };
+});

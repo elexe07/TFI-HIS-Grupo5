@@ -9,4 +9,3 @@ export interface MedicoRepository {
   buscarPorMatricula(matricula: string): Promise<Medico | null>;
   listar(): Promise<Medico[]>;
 }
-

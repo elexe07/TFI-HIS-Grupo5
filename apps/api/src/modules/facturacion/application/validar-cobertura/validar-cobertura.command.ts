@@ -11,4 +11,3 @@ export interface ValidarCoberturaResultado {
   readonly motivoRechazo?: string;
   readonly cuentaActualizada?: boolean;
 }
-

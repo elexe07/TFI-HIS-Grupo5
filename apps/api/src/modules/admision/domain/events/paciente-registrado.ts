@@ -12,4 +12,3 @@ export class PacienteRegistrado extends DomainEventBase {
     super(ocurridoEn);
   }
 }
-

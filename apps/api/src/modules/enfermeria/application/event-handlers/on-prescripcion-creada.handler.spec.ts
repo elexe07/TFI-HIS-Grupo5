@@ -26,4 +26,24 @@ describe('OnPrescripcionCreadaHandler', () => {
     expect(indicaciones).toHaveLength(3);
     expect(indicaciones[0]?.descripcion).toBe('Amoxicilina 500 mg');
   });
+
+  it('omite la generación si la prescripción no tiene internacionId', async () => {
+    const repo = new IndicacionRepositoryEnMemoria();
+    const useCase = new GenerarIndicacionesHandler(repo);
+    const handler = new OnPrescripcionCreadaHandler(useCase);
+
+    const evento = new PrescripcionCreadaEvent({
+      prescripcionId: 'presc-2',
+      pacienteId: 'pac-2',
+      medicamento: 'Ibuprofeno',
+      dosis: '400 mg',
+      frecuenciaHoras: 8,
+      duracionDias: 1,
+    });
+
+    await handler.manejar(evento);
+
+    const indicaciones = await repo.listar();
+    expect(indicaciones).toHaveLength(0);
+  });
 });

@@ -30,7 +30,7 @@ export class AplicarCargoMedicacionHandler {
       return;
     }
 
-    const { pacienteId, internacionId, medicamento } = evento.payload;
+    const { pacienteId, internacionId, medicamento } = evento;
     const ahora = this.clock.ahora();
 
     let cuenta = await this.cuentaRepo.buscarPorTipoYReferencia(

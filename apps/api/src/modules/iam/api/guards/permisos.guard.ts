@@ -28,7 +28,13 @@ export class PermisosGuard implements CanActivate {
     request.usuario = await this.autenticar(request);
 
     const permiso = this.metadato<Permiso>(ctx, PERMISO_REQUERIDO);
-    if (permiso && !request.usuario.permisos.includes(permiso)) throw new PermisoFaltante(permiso);
+    if (
+      permiso &&
+      request.usuario.rol !== 'ADMINISTRADOR' &&
+      !request.usuario.permisos.includes(permiso)
+    ) {
+      throw new PermisoFaltante(permiso);
+    }
     return true;
   }
 

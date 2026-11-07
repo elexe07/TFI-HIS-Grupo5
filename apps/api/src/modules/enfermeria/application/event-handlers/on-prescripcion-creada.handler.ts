@@ -15,12 +15,23 @@ export class OnPrescripcionCreadaHandler {
 
   @OnEvent(PRESCRIPCION_CREADA)
   async manejar(evento: PrescripcionCreadaEvent): Promise<void> {
+    if (!evento.internacionId) {
+      this.logger.debug(
+        `Prescripción ${evento.prescripcionId} sin internación asociada: se omite la generación de indicaciones de enfermería`,
+      );
+      return;
+    }
+
     this.logger.log(
       `Generando indicaciones para prescripción ${evento.prescripcionId} (evento ${evento.eventoId})`,
     );
 
     const inicioEn =
-      evento.inicioEn instanceof Date ? evento.inicioEn : new Date(evento.inicioEn);
+      evento.inicioEn instanceof Date
+        ? evento.inicioEn
+        : evento.inicioEn
+          ? new Date(evento.inicioEn)
+          : new Date();
 
     await this.generarIndicaciones.ejecutar(
       new GenerarIndicacionesCommand({

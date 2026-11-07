@@ -1,14 +1,25 @@
-import react from '@vitejs/plugin-react';
-import { defineConfig } from 'vite';
+import { defineConfig } from 'vite'
+import vue from '@vitejs/plugin-vue'
+import path from 'path'
 
-// En desarrollo, /api y /docs se redirigen a la API de NestJS (sin CORS ni URLs hardcodeadas).
 export default defineConfig({
-  plugins: [react()],
+  plugins: [vue()],
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'),
+    },
+  },
   server: {
     port: 5173,
     proxy: {
-      '/api': 'http://localhost:3000',
-      '/docs': 'http://localhost:3000',
+      '/api': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+      },
+      '/docs': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+      },
     },
   },
-});
+})

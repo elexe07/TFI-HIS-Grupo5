@@ -41,8 +41,8 @@ function getCellValue(row: Record<string, unknown>, key: string): unknown {
 
 function formatCellValue(row: Record<string, unknown>, column: TableColumn): string {
   const value = getCellValue(row, column.key)
-  if (value === null || value === undefined) return '-'
   if (column.format) return column.format(value, row)
+  if (value === null || value === undefined) return '-'
   if (typeof value === 'boolean') return value ? 'Sí' : 'No'
   if (value instanceof Date) return value.toLocaleString('es-AR')
   return String(value)

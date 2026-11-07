@@ -127,6 +127,24 @@ const routes: RouteRecordRaw[] = [
     },
     children: [
       {
+        path: '',
+        name: 'hce.inicio',
+        component: () => import('@/views/hce/HistoriaClinicaView.vue'),
+        meta: { title: 'Historia Clínica' },
+      },
+      {
+        path: 'evoluciones',
+        name: 'hce.evoluciones',
+        component: () => import('@/views/hce/EvolucionFormView.vue'),
+        meta: { permisos: ['hce:escribir'] as Permiso[], title: 'Evoluciones' },
+      },
+      {
+        path: 'prescripciones',
+        name: 'hce.prescripciones',
+        component: () => import('@/views/hce/PrescripcionFormView.vue'),
+        meta: { permisos: ['prescripciones:crear'] as Permiso[], title: 'Prescripciones' },
+      },
+      {
         path: 'paciente/:pacienteId',
         name: 'hce.historia',
         component: () => import('@/views/hce/HistoriaClinicaView.vue'),

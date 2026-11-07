@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import { useHceStore } from '@/stores/hce'
 import { useAdmisionStore } from '@/stores/admision'
 import { useToastStore } from '@/stores/toast'
 import { Card, Button, Input, Select, Table, Badge, type TableColumn } from '@/components/ui'
 import type { PrescripcionDTO, EstadoPrescripcion, CrearPrescripcionRequest } from '@/types/api'
 
+const route = useRoute()
 const hceStore = useHceStore()
 const admisionStore = useAdmisionStore()
 const toastStore = useToastStore()
@@ -13,8 +15,7 @@ const toastStore = useToastStore()
 const pacienteId = ref('')
 const showForm = ref(false)
 
-const form = ref<Omit<CrearPrescripcionRequest, 'frecuenciaHoras' | 'duracionDias'> & { frecuenciaHoras: string; duracionDias: string }>({
-  historiaId: '',
+const form = ref<{ medicamento: string; dosis: string; frecuenciaHoras: string; duracionDias: string }>({
   medicamento: '',
   dosis: '',
   frecuenciaHoras: '8',
@@ -40,20 +41,22 @@ async function guardarPrescripcion() {
     toastStore.error('Campos requeridos', 'Complete medicamento y dosis')
     return
   }
-  if (!form.value.historiaId) {
-    const historia = hceStore.historiaActual
-    if (!historia) {
-      toastStore.error('Error', 'No hay historia clínica cargada')
+  try {
+    if (!pacienteId.value) {
+      toastStore.error('Error', 'Seleccione un paciente primero')
       return
     }
-    form.value.historiaId = historia.id
-  }
-  try {
+    if (!hceStore.historiaActual || hceStore.historiaActual.pacienteId !== pacienteId.value) {
+      await hceStore.cargarHistoria(pacienteId.value)
+    }
+    const historia = hceStore.historiaActual
+    if (!historia) {
+      toastStore.error('Error', 'No se pudo obtener la historia clínica del paciente')
+      return
+    }
     const request: CrearPrescripcionRequest = {
-      historiaId: form.value.historiaId,
-      evolucionId: undefined,
-      medicamento: form.value.medicamento,
-      dosis: form.value.dosis,
+      medicamento: form.value.medicamento.trim(),
+      dosis: form.value.dosis.trim(),
       frecuenciaHoras: parseInt(form.value.frecuenciaHoras, 10) || 8,
       duracionDias: parseInt(form.value.duracionDias, 10) || 7,
     }
@@ -62,13 +65,12 @@ async function guardarPrescripcion() {
     resetForm()
     cargarDatos()
   } catch (err) {
-    // Error manejado en store
+    toastStore.apiError(err, 'Error al crear prescripción')
   }
 }
 
 function resetForm() {
   form.value = {
-    historiaId: '',
     medicamento: '',
     dosis: '',
     frecuenciaHoras: '8',
@@ -78,20 +80,40 @@ function resetForm() {
 }
 
 function abrirFormulario() {
+  form.value = {
+    medicamento: '',
+    dosis: '',
+    frecuenciaHoras: '8',
+    duracionDias: '7',
+  }
   showForm.value = true
-  resetForm()
 }
 
-watch(() => admisionStore.pacienteSeleccionado, (paciente) => {
-  if (paciente) {
-    pacienteId.value = paciente.id
+watch(pacienteId, (nuevoId) => {
+  if (nuevoId) {
     cargarDatos()
   }
 })
 
-onMounted(() => {
-  if (admisionStore.pacienteSeleccionado) {
+watch(() => admisionStore.pacienteSeleccionado, (paciente) => {
+  if (paciente) {
+    pacienteId.value = paciente.id
+  }
+})
+
+onMounted(async () => {
+  if (admisionStore.pacientes.length === 0) {
+    await admisionStore.cargarPacientes()
+  }
+  const idRuta = (route.params.pacienteId || route.query.pacienteId) as string | undefined
+  if (idRuta) {
+    pacienteId.value = idRuta
+  } else if (admisionStore.pacienteSeleccionado) {
     pacienteId.value = admisionStore.pacienteSeleccionado.id
+  } else if (admisionStore.pacientes.length > 0 && admisionStore.pacientes[0]) {
+    pacienteId.value = admisionStore.pacientes[0].id
+  }
+  if (pacienteId.value) {
     cargarDatos()
   }
 })

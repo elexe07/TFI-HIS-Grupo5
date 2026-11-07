@@ -1,15 +1,114 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { useHceStore } from '@/stores/hce'
 import { useAdmisionStore } from '@/stores/admision'
-import { Card, Select, Table, Badge, type TableColumn } from '@/components/ui'
-import type { SeveridadAlergia, AlergiaDTO, EstudioDTO, PrescripcionDTO } from '@/types/api'
+import { useToastStore } from '@/stores/toast'
+import { Card, Button, Input, Select, Table, Badge, Modal, type TableColumn } from '@/components/ui'
+import type { SeveridadAlergia, AlergiaDTO, EstudioDTO, PrescripcionDTO, TipoEstudio } from '@/types/api'
 
+const route = useRoute()
+const router = useRouter()
 const hceStore = useHceStore()
 const admisionStore = useAdmisionStore()
+const toastStore = useToastStore()
 
 const pacienteId = ref('')
 const activeTab = ref<'resumen' | 'alergias' | 'estudios' | 'prescripciones' | 'timeline'>('resumen')
+
+// Modales y formularios
+const showAlergiaModal = ref(false)
+const formAlergia = ref<{ sustancia: string; severidad: SeveridadAlergia }>({
+  sustancia: '',
+  severidad: 'LEVE',
+})
+
+const showAntecedenteModal = ref(false)
+const formAntecedente = ref<{ parentesco: string; condicion: string }>({
+  parentesco: '',
+  condicion: '',
+})
+
+const showEstudioModal = ref(false)
+const formEstudio = ref<{ tipo: TipoEstudio; descripcion: string; fecha: string; resultado: string }>({
+  tipo: 'LABORATORIO',
+  descripcion: '',
+  fecha: new Date().toISOString().split('T')[0] ?? '',
+  resultado: '',
+})
+
+function abrirModalAlergia() {
+  formAlergia.value = { sustancia: '', severidad: 'LEVE' }
+  showAlergiaModal.value = true
+}
+
+async function guardarAlergia() {
+  if (!formAlergia.value.sustancia.trim()) {
+    toastStore.error('Campo requerido', 'Ingrese la sustancia o alérgeno')
+    return
+  }
+  try {
+    await hceStore.crearAlergia({
+      sustancia: formAlergia.value.sustancia.trim(),
+      severidad: formAlergia.value.severidad,
+    })
+    toastStore.success('Alergia guardada', 'Alergia registrada en la historia clínica')
+    showAlergiaModal.value = false
+  } catch (err) {
+    toastStore.apiError(err, 'Error al registrar alergia')
+  }
+}
+
+function abrirModalAntecedente() {
+  formAntecedente.value = { parentesco: '', condicion: '' }
+  showAntecedenteModal.value = true
+}
+
+async function guardarAntecedente() {
+  if (!formAntecedente.value.parentesco.trim() || !formAntecedente.value.condicion.trim()) {
+    toastStore.error('Campos requeridos', 'Parentesco y condición médica son obligatorios')
+    return
+  }
+  try {
+    await hceStore.crearAntecedente({
+      parentesco: formAntecedente.value.parentesco.trim(),
+      condicion: formAntecedente.value.condicion.trim(),
+    })
+    toastStore.success('Antecedente guardado', 'Antecedente familiar registrado con éxito')
+    showAntecedenteModal.value = false
+  } catch (err) {
+    toastStore.apiError(err, 'Error al registrar antecedente')
+  }
+}
+
+function abrirModalEstudio() {
+  formEstudio.value = {
+    tipo: 'LABORATORIO',
+    descripcion: '',
+    fecha: new Date().toISOString().split('T')[0] ?? '',
+    resultado: '',
+  }
+  showEstudioModal.value = true
+}
+
+async function guardarEstudio() {
+  if (!formEstudio.value.descripcion.trim()) {
+    toastStore.error('Campo requerido', 'Ingrese la descripción del estudio')
+    return
+  }
+  try {
+    await hceStore.crearEstudio({
+      tipo: formEstudio.value.tipo,
+      descripcion: formEstudio.value.descripcion.trim(),
+      fecha: formEstudio.value.fecha || (new Date().toISOString().split('T')[0] ?? ''),
+      resultado: formEstudio.value.resultado.trim() || undefined,
+    })
+    toastStore.success('Estudio guardado', 'Estudio complementario registrado')
+    showEstudioModal.value = false
+  } catch (err) {
+    toastStore.apiError(err, 'Error al registrar estudio')
+  }
+}
 
 const alergiasColumns: TableColumn<AlergiaDTO>[] = [
   { key: 'sustancia', label: 'Sustancia' },
@@ -35,20 +134,37 @@ const prescripcionesColumns: TableColumn<PrescripcionDTO>[] = [
 
 async function cargarHistoria() {
   if (!pacienteId.value) return
-  await hceStore.cargarHistoria(pacienteId.value)
+  try {
+    await hceStore.cargarHistoria(pacienteId.value)
+  } catch (err) {
+    // Si aún no tiene HCE creada, se maneja el estado
+  }
 }
 
-watch(() => admisionStore.pacienteSeleccionado, (paciente) => {
-  if (paciente) {
-    pacienteId.value = paciente.id
+watch(pacienteId, (nuevoId) => {
+  if (nuevoId) {
     cargarHistoria()
   }
 })
 
-onMounted(() => {
-  if (admisionStore.pacienteSeleccionado) {
+watch(() => admisionStore.pacienteSeleccionado, (paciente) => {
+  if (paciente) {
+    pacienteId.value = paciente.id
+  }
+})
+
+onMounted(async () => {
+  if (admisionStore.pacientes.length === 0) {
+    await admisionStore.cargarPacientes()
+  }
+
+  const idRuta = route.params.pacienteId as string | undefined
+  if (idRuta) {
+    pacienteId.value = idRuta
+  } else if (admisionStore.pacienteSeleccionado) {
     pacienteId.value = admisionStore.pacienteSeleccionado.id
-    cargarHistoria()
+  } else if (admisionStore.pacientes.length > 0 && admisionStore.pacientes[0]) {
+    pacienteId.value = admisionStore.pacientes[0].id
   }
 })
 
@@ -76,44 +192,65 @@ const timelineEventos = computed(() => {
 
   const eventos: any[] = []
 
-  // Apertura de HCE (basado en createdAt de la historia)
-  eventos.push({
-    id: 'apertura',
-    type: 'hce',
-    title: 'Historia Clínica Creada',
-    time: new Date(historia.createdAt).toLocaleString('es-AR'),
-    description: `ID: ${historia.id.slice(-8)}`,
-  })
+  // Apertura de HCE (basado en createdAt o creadoEn)
+  const fechaApertura = historia.createdAt || (historia as any).creadoEn
+  if (fechaApertura) {
+    eventos.push({
+      id: 'apertura',
+      type: 'hce',
+      title: 'Historia Clínica Creada',
+      timestamp: new Date(fechaApertura).getTime(),
+      time: new Date(fechaApertura).toLocaleString('es-AR'),
+      description: `ID: ${historia.id.slice(-8)} - Apertura inicial de ficha médica`,
+    })
+  }
 
   // Alergias
   historia.alergias?.forEach((a, i) => {
     eventos.push({
-      id: `alergia-${i}`,
+      id: `alergia-${a.id || i}`,
       type: 'alergia',
       title: `Alergia: ${a.sustancia}`,
+      timestamp: new Date(a.registradoEn).getTime(),
       time: new Date(a.registradoEn).toLocaleDateString('es-AR'),
       description: `Severidad: ${a.severidad}`,
     })
   })
 
+  // Antecedentes
+  historia.antecedentes?.forEach((ant, i) => {
+    eventos.push({
+      id: `antecedente-${ant.id || i}`,
+      type: 'antecedente',
+      title: `Antecedente: ${ant.parentesco}`,
+      timestamp: new Date(ant.registradoEn).getTime(),
+      time: new Date(ant.registradoEn).toLocaleDateString('es-AR'),
+      description: `Condición: ${ant.condicion}`,
+    })
+  })
+
   // Estudios
   historia.estudios?.forEach((e, i) => {
+    const rawFecha = e.fecha || (e as any).createdAt || (e as any).creadoEn
     eventos.push({
-      id: `estudio-${i}`,
+      id: `estudio-${e.id || i}`,
       type: 'estudio',
       title: `Estudio: ${e.descripcion}`,
-      time: new Date(e.fecha).toLocaleDateString('es-AR'),
-      description: `Tipo: ${e.tipo} - Resultado: ${e.resultado || 'Pendiente'}`,
+      timestamp: rawFecha ? new Date(rawFecha).getTime() : 0,
+      time: e.fecha ? new Date(e.fecha).toLocaleDateString('es-AR') : '-',
+      description: `Tipo: ${e.tipo} - Resultado: ${e.resultado || 'Sin resultado informado'}`,
     })
   })
 
   // Prescripciones
   historia.prescripciones?.forEach((p, i) => {
+    const pFecha = p.createdAt || (p as any).creadoEn
     eventos.push({
-      id: `prescripcion-${i}`,
+      id: `prescripcion-${p.id || i}`,
       type: 'prescripcion',
       title: `Prescripción: ${p.medicamento}`,
-      time: new Date(p.createdAt).toLocaleDateString('es-AR'),
+      timestamp: pFecha ? new Date(pFecha).getTime() : 0,
+      time: pFecha ? new Date(pFecha).toLocaleDateString('es-AR') : '-',
       description: `${p.dosis} - Cada ${p.frecuenciaHoras}hrs x ${p.duracionDias} días - Estado: ${p.estado}`,
     })
   })
@@ -121,15 +258,16 @@ const timelineEventos = computed(() => {
   // Evoluciones
   historia.evoluciones?.forEach((e, i) => {
     eventos.push({
-      id: `evolucion-${i}`,
+      id: `evolucion-${e.id || i}`,
       type: 'evolucion',
-      title: 'Evolución Clínica',
+      title: 'Evolución Médica',
+      timestamp: new Date(e.registradoEn).getTime(),
       time: new Date(e.registradoEn).toLocaleString('es-AR'),
-      description: `${e.motivo} - ${e.diagnostico}`,
+      description: `${e.motivo}: ${e.diagnostico}${e.tratamiento ? ' | Tratamiento: ' + e.tratamiento : ''}`,
     })
   })
 
-  return eventos.sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime())
+  return eventos.sort((a, b) => b.timestamp - a.timestamp)
 })
 </script>
 
@@ -215,16 +353,13 @@ const timelineEventos = computed(() => {
         <div role="tabpanel" class="tab-panel" v-show="activeTab === 'resumen'">
           <div v-if="hceStore.historiaActual" class="resumen-grid">
             <Card class="info-card">
-              <h3>Datos Generales</h3>
-              <dl class="info-list">
-                <div><dt>ID Historia</dt><dd>{{ hceStore.historiaActual.id }}</dd></div>
-                <div><dt>Paciente ID</dt><dd>{{ hceStore.historiaActual.pacienteId }}</dd></div>
-                <div><dt>Creada</dt><dd>{{ new Date(hceStore.historiaActual.createdAt).toLocaleDateString('es-AR') }}</dd></div>
-              </dl>
-            </Card>
-
-            <Card class="info-card">
-              <h3>Antecedentes Familiares</h3>
+              <div class="card-header-flex">
+                <h3>Antecedentes Familiares</h3>
+                <Button variant="secondary" size="sm" @click="abrirModalAntecedente">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                  + Antecedente
+                </Button>
+              </div>
               <div class="antecedentes-text">
                 <template v-if="hceStore.historiaActual.antecedentes.length > 0">
                   <div v-for="ant in hceStore.historiaActual.antecedentes" :key="ant.id" class="antecedente-item">
@@ -236,7 +371,12 @@ const timelineEventos = computed(() => {
             </Card>
 
             <Card class="info-card" v-if="hceStore.evoluciones.length > 0">
-              <h3>Última Evolución</h3>
+              <div class="card-header-flex">
+                <h3>Última Evolución</h3>
+                <Button variant="ghost" size="sm" @click="router.push('/hce/evoluciones')">
+                  Ver evoluciones
+                </Button>
+              </div>
               <div class="evolucion-preview">
                 <div class="evolucion-meta">
                   <span>{{ hceStore.evoluciones[0]?.registradoEn ? new Date(hceStore.evoluciones[0].registradoEn).toLocaleString('es-AR') : '-' }}</span>
@@ -275,6 +415,10 @@ const timelineEventos = computed(() => {
           <div v-if="hceStore.historiaActual">
             <div class="panel-header">
               <h3>Alergias Registradas</h3>
+              <Button variant="primary" size="sm" @click="abrirModalAlergia">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                + Registrar Alergia
+              </Button>
             </div>
             <Table
               :columns="alergiasColumns"
@@ -296,6 +440,10 @@ const timelineEventos = computed(() => {
           <div v-if="hceStore.historiaActual">
             <div class="panel-header">
               <h3>Estudios Solicitados</h3>
+              <Button variant="primary" size="sm" @click="abrirModalEstudio">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                + Registrar Estudio
+              </Button>
             </div>
             <Table
               :columns="estudiosColumns"
@@ -317,6 +465,10 @@ const timelineEventos = computed(() => {
           <div v-if="hceStore.historiaActual">
             <div class="panel-header">
               <h3>Prescripciones</h3>
+              <Button variant="primary" size="sm" @click="router.push('/hce/prescripciones')">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                + Nueva Prescripción
+              </Button>
             </div>
             <Table
               :columns="prescripcionesColumns"
@@ -341,20 +493,22 @@ const timelineEventos = computed(() => {
 
         <!-- Línea de Tiempo -->
         <div role="tabpanel" class="tab-panel" v-show="activeTab === 'timeline'">
-          <div v-if="hceStore.historiaActual" class="timeline">
-            <div v-for="evento in timelineEventos" :key="evento.id" class="timeline-item">
-              <div class="timeline-marker" :class="evento.type"></div>
-              <div class="timeline-content">
-                <div class="timeline-header">
-                  <span class="timeline-title">{{ evento.title }}</span>
-                  <span class="timeline-time">{{ evento.time }}</span>
+          <div v-if="hceStore.historiaActual" class="timeline-container">
+            <div class="timeline">
+              <div v-for="evento in timelineEventos" :key="evento.id" class="timeline-item">
+                <div class="timeline-marker" :class="evento.type"></div>
+                <div class="timeline-content">
+                  <div class="timeline-header">
+                    <span class="timeline-title">{{ evento.title }}</span>
+                    <span class="timeline-time">{{ evento.time }}</span>
+                  </div>
+                  <div class="timeline-body">{{ evento.description }}</div>
                 </div>
-                <div class="timeline-body">{{ evento.description }}</div>
               </div>
-            </div>
-            <div v-if="timelineEventos.length === 0" class="empty-timeline">
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="12" y1="3" x2="12" y2="21"></line><circle cx="12" cy="12" r="3"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
-              <p>No hay eventos en la línea de tiempo.</p>
+              <div v-if="timelineEventos.length === 0" class="empty-timeline">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="12" y1="3" x2="12" y2="21"></line><circle cx="12" cy="12" r="3"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
+                <p>No hay eventos en la línea de tiempo.</p>
+              </div>
             </div>
           </div>
         </div>
@@ -372,6 +526,78 @@ const timelineEventos = computed(() => {
       <h3>Seleccione un Paciente</h3>
       <p class="text-muted">Elija un paciente para ver su historia clínica completa.</p>
     </div>
+
+    <!-- Modal Registrar Alergia -->
+    <Modal v-model="showAlergiaModal" title="Registrar Alergia" size="md" @close="showAlergiaModal = false">
+      <div class="form-grid">
+        <div class="form-row">
+          <Input v-model="formAlergia.sustancia" label="Sustancia o Medicamento" placeholder="Ej: Penicilina, Ibuprofeno, Maní..." required />
+        </div>
+        <div class="form-row">
+          <Select
+            v-model="formAlergia.severidad"
+            label="Severidad de la reacción"
+            :options="[
+              { value: 'LEVE', label: 'Leve (erupción leve, molestias menores)' },
+              { value: 'MODERADA', label: 'Moderada (urticaria generalizada, edema)' },
+              { value: 'GRAVE', label: 'Grave (anafilaxia, compromiso respiratorio)' },
+            ]"
+            required
+          />
+        </div>
+      </div>
+      <div class="form-actions">
+        <Button variant="ghost" @click="showAlergiaModal = false">Cancelar</Button>
+        <Button variant="primary" @click="guardarAlergia">Guardar Alergia</Button>
+      </div>
+    </Modal>
+
+    <!-- Modal Registrar Antecedente -->
+    <Modal v-model="showAntecedenteModal" title="Registrar Antecedente Familiar" size="md" @close="showAntecedenteModal = false">
+      <div class="form-grid">
+        <div class="form-row">
+          <Input v-model="formAntecedente.parentesco" label="Parentesco" placeholder="Ej: Padre, Madre, Abuela materna..." required />
+        </div>
+        <div class="form-row">
+          <Input v-model="formAntecedente.condicion" label="Condición médica / Diagnóstico" placeholder="Ej: Diabetes mellitus tipo 2, Hipertensión arterial..." required />
+        </div>
+      </div>
+      <div class="form-actions">
+        <Button variant="ghost" @click="showAntecedenteModal = false">Cancelar</Button>
+        <Button variant="primary" @click="guardarAntecedente">Guardar Antecedente</Button>
+      </div>
+    </Modal>
+
+    <!-- Modal Registrar Estudio -->
+    <Modal v-model="showEstudioModal" title="Registrar Estudio Complementario" size="md" @close="showEstudioModal = false">
+      <div class="form-grid">
+        <div class="form-row">
+          <Select
+            v-model="formEstudio.tipo"
+            label="Tipo de estudio"
+            :options="[
+              { value: 'LABORATORIO', label: 'Laboratorio' },
+              { value: 'IMAGEN', label: 'Diagnóstico por Imágenes' },
+              { value: 'OTRO', label: 'Otro' },
+            ]"
+            required
+          />
+        </div>
+        <div class="form-row">
+          <Input v-model="formEstudio.descripcion" label="Descripción del estudio" placeholder="Ej: Hemograma completo, Radiografía de tórax..." required />
+        </div>
+        <div class="form-row">
+          <Input v-model="formEstudio.fecha" label="Fecha del estudio" type="date" required />
+        </div>
+        <div class="form-row">
+          <Input v-model="formEstudio.resultado" label="Resultado / Informe (opcional)" placeholder="Ej: Glucosa 95 mg/dl, Sin particularidades..." />
+        </div>
+      </div>
+      <div class="form-actions">
+        <Button variant="ghost" @click="showEstudioModal = false">Cancelar</Button>
+        <Button variant="primary" @click="guardarEstudio">Guardar Estudio</Button>
+      </div>
+    </Modal>
   </div>
 </template>
 
@@ -485,17 +711,26 @@ const timelineEventos = computed(() => {
 }
 
 .tab-panel {
-  display: none;
   animation: fadeIn 0.2s ease;
-}
-
-.tab-panel:first-child {
-  display: block;
 }
 
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(4px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+.card-header-flex {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-sm);
+}
+
+.card-header-flex h3 {
+  margin: 0 !important;
+  border-bottom: none !important;
+  padding-bottom: 0 !important;
 }
 
 .panel-header {
@@ -620,6 +855,28 @@ const timelineEventos = computed(() => {
   letter-spacing: 0.05em;
 }
 
+.timeline-container {
+  max-height: 580px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: var(--space-xs) var(--space-md) var(--space-md) var(--space-xs);
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border) transparent;
+}
+
+.timeline-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.timeline-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.timeline-container::-webkit-scrollbar-thumb {
+  background-color: var(--color-border);
+  border-radius: 9999px;
+}
+
 .timeline {
   position: relative;
   padding-left: var(--space-lg);
@@ -655,10 +912,32 @@ const timelineEventos = computed(() => {
 }
 
 .timeline-marker.hce { background-color: var(--color-primary); }
-.timeline-marker.alergia { background-color: var(--color-warning); }
+.timeline-marker.alergia { background-color: var(--color-danger); }
+.timeline-marker.antecedente { background-color: var(--color-warning); }
 .timeline-marker.estudio { background-color: var(--color-info); }
 .timeline-marker.prescripcion { background-color: var(--color-success); }
-.timeline-marker.evolucion { background-color: var(--color-secondary); }
+.timeline-marker.evolucion { background-color: #8b5cf6; }
+
+.form-grid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  margin-top: var(--space-sm);
+}
+
+.form-row {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-sm);
+  padding-top: var(--space-md);
+  margin-top: var(--space-md);
+  border-top: 1px solid var(--color-border);
+}
 
 .timeline-content {
   flex: 1;

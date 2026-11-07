@@ -46,18 +46,30 @@ const diasSemana = [
 
 const diasSemanaNombres = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']
 
+function formatHoraTurno(fechaIso?: string): string {
+  if (!fechaIso) return '-'
+  const d = new Date(fechaIso)
+  if (isNaN(d.getTime())) return '-'
+  return d.toLocaleTimeString('en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZone: 'UTC',
+    hour12: true,
+  })
+}
+
 const columns: TableColumn<TurnoDTO>[] = [
   {
     key: 'inicio',
     label: 'Hora Inicio',
-    width: '100px',
-    format: (v) => v ? new Date(v as string).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' }) : '-'
+    width: '130px',
+    format: (v) => formatHoraTurno(v as string)
   },
   {
     key: 'fin',
     label: 'Hora Fin',
-    width: '100px',
-    format: (v) => v ? new Date(v as string).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' }) : '-'
+    width: '130px',
+    format: (v) => formatHoraTurno(v as string)
   },
   {
     key: 'paciente',

@@ -38,13 +38,19 @@ async function guardarEvolucion() {
     return
   }
   try {
+    if (!pacienteId.value) {
+      toastStore.error('Error', 'Seleccione un paciente primero')
+      return
+    }
+    if (!hceStore.historiaActual || hceStore.historiaActual.pacienteId !== pacienteId.value) {
+      await hceStore.cargarHistoria(pacienteId.value)
+    }
     const historia = hceStore.historiaActual
     if (!historia) {
-      toastStore.error('Error', 'No hay historia clínica cargada')
+      toastStore.error('Error', 'No se pudo obtener la historia clínica del paciente')
       return
     }
     await hceStore.crearEvolucion({
-      historiaId: historia.id,
       motivo: form.value.motivo.trim(),
       diagnostico: form.value.diagnostico.trim(),
       tratamiento: form.value.tratamiento.trim() || undefined,
@@ -53,7 +59,7 @@ async function guardarEvolucion() {
     resetForm()
     cargarDatos()
   } catch (err) {
-    // Error manejado en store
+    toastStore.apiError(err, 'Error al guardar evolución')
   }
 }
 
@@ -67,24 +73,41 @@ function resetForm() {
 }
 
 function abrirFormulario() {
+  form.value = {
+    motivo: '',
+    diagnostico: '',
+    tratamiento: '',
+  }
   showForm.value = true
-  resetForm()
 }
 
-watch(() => admisionStore.pacienteSeleccionado, (paciente) => {
-  if (paciente) {
-    pacienteId.value = paciente.id
+watch(pacienteId, (nuevoId) => {
+  if (nuevoId) {
     cargarDatos()
   }
 })
 
-onMounted(() => {
-  if (route.query.pacienteId) {
-    pacienteId.value = route.query.pacienteId as string
+watch(() => admisionStore.pacienteSeleccionado, (paciente) => {
+  if (paciente) {
+    pacienteId.value = paciente.id
+  }
+})
+
+onMounted(async () => {
+  if (admisionStore.pacientes.length === 0) {
+    await admisionStore.cargarPacientes()
+  }
+  const idRuta = (route.params.pacienteId || route.query.pacienteId) as string | undefined
+  if (idRuta) {
+    pacienteId.value = idRuta
   } else if (admisionStore.pacienteSeleccionado) {
     pacienteId.value = admisionStore.pacienteSeleccionado.id
+  } else if (admisionStore.pacientes.length > 0 && admisionStore.pacientes[0]) {
+    pacienteId.value = admisionStore.pacientes[0].id
   }
-  cargarDatos()
+  if (pacienteId.value) {
+    cargarDatos()
+  }
 })
 </script>
 

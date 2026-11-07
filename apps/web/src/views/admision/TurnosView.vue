@@ -23,11 +23,48 @@ const formInicio = ref('09:00')
 const formFin = ref('09:30')
 const formMotivo = ref('')
 
+function formatHoraTurno(fechaIso?: string): string {
+  if (!fechaIso) return '-'
+  const d = new Date(fechaIso)
+  if (isNaN(d.getTime())) return '-'
+  return d.toLocaleTimeString('en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZone: 'UTC',
+    hour12: true,
+  })
+}
+
 const columns: TableColumn<TurnoDTO>[] = [
-  { key: 'inicio', label: 'Fecha', width: '120px', format: (v) => v ? new Date(v as string).toLocaleDateString('es-AR') : '-' },
-  { key: 'hora', label: 'Hora', width: '100px', format: (_v, row) => row.inicio ? new Date(row.inicio).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' }) : '-' },
-  { key: 'paciente', label: 'Paciente', format: (_v, row) => row.paciente ? `${row.paciente.apellido}, ${row.paciente.nombre} (${row.paciente.tipoDocumento} ${row.paciente.numeroDocumento})` : '-' },
-  { key: 'medico', label: 'Profesional', width: '180px', format: (_v, row) => row.medico ? `Dr. ${row.medico.apellido}, ${row.medico.nombre}` : '-' },
+  {
+    key: 'inicio',
+    label: 'Fecha',
+    width: '120px',
+    format: (v) => v ? new Date(v as string).toLocaleDateString('es-AR', { timeZone: 'UTC' }) : '-'
+  },
+  {
+    key: 'hora',
+    label: 'Hora',
+    width: '130px',
+    format: (_v, row) => formatHoraTurno(row.inicio)
+  },
+  {
+    key: 'paciente',
+    label: 'Paciente',
+    format: (_v, row) => {
+      const p = row.paciente || admisionStore.pacientes.find(pac => pac.id === row.pacienteId)
+      return p ? `${p.apellido}, ${p.nombre} (${p.tipoDocumento} ${p.numeroDocumento})` : (row.pacienteId || '-')
+    }
+  },
+  {
+    key: 'medico',
+    label: 'Profesional',
+    width: '180px',
+    format: (_v, row) => {
+      const m = row.medico || admisionStore.medicos.find(med => med.id === row.medicoId)
+      return m ? `Dr. ${m.apellido}, ${m.nombre}` : (row.medicoId || '-')
+    }
+  },
   { key: 'estado', label: 'Estado', width: '140px' },
   { key: 'motivoConsulta', label: 'Motivo', format: (v): string => (v as string) || '-' },
   { key: 'actions', label: 'Acciones', width: '120px' },
@@ -214,6 +251,15 @@ onMounted(async () => {
         :striped="true"
         emptyText="No se encontraron turnos con los filtros aplicados."
       >
+        <template #cell-inicio="{ row }">
+          <span>{{ (row as any).inicio ? new Date((row as any).inicio as string).toLocaleDateString('es-AR', { timeZone: 'UTC' }) : '-' }}</span>
+        </template>
+
+        <template #cell-hora="{ row }">
+          <strong v-if="(row as any).inicio">{{ formatHoraTurno((row as any).inicio as string) }}</strong>
+          <span v-else class="text-muted">-</span>
+        </template>
+
         <template #cell-estado="{ value }">
           <Badge :variant="getEstadoVariant(value as EstadoTurno)" size="md">{{ value }}</Badge>
         </template>

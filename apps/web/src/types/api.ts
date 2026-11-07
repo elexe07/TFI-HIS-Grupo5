@@ -268,7 +268,7 @@ export interface EvolucionDTO {
 }
 
 export interface CrearEvolucionRequest {
-  historiaId: string
+  historiaId?: string
   turnoId?: string
   internacionId?: string
   motivo: string
@@ -286,7 +286,7 @@ export interface AlergiaDTO {
 }
 
 export interface CrearAlergiaRequest {
-  historiaId: string
+  historiaId?: string
   sustancia: string
   severidad: SeveridadAlergia
 }
@@ -301,7 +301,7 @@ export interface AntecedenteFamiliarDTO {
 }
 
 export interface CrearAntecedenteRequest {
-  historiaId: string
+  historiaId?: string
   parentesco: string
   condicion: string
 }
@@ -322,7 +322,7 @@ export interface PrescripcionDTO {
 }
 
 export interface CrearPrescripcionRequest {
-  historiaId: string
+  historiaId?: string
   evolucionId?: string
   medicamento: string
   dosis: string
@@ -342,7 +342,7 @@ export interface EstudioDTO {
 }
 
 export interface CrearEstudioRequest {
-  historiaId: string
+  historiaId?: string
   tipo: TipoEstudio
   descripcion: string
   resultado?: string

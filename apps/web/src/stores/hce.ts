@@ -108,10 +108,11 @@ export const useHceStore = defineStore('hce', () => {
     cargando.value = true
     error.value = null
     try {
-      const nueva = await hceApi.crearEvolucion(data)
-      if (historiaActual.value) {
-        historiaActual.value.evoluciones.unshift(nueva)
-      }
+      const pId = historiaActual.value?.pacienteId
+      if (!pId) throw new Error('No hay historia clínica activa para registrar la evolución')
+      const { historiaId, ...payload } = data as any
+      const nueva = await hceApi.crearEvolucion(pId, payload)
+      await cargarHistoria(pId)
       return nueva
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Error al crear evolución'
@@ -125,10 +126,11 @@ export const useHceStore = defineStore('hce', () => {
     cargando.value = true
     error.value = null
     try {
-      const nueva = await hceApi.crearAlergia(data)
-      if (historiaActual.value) {
-        historiaActual.value.alergias.unshift(nueva)
-      }
+      const pId = historiaActual.value?.pacienteId
+      if (!pId) throw new Error('No hay historia clínica activa para registrar la alergia')
+      const { historiaId, ...payload } = data as any
+      const nueva = await hceApi.crearAlergia(pId, payload)
+      await cargarHistoria(pId)
       return nueva
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Error al registrar alergia'
@@ -142,10 +144,11 @@ export const useHceStore = defineStore('hce', () => {
     cargando.value = true
     error.value = null
     try {
-      const nuevo = await hceApi.crearAntecedente(data)
-      if (historiaActual.value) {
-        historiaActual.value.antecedentes.unshift(nuevo)
-      }
+      const pId = historiaActual.value?.pacienteId
+      if (!pId) throw new Error('No hay historia clínica activa para registrar el antecedente')
+      const { historiaId, ...payload } = data as any
+      const nuevo = await hceApi.crearAntecedente(pId, payload)
+      await cargarHistoria(pId)
       return nuevo
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Error al registrar antecedente'
@@ -159,10 +162,11 @@ export const useHceStore = defineStore('hce', () => {
     cargando.value = true
     error.value = null
     try {
-      const nueva = await hceApi.crearPrescripcion(data)
-      if (historiaActual.value) {
-        historiaActual.value.prescripciones.unshift(nueva)
-      }
+      const pId = historiaActual.value?.pacienteId
+      if (!pId) throw new Error('No hay historia clínica activa para registrar la prescripción')
+      const { historiaId, ...payload } = data as any
+      const nueva = await hceApi.crearPrescripcion(pId, payload)
+      await cargarHistoria(pId)
       return nueva
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Error al crear prescripción'
@@ -176,10 +180,11 @@ export const useHceStore = defineStore('hce', () => {
     cargando.value = true
     error.value = null
     try {
-      const nuevo = await hceApi.crearEstudio(data)
-      if (historiaActual.value) {
-        historiaActual.value.estudios.unshift(nuevo)
-      }
+      const pId = historiaActual.value?.pacienteId
+      if (!pId) throw new Error('No hay historia clínica activa para registrar el estudio')
+      const { historiaId, ...payload } = data as any
+      const nuevo = await hceApi.crearEstudio(pId, payload)
+      await cargarHistoria(pId)
       return nuevo
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Error al registrar estudio'

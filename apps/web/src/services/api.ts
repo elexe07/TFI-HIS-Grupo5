@@ -216,24 +216,24 @@ export const hceApi = {
     get<import('@/types/api').HistoriaClinicaDTO>(`/pacientes/${pacienteId}/historia`),
 
   // Evoluciones
-  crearEvolucion: (data: import('@/types/api').CrearEvolucionRequest) =>
-    post<import('@/types/api').EvolucionDTO>('/historias/evoluciones', data),
+  crearEvolucion: (pacienteId: string, data: Partial<import('@/types/api').CrearEvolucionRequest>) =>
+    post<import('@/types/api').EvolucionDTO>(`/pacientes/${pacienteId}/historia/evoluciones`, data),
 
   // Alergias
-  crearAlergia: (data: import('@/types/api').CrearAlergiaRequest) =>
-    post<import('@/types/api').AlergiaDTO>('/historias/alergias', data),
+  crearAlergia: (pacienteId: string, data: Partial<import('@/types/api').CrearAlergiaRequest>) =>
+    post<import('@/types/api').AlergiaDTO>(`/pacientes/${pacienteId}/historia/alergias`, data),
 
   // Antecedentes
-  crearAntecedente: (data: import('@/types/api').CrearAntecedenteRequest) =>
-    post<import('@/types/api').AntecedenteFamiliarDTO>('/historias/antecedentes', data),
+  crearAntecedente: (pacienteId: string, data: Partial<import('@/types/api').CrearAntecedenteRequest>) =>
+    post<import('@/types/api').AntecedenteFamiliarDTO>(`/pacientes/${pacienteId}/historia/antecedentes`, data),
 
   // Prescripciones
-  crearPrescripcion: (data: import('@/types/api').CrearPrescripcionRequest) =>
-    post<import('@/types/api').PrescripcionDTO>('/historias/prescripciones', data),
+  crearPrescripcion: (pacienteId: string, data: Partial<import('@/types/api').CrearPrescripcionRequest>) =>
+    post<import('@/types/api').PrescripcionDTO>(`/pacientes/${pacienteId}/historia/prescripciones`, data),
 
   // Estudios
-  crearEstudio: (data: import('@/types/api').CrearEstudioRequest) =>
-    post<import('@/types/api').EstudioDTO>('/historias/estudios', data),
+  crearEstudio: (pacienteId: string, data: Partial<import('@/types/api').CrearEstudioRequest>) =>
+    post<import('@/types/api').EstudioDTO>(`/pacientes/${pacienteId}/historia/estudios`, data),
 }
 
 // --- ENFERMERÍA ---

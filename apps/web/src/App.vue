@@ -41,6 +41,8 @@ onMounted(() => {
 }
 
 .app-main {
+  margin-top: var(--header-height);
+
   display: flex;
   flex: 1;
   min-height: calc(100vh - var(--header-height));

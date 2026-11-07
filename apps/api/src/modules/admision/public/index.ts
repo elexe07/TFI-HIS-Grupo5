@@ -1,15 +1,5 @@
-import { DomainEventBase } from '../../../building-blocks/domain';
-
-export const PACIENTE_REGISTRADO = 'admision.paciente-registrado';
-
-export class PacienteRegistrado extends DomainEventBase {
-  readonly nombre = PACIENTE_REGISTRADO;
-
-  constructor(
-    readonly pacienteId: string,
-    ocurridoEn: Date = new Date(),
-  ) {
-    super(ocurridoEn);
-  }
-}
-
+export {
+  EVENTO_PACIENTE_REGISTRADO,
+  PacienteRegistrado,
+} from '../domain/events/paciente-registrado';
+export { EstadoTriaje, EstadoTurno, NivelTriaje, Sexo, TipoDocumento } from '../domain/tipos';

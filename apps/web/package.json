@@ -13,15 +13,16 @@
     "format": "prettier --write \"src/**/*.{ts,vue,json,css,md}\""
   },
   "dependencies": {
-    "vue": "^3.5.12",
-    "vue-router": "^4.4.5",
-    "pinia": "^2.2.4",
-    "pinia-plugin-persistedstate": "^4.1.2",
     "axios": "^1.7.7",
     "date-fns": "^4.1.0",
+    "pinia": "^2.2.4",
+    "pinia-plugin-persistedstate": "^4.1.2",
+    "vue": "^3.5.12",
+    "vue-router": "^4.4.5",
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@eslint/eslintrc": "^3.3.7",
     "@tsconfig/node22": "^22.0.0",
     "@types/node": "^22.7.5",
     "@vitejs/plugin-vue": "^5.1.4",

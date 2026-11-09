@@ -448,6 +448,17 @@ model Insumo {
   @@schema("recursos")
 }
 
+/// Idempotencia: cada evento consumido por este módulo se registra aquí
+/// con su eventoId (origen_evento_id) para no procesarlo dos veces.
+model EventoProcesado {
+  id             String   @id @db.Uuid
+  origenEventoId String   @unique @map("origen_evento_id") @db.Uuid
+  procesadoEn    DateTime @default(now()) @map("procesado_en") @db.Timestamptz
+
+  @@map("eventos_procesados")
+  @@schema("recursos")
+}
+
 // ============================ FACTURACION ============================
 
 enum ConceptoCargo {

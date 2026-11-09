@@ -1,5 +1,6 @@
 import { Link, Route, Routes } from 'react-router-dom';
 import { EstadoApi } from './components/EstadoApi';
+import { RecursosPage } from './pages/RecursosPage';
 import { SaludosPage } from './pages/SaludosPage';
 
 /**
@@ -13,6 +14,7 @@ export function App() {
         <h1>HIS</h1>
         <nav>
           <Link to="/">Inicio</Link>
+          <Link to="/recursos">Recursos y Camas</Link>
           <Link to="/ejemplo">Ejemplo</Link>
           <a href="/docs" target="_blank" rel="noreferrer">
             Swagger
@@ -23,6 +25,7 @@ export function App() {
       <main>
         <Routes>
           <Route path="/" element={<Inicio />} />
+          <Route path="/recursos" element={<RecursosPage />} />
           <Route path="/ejemplo" element={<SaludosPage />} />
         </Routes>
       </main>

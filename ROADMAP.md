@@ -198,11 +198,11 @@ Pensado para unas 10 semanas. Ajustar a las fechas de la cátedra en la primera 
 
 ### Fase 6 — Recursos y Camas
 
-- [ ] Dominio por TDD: `Cama` con máquina de estados (libre → ocupada → en limpieza → libre; libre ↔ bloqueada), `Internacion`, `Insumo` (stock no negativo).
-- [ ] Casos de uso: internar paciente (asigna cama libre), dar de alta, cambiar estado de cama, ver mapa de camas, registrar ingreso de insumo, listar insumos bajo mínimo.
-- [ ] Handler de `MedicacionAdministrada` → descuenta insumo.
-- [ ] Publica `PacienteInternado` y `PacienteDadoDeAlta`.
-- [ ] Pantalla: mapa de camas con colores por estado.
+- [x] Dominio por TDD: `Cama` con máquina de estados (libre → ocupada → en limpieza → libre; libre ↔ bloqueada), `Internacion`, `Insumo` (stock no negativo).
+- [x] Casos de uso: internar paciente (asigna cama libre), dar de alta, cambiar estado de cama, ver mapa de camas, registrar ingreso de insumo, listar insumos bajo mínimo.
+- [x] Handler de `MedicacionAdministrada` → descuenta insumo.
+- [x] Publica `PacienteInternado` y `PacienteDadoDeAlta`.
+- [x] Pantalla: mapa de camas con colores por estado.
 
 ### Fase 7 — Facturación
 

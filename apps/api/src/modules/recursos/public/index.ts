@@ -2,6 +2,14 @@
  * Superficie pública del módulo Recursos y Camas.
  * Lo único que otros módulos pueden importar directamente.
  */
-export { PacienteDadoDeAlta, PacienteInternado } from '../domain/eventos';
+export const PACIENTE_INTERNADO = 'recursos.paciente-internado';
+export const PACIENTE_DADO_DE_ALTA = 'recursos.paciente-dado-de-alta';
+
+export {
+  PacienteDadoDeAlta,
+  PacienteInternado,
+  type PacienteInternadoProps,
+  type PacienteDadoDeAltaProps,
+} from '../domain/eventos';
 export { EstadoCama } from '../domain/cama';
 export { EstadoInternacion } from '../domain/internacion';

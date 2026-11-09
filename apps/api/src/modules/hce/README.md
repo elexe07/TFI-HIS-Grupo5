@@ -1,6 +1,6 @@
 # Módulo HCE — Historia Clínica Electrónica
 
-**Responsable:** ______ · **Revisor:** ______ · **Fase:** 4
+**Responsable:** Facu / Equipo · **Revisor:** ______ · **Fase:** 4 · **Estado:** implementado (backend)
 
 ## Qué pide la consigna
 
@@ -8,20 +8,20 @@ Información médica centralizada e **inmutable** del paciente: ficha, alergias,
 
 ## Casos de uso (ROADMAP §6)
 
-| ID     | Caso de uso                                      | Tests mínimos                                              |
-| ------ | ------------------------------------------------ | ---------------------------------------------------------- |
-| HCE-01 | Abrir historia (por evento `PacienteRegistrado`) | no duplica si llega dos veces                              |
-| HCE-02 | Registrar evolución                              | inmutable; emite `EvolucionRegistrada`                     |
-| HCE-03 | Registrar alergia                                | duplicada falla                                            |
-| HCE-04 | Registrar antecedente familiar                   | —                                                          |
-| HCE-05 | Crear prescripción                               | alergia al medicamento bloquea; emite `PrescripcionCreada` |
-| HCE-06 | Registrar estudio                                | —                                                          |
-| HCE-07 | Consultar historia                               | paciente solo ve la propia                                 |
+| ID     | Caso de uso                                      | Handler                       | Tests mínimos                                              |
+| ------ | ------------------------------------------------ | ----------------------------- | ---------------------------------------------------------- |
+| HCE-01 | Abrir historia (por evento `PacienteRegistrado`) | `AbrirHistoriaHandler`        | no duplica si llega dos veces                              |
+| HCE-02 | Registrar evolución                              | `RegistrarEvolucionHandler`   | inmutable; emite `EvolucionRegistrada`                     |
+| HCE-03 | Registrar alergia                                | `RegistrarAlergiaHandler`     | duplicada falla                                            |
+| HCE-04 | Registrar antecedente familiar                   | `RegistrarAntecedenteHandler` | registra parentesco y condición                            |
+| HCE-05 | Crear prescripción                               | `CrearPrescripcionHandler`    | alergia al medicamento bloquea; emite `PrescripcionCreada` |
+| HCE-06 | Registrar estudio                                | `RegistrarEstudioHandler`     | tipo, fecha, descripción y resultado                       |
+| HCE-07 | Consultar historia                               | `ConsultarHistoriaHandler`    | paciente solo ve la propia                                 |
 
 ## Regla clave: inmutabilidad (ADR-008)
 
-- `Evolucion` y `AntecedenteFamiliar` no se editan ni se borran. El puerto `HistoriaClinicaRepository` **no tiene** métodos `actualizarEvolucion` ni `eliminar`.
-- Un test unitario verifica que el repositorio en memoria y el de Prisma no exponen esos métodos (o un test de arquitectura por nombre de método).
+- `Evolucion` y `AntecedenteFamiliar` no se editan ni se borran. El puerto `HistoriaClinicaRepository` **no tiene** métodos `actualizarEvolucion`, `eliminar`, `update` ni `delete`.
+- El test `inmutabilidad.spec.ts` verifica por reflexión que el repositorio en memoria y el de Prisma no exponen esos métodos.
 
 ## Eventos
 
@@ -34,10 +34,11 @@ Información médica centralizada e **inmutable** del paciente: ficha, alergias,
 
 `hce.historias_clinicas`, `hce.evoluciones`, `hce.alergias`, `hce.antecedentes_familiares`, `hce.prescripciones`, `hce.estudios`.
 
-## Endpoints sugeridos
+## Endpoints
 
-`GET /api/pacientes/:id/historia` · `POST /api/pacientes/:id/historia/evoluciones` · `.../alergias` · `.../antecedentes` · `.../prescripciones` · `.../estudios`
-
-## Permisos
-
-`hce:leer`, `hce:escribir`, `prescripciones:crear`
+- `GET /api/pacientes/:id/historia` (Requiere `hce:leer`)
+- `POST /api/pacientes/:id/historia/evoluciones` (Requiere `hce:escribir`)
+- `POST /api/pacientes/:id/historia/alergias` (Requiere `hce:escribir`)
+- `POST /api/pacientes/:id/historia/antecedentes` (Requiere `hce:escribir`)
+- `POST /api/pacientes/:id/historia/prescripciones` (Requiere `prescripciones:crear`)
+- `POST /api/pacientes/:id/historia/estudios` (Requiere `hce:escribir`)

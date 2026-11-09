@@ -1,6 +1,6 @@
 # Módulo Facturación y Administración
 
-**Responsable:** ______ · **Revisor:** ______ · **Fase:** 7 (último: consume eventos de todos)
+**Responsable:** Ezequiel · **Revisor:** ______ · **Fase:** 7 (último: consume eventos de todos)
 
 ## Qué pide la consigna
 

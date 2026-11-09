@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { ConceptoCargo, PrismaClient } from '@prisma/client';
+import { ConceptoCargo, PrismaClient, Sexo, TipoDocumento } from '@prisma/client';
 import { hash } from 'bcryptjs';
 import { MATRIZ_PERMISOS, PERMISOS, ROLES } from '../src/modules/iam/domain/permisos';
 
@@ -160,12 +160,141 @@ async function sembrarRecursos(): Promise<void> {
   }
 }
 
+function hora(h: number, m: number): Date {
+  return new Date(Date.UTC(1970, 0, 1, h, m, 0, 0));
+}
+
+async function sembrarAdmision(): Promise<void> {
+  const rolMedico = await prisma.rol.findUniqueOrThrow({ where: { nombre: 'MEDICO' } });
+  const passwordHash = await hash('Medico1234!', 10);
+
+  // 1. Pacientes iniciales
+  const pacientesSeed = [
+    {
+      tipoDocumento: TipoDocumento.DNI,
+      numeroDocumento: '12345678',
+      nombre: 'Juan',
+      apellido: 'Pérez',
+      fechaNacimiento: new Date('1990-05-15'),
+      sexo: Sexo.M,
+      telefono: '11-2345-6789',
+      email: 'juan.perez@email.com',
+      obraSocialCodigo: 'OSDE',
+      numeroAfiliado: 'OSDE-123456',
+    },
+    {
+      tipoDocumento: TipoDocumento.DNI,
+      numeroDocumento: '23456789',
+      nombre: 'María',
+      apellido: 'López',
+      fechaNacimiento: new Date('1985-08-20'),
+      sexo: Sexo.F,
+      telefono: '11-9876-5432',
+      email: 'maria.lopez@email.com',
+      obraSocialCodigo: 'PAMI',
+      numeroAfiliado: 'PAMI-987654',
+    },
+  ];
+
+  for (const p of pacientesSeed) {
+    await prisma.paciente.upsert({
+      where: {
+        tipoDocumento_numeroDocumento: {
+          tipoDocumento: p.tipoDocumento,
+          numeroDocumento: p.numeroDocumento,
+        },
+      },
+      update: {},
+      create: { id: randomUUID(), ...p },
+    });
+  }
+
+  // 2. Médicos y agendas iniciales
+  const medicosSeed = [
+    {
+      email: 'dr.garcia@his.local',
+      nombre: 'Martín',
+      apellido: 'García',
+      matricula: 'MN-44551',
+      especialidad: 'Clínica Médica',
+      franjas: [
+        { diaSemana: 1, horaInicio: hora(8, 0), horaFin: hora(12, 0), duracionTurnoMin: 30 },
+        { diaSemana: 3, horaInicio: hora(8, 0), horaFin: hora(12, 0), duracionTurnoMin: 30 },
+        { diaSemana: 5, horaInicio: hora(8, 0), horaFin: hora(12, 0), duracionTurnoMin: 30 },
+      ],
+    },
+    {
+      email: 'dra.gomez@his.local',
+      nombre: 'Laura',
+      apellido: 'Gómez',
+      matricula: 'MN-55662',
+      especialidad: 'Pediatría',
+      franjas: [
+        { diaSemana: 2, horaInicio: hora(9, 0), horaFin: hora(13, 0), duracionTurnoMin: 30 },
+        { diaSemana: 4, horaInicio: hora(9, 0), horaFin: hora(13, 0), duracionTurnoMin: 30 },
+      ],
+    },
+    {
+      email: 'dr.fernandez@his.local',
+      nombre: 'Lucas',
+      apellido: 'Fernández',
+      matricula: 'MN-66773',
+      especialidad: 'Traumatología',
+      franjas: [
+        { diaSemana: 1, horaInicio: hora(14, 0), horaFin: hora(18, 0), duracionTurnoMin: 30 },
+        { diaSemana: 4, horaInicio: hora(14, 0), horaFin: hora(18, 0), duracionTurnoMin: 30 },
+      ],
+    },
+  ];
+
+  for (const m of medicosSeed) {
+    const usuario = await prisma.usuario.upsert({
+      where: { email: m.email.toLowerCase() },
+      update: { activo: true },
+      create: {
+        id: randomUUID(),
+        email: m.email.toLowerCase(),
+        nombre: `${m.nombre} ${m.apellido}`,
+        passwordHash,
+        rolId: rolMedico.id,
+      },
+    });
+
+    const medico = await prisma.medico.upsert({
+      where: { matricula: m.matricula },
+      update: { nombre: m.nombre, apellido: m.apellido, especialidad: m.especialidad },
+      create: {
+        id: randomUUID(),
+        usuarioId: usuario.id,
+        matricula: m.matricula,
+        nombre: m.nombre,
+        apellido: m.apellido,
+        especialidad: m.especialidad,
+      },
+    });
+
+    // Sembrar franjas de agenda
+    await prisma.agenda.deleteMany({ where: { medicoId: medico.id } });
+    await prisma.agenda.createMany({
+      data: m.franjas.map((f) => ({
+        id: randomUUID(),
+        medicoId: medico.id,
+        diaSemana: f.diaSemana,
+        horaInicio: f.horaInicio,
+        horaFin: f.horaFin,
+        duracionTurnoMin: f.duracionTurnoMin,
+      })),
+    });
+  }
+}
+
 async function main(): Promise<void> {
   await sembrarIam();
   await sembrarFacturacion();
   await sembrarRecursos();
+  await sembrarAdmision();
   console.log(
-    `Seed OK: roles y permisos, admin ${ADMIN.email}, obras sociales, tarifas, habitaciones, camas e insumos.`,
+    `Seed OK: roles y permisos, admin ${ADMIN.email}, obras sociales, tarifas, habitaciones, camas, insumos, médicos y pacientes.`,
   );
 }
 

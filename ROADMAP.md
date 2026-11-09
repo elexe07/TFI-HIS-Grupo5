@@ -174,10 +174,10 @@ Pensado para unas 10 semanas. Ajustar a las fechas de la cátedra en la primera 
 
 ### Fase 3 — Admisión y Turnos
 
-- [ ] Dominio por TDD: `Paciente`, `Agenda` (franjas semanales), `Turno` (estados: reservado, cancelado, atendido), `Triaje` (niveles rojo a azul).
-- [ ] Casos de uso: registrar paciente, buscar paciente, definir agenda, reservar turno (sin solapar), cancelar turno, registrar triaje, ver cola de guardia.
-- [ ] Publica `PacienteRegistrado`.
-- [ ] Pantallas: alta/búsqueda de paciente, reservar turno, cola de guardia.
+- [x] Dominio por TDD: `Paciente`, `Agenda` (franjas semanales), `Turno` (estados: reservado, cancelado, atendido), `Triaje` (niveles rojo a azul).
+- [x] Casos de uso: registrar paciente, buscar paciente, definir agenda, reservar turno (sin solapar), cancelar turno, registrar triaje, ver cola de guardia.
+- [x] Publica `PacienteRegistrado`.
+- [x] Pantallas: alta/búsqueda de paciente, reservar turno, cola de guardia.
 
 ### Fase 4 — HCE
 
@@ -190,11 +190,11 @@ Pensado para unas 10 semanas. Ajustar a las fechas de la cátedra en la primera 
 
 ### Fase 5 — Enfermería
 
-- [ ] Dominio por TDD: `Indicacion` (pendiente, ejecutada, omitida), `SignosVitales` con rangos válidos, `AdministracionDeMedicacion`, `NotaDeEnfermeria`.
-- [ ] Handler de `PrescripcionCreada` → genera indicaciones según frecuencia y duración.
-- [ ] Casos de uso: registrar signos vitales, administrar medicación (solo con indicación pendiente, una sola vez), omitir indicación con motivo, registrar nota, ver indicaciones del día.
-- [ ] Publica `MedicacionAdministrada`.
-- [ ] Pantalla: indicaciones del día por paciente y carga de signos vitales.
+- [x] Dominio por TDD: `Indicacion` (pendiente, ejecutada, omitida), `SignosVitales` con rangos válidos, `AdministracionDeMedicacion`, `NotaDeEnfermeria`.
+- [x] Handler de `PrescripcionCreada` → genera indicaciones según frecuencia y duración.
+- [x] Casos de uso: registrar signos vitales, administrar medicación (solo con indicación pendiente, una sola vez), omitir indicación con motivo, registrar nota, ver indicaciones del día.
+- [x] Publica `MedicacionAdministrada`.
+- [x] Pantalla: indicaciones del día por paciente y carga de signos vitales.
 
 ### Fase 6 — Recursos y Camas
 
@@ -206,10 +206,10 @@ Pensado para unas 10 semanas. Ajustar a las fechas de la cátedra en la primera 
 
 ### Fase 7 — Facturación
 
-- [ ] Dominio por TDD: `Cuenta` (una por consulta o internación), `Cargo` idempotente por evento, `Tarifa`.
-- [ ] Handlers: `EvolucionRegistrada` → cargo consulta; `MedicacionAdministrada` → cargo medicación; `PacienteInternado` → abre cuenta; `PacienteDadoDeAlta` → cargo por días de cama y cierra cuenta.
-- [ ] Validar cobertura con un adaptador fake (acepta o rechaza según la obra social) detrás de un puerto.
-- [ ] Reportes: facturación por período y ocupación de camas.
+- [x] Dominio por TDD: `Cuenta` (una por consulta o internación), `Cargo` idempotente por evento, `Tarifa`.
+- [x] Handlers: `EvolucionRegistrada` → cargo consulta; `MedicacionAdministrada` → cargo medicación; `PacienteInternado` → abre cuenta; `PacienteDadoDeAlta` → cargo por días de cama y cierra cuenta.
+- [x] Validar cobertura con un adaptador fake (acepta o rechaza según la obra social) detrás de un puerto.
+- [x] Reportes: facturación por período y ocupación de camas.
 - [ ] Pantalla: cuenta del paciente y los dos reportes.
 
 ### Fase 8 — Cierre
@@ -316,7 +316,7 @@ Cada módulo tiene un responsable y un revisor habitual. Nadie revisa su propio 
 | HCE                              |                 |         |
 | Enfermería                       |                 |         |
 | Recursos y Camas                 |                 |         |
-| Facturación                      |                 |         |
+| Facturación                      | Ezequiel        |         |
 | Frontend                         | rota por módulo |         |
 
 Sugerencia según tamaño: con 3 personas, A = esqueleto + IAM + Facturación, B = Admisión + Recursos, C = HCE + Enfermería. Con 4, se separa Facturación. Con 5 o 6, un módulo por persona.

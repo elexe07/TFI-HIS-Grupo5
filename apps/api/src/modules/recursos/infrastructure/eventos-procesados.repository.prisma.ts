@@ -4,9 +4,7 @@ import type { EventosProcesadosRepository } from '../domain';
 import { generarId } from '../../../building-blocks/domain';
 
 @Injectable()
-export class EventosProcesadosRepositoryPrisma
-  implements EventosProcesadosRepository
-{
+export class EventosProcesadosRepositoryPrisma implements EventosProcesadosRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async haSidoProcesado(eventoId: string): Promise<boolean> {

@@ -46,9 +46,7 @@ export class InsumosController {
   @ApiOperation({ summary: 'Listar insumos (opcionalmente solo bajo mínimo)' })
   @ApiOkResponse({ description: 'Listado de insumos' })
   listar(@Query() query: ListarInsumosQueryDto): Promise<InsumoDto[]> {
-    return this.listarInsumos.ejecutar(
-      new ListarInsumosQuery({ bajoMinimo: query.bajoMinimo }),
-    );
+    return this.listarInsumos.ejecutar(new ListarInsumosQuery({ bajoMinimo: query.bajoMinimo }));
   }
 
   @Post(':id/ingresos')

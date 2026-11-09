@@ -58,7 +58,10 @@ watch(
 );
 
 onMounted(async () => {
-  if (authStore.usuariosSistema.length === 0 && (authStore.esAdmin || authStore.tienePermiso('iam:usuarios:leer'))) {
+  if (
+    authStore.usuariosSistema.length === 0 &&
+    (authStore.esAdmin || authStore.tienePermiso('iam:usuarios:leer'))
+  ) {
     authStore.cargarUsuariosSistema().catch(() => {});
   }
   if (admisionStore.pacientes.length === 0) {

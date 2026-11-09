@@ -8,11 +8,7 @@ import {
   type HabitacionRepository,
   type InternacionRepository,
 } from '../../domain';
-import {
-  CAMA_REPOSITORY,
-  HABITACION_REPOSITORY,
-  INTERNACION_REPOSITORY,
-} from '../ports/tokens';
+import { CAMA_REPOSITORY, HABITACION_REPOSITORY, INTERNACION_REPOSITORY } from '../ports/tokens';
 import type {
   CamaMapaDto,
   HabitacionMapaDto,
@@ -22,9 +18,7 @@ import type {
 import type { ObtenerMapaCamasQuery } from './obtener-mapa-camas.query';
 
 @Injectable()
-export class ObtenerMapaCamasHandler
-  implements CasoDeUso<ObtenerMapaCamasQuery, MapaCamasDto>
-{
+export class ObtenerMapaCamasHandler implements CasoDeUso<ObtenerMapaCamasQuery, MapaCamasDto> {
   constructor(
     @Inject(HABITACION_REPOSITORY)
     private readonly habitaciones: HabitacionRepository,
@@ -70,9 +64,7 @@ export class ObtenerMapaCamasHandler
     todasLasCamas: Cama[],
   ): Promise<HabitacionMapaDto> {
     const camasHabitacion = todasLasCamas.filter((c) => c.habitacionId === hab.id);
-    const camasDto = await Promise.all(
-      camasHabitacion.map((cama) => this.mapearCama(cama)),
-    );
+    const camasDto = await Promise.all(camasHabitacion.map((cama) => this.mapearCama(cama)));
 
     return {
       id: hab.id,

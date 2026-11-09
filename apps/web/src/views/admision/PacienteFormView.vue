@@ -106,7 +106,9 @@ const obraSocialOptions = computed(() => [
 async function cargarDatos() {
   await Promise.all([
     cargarPaciente(),
-    facturacionStore.obrasSociales.length === 0 ? facturacionStore.cargarObrasSociales() : Promise.resolve(),
+    facturacionStore.obrasSociales.length === 0
+      ? facturacionStore.cargarObrasSociales()
+      : Promise.resolve(),
   ]);
 }
 

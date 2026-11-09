@@ -75,7 +75,10 @@ async function handleAtender(row: any) {
   atendiendoId.value = row.id;
   try {
     await admisionStore.atenderTriaje(row.id);
-    toastStore.success('Paciente atendido', 'El paciente fue marcado como atendido y retirado de la cola');
+    toastStore.success(
+      'Paciente atendido',
+      'El paciente fue marcado como atendido y retirado de la cola',
+    );
   } catch (err) {
     toastStore.error('Error', 'No se pudo registrar la atención');
   } finally {

@@ -30,10 +30,7 @@ async function generarReporte() {
     if (reporteTipo.value === 'facturacion') {
       const desdeIso = new Date(`${fechaDesde.value}T00:00:00Z`).toISOString();
       const hastaIso = new Date(`${fechaHasta.value}T23:59:59Z`).toISOString();
-      await facturacionStore.generarReporteFacturacion(
-        desdeIso,
-        hastaIso,
-      );
+      await facturacionStore.generarReporteFacturacion(desdeIso, hastaIso);
       reporteFacturacionData.value = facturacionStore.reporteFacturacion;
       toastStore.success('Reporte generado', 'Reporte de facturación cargado');
     } else {

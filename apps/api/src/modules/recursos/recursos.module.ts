@@ -29,11 +29,7 @@ import { InternacionRepositoryPrisma } from './infrastructure/internacion.reposi
  * Fase 6 del ROADMAP.
  */
 @Module({
-  controllers: [
-    CamasController,
-    InternacionesController,
-    InsumosController,
-  ],
+  controllers: [CamasController, InternacionesController, InsumosController],
   providers: [
     // Casos de uso (Application)
     InternarPacienteHandler,

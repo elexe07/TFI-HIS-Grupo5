@@ -6,9 +6,7 @@ import { CAMA_REPOSITORY } from '../ports/tokens';
 import type { CambiarEstadoCamaCommand } from './cambiar-estado-cama.command';
 
 @Injectable()
-export class CambiarEstadoCamaHandler
-  implements CasoDeUso<CambiarEstadoCamaCommand, CamaDto>
-{
+export class CambiarEstadoCamaHandler implements CasoDeUso<CambiarEstadoCamaCommand, CamaDto> {
   constructor(
     @Inject(CAMA_REPOSITORY)
     private readonly camas: CamaRepository,

@@ -6,7 +6,10 @@ import { PACIENTE_INTERNADO, type PacienteInternado } from '../../../recursos/pu
 import { Cuenta } from '../../domain/cuenta';
 import { TipoCuenta } from '../../domain/enums';
 import { CUENTA_REPOSITORY, type CuentaRepository } from '../../domain/ports/cuenta.repository';
-import { OBRA_SOCIAL_REPOSITORY, type ObraSocialRepository } from '../../domain/ports/obra-social.repository';
+import {
+  OBRA_SOCIAL_REPOSITORY,
+  type ObraSocialRepository,
+} from '../../domain/ports/obra-social.repository';
 
 @Injectable()
 export class AbrirCuentaInternacionHandler {
@@ -67,9 +70,14 @@ export class AbrirCuentaInternacionHandler {
       });
 
       await this.cuentaRepo.guardar(cuenta);
-      this.logger.log(`Cuenta de internación abierta para ${internacionId} (paciente ${pacienteId}, cobertura: ${porcentajeCobertura ?? 0}%)`);
+      this.logger.log(
+        `Cuenta de internación abierta para ${internacionId} (paciente ${pacienteId}, cobertura: ${porcentajeCobertura ?? 0}%)`,
+      );
     } catch (error) {
-      this.logger.error(`Error al abrir cuenta de internación para evento ${evento.eventoId}`, error);
+      this.logger.error(
+        `Error al abrir cuenta de internación para evento ${evento.eventoId}`,
+        error,
+      );
     }
   }
 }

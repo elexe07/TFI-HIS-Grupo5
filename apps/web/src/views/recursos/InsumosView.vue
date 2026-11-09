@@ -30,7 +30,8 @@ const columns: TableColumn<InsumoDTO>[] = [
     key: 'updatedAt',
     label: 'Actualizado',
     width: '160px',
-    format: (v: unknown) => (v ? new Date(v as string).toLocaleString('es-AR', { hour12: false }) : '—'),
+    format: (v: unknown) =>
+      v ? new Date(v as string).toLocaleString('es-AR', { hour12: false }) : '—',
   },
 ];
 
@@ -91,7 +92,10 @@ async function registrarEgreso() {
   const cantidad = parseInt(cantidadEgreso.value, 10);
   if (cantidad <= 0) return;
   if (cantidad > editingInsumo.value.stockActual) {
-    toastStore.error('Stock insuficiente', `El stock actual es de ${editingInsumo.value.stockActual} unidades`);
+    toastStore.error(
+      'Stock insuficiente',
+      `El stock actual es de ${editingInsumo.value.stockActual} unidades`,
+    );
     return;
   }
   try {

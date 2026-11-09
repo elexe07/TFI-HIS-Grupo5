@@ -6,9 +6,7 @@ import { INSUMO_REPOSITORY } from '../ports/tokens';
 import type { ListarInsumosQuery } from './listar-insumos.query';
 
 @Injectable()
-export class ListarInsumosHandler
-  implements CasoDeUso<ListarInsumosQuery, InsumoDto[]>
-{
+export class ListarInsumosHandler implements CasoDeUso<ListarInsumosQuery, InsumoDto[]> {
   constructor(
     @Inject(INSUMO_REPOSITORY)
     private readonly insumos: InsumoRepository,

@@ -1,8 +1,5 @@
 import { Insumo, StockInsuficiente } from '../../domain';
-import {
-  EventosProcesadosRepositoryEnMemoria,
-  InsumoRepositoryEnMemoria,
-} from '../../testing';
+import { EventosProcesadosRepositoryEnMemoria, InsumoRepositoryEnMemoria } from '../../testing';
 import { DescontarInsumoPorEventoCommand } from './descontar-insumo-evento.command';
 import { DescontarInsumoPorEventoHandler } from './descontar-insumo-evento.handler';
 

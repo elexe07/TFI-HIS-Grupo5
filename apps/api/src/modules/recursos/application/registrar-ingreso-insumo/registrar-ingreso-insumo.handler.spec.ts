@@ -47,9 +47,7 @@ describe('RegistrarIngresoInsumoHandler (REC-05)', () => {
 
   it('falla con CantidadInvalida si la cantidad es menor o igual a cero', async () => {
     await expect(
-      handler.ejecutar(
-        new RegistrarIngresoInsumoCommand({ insumoId, cantidad: 0 }),
-      ),
+      handler.ejecutar(new RegistrarIngresoInsumoCommand({ insumoId, cantidad: 0 })),
     ).rejects.toThrow(CantidadInvalida);
   });
 });

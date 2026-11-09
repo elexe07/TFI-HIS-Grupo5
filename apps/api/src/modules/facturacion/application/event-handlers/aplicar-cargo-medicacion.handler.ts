@@ -9,7 +9,10 @@ import { Cuenta } from '../../domain/cuenta';
 import { ConceptoCargo, EstadoCuenta, TipoCuenta } from '../../domain/enums';
 import { TarifaNoEncontrada } from '../../domain/errores';
 import { CUENTA_REPOSITORY, type CuentaRepository } from '../../domain/ports/cuenta.repository';
-import { OBRA_SOCIAL_REPOSITORY, type ObraSocialRepository } from '../../domain/ports/obra-social.repository';
+import {
+  OBRA_SOCIAL_REPOSITORY,
+  type ObraSocialRepository,
+} from '../../domain/ports/obra-social.repository';
 import { TARIFA_REPOSITORY, type TarifaRepository } from '../../domain/ports/tarifa.repository';
 
 @Injectable()
@@ -91,7 +94,11 @@ export class AplicarCargoMedicacionHandler {
     }
 
     // 3. Si es curación, agregar cargo por las gasas utilizadas
-    if (medLower.includes('curacion') || medLower.includes('curación') || medLower.includes('gasa')) {
+    if (
+      medLower.includes('curacion') ||
+      medLower.includes('curación') ||
+      medLower.includes('gasa')
+    ) {
       const cargoGasasCuracion = Cargo.crear({
         cuentaId: cuenta.id,
         concepto: ConceptoCargo.MEDICACION,

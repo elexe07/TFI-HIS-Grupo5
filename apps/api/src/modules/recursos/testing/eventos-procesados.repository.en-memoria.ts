@@ -1,8 +1,6 @@
 import type { EventosProcesadosRepository } from '../domain/eventos-procesados.repository';
 
-export class EventosProcesadosRepositoryEnMemoria
-  implements EventosProcesadosRepository
-{
+export class EventosProcesadosRepositoryEnMemoria implements EventosProcesadosRepository {
   private readonly procesados = new Set<string>();
 
   haSidoProcesado(eventoId: string): Promise<boolean> {

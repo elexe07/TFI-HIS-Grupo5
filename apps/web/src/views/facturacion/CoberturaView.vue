@@ -95,7 +95,11 @@ function onPacienteChange(pacienteId: string | number | null) {
 }
 
 async function ejecutarValidacion() {
-  if (!validarForm.value.pacienteId || !validarForm.value.codigoObraSocial || !validarForm.value.numeroAfiliado) {
+  if (
+    !validarForm.value.pacienteId ||
+    !validarForm.value.codigoObraSocial ||
+    !validarForm.value.numeroAfiliado
+  ) {
     toastStore.error('Campos obligatorios', 'Complete paciente, obra social y número de afiliado');
     return;
   }
@@ -108,7 +112,10 @@ async function ejecutarValidacion() {
     });
     resultadoValidacion.value = res;
     if (res.aprobada) {
-      toastStore.success('Cobertura Aprobada', `Cobertura del ${res.porcentajeCobertura}% aplicada.`);
+      toastStore.success(
+        'Cobertura Aprobada',
+        `Cobertura del ${res.porcentajeCobertura}% aplicada.`,
+      );
       if (res.cuentaActualizada) {
         await facturacionStore.cargarCuentas();
       }
@@ -133,7 +140,14 @@ onMounted(() => {
         <p class="view-subtitle">Consulta convenios, tarifas y valida coberturas en línea</p>
       </div>
       <Button variant="primary" @click="abrirModalValidar">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <svg
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
           <polyline points="20 6 9 17 4 12"></polyline>
         </svg>
         Validar Cobertura
@@ -142,7 +156,12 @@ onMounted(() => {
 
     <Card class="search-card">
       <div class="search-form">
-        <Input v-model="searchTerm" label="Buscar Obra Social" placeholder="Nombre o código..." size="sm" />
+        <Input
+          v-model="searchTerm"
+          label="Buscar Obra Social"
+          placeholder="Nombre o código..."
+          size="sm"
+        />
         <Button variant="ghost" @click="limpiarFiltros"> Limpiar </Button>
       </div>
     </Card>
@@ -229,11 +248,7 @@ onMounted(() => {
             </div>
             <div class="form-field">
               <label class="label">Número de Afiliado *</label>
-              <Input
-                v-model="validarForm.numeroAfiliado"
-                placeholder="Ej: 123456789"
-                required
-              />
+              <Input v-model="validarForm.numeroAfiliado" placeholder="Ej: 123456789" required />
             </div>
           </div>
 
@@ -242,23 +257,28 @@ onMounted(() => {
             <Select
               :model-value="validarForm.cuentaId"
               @update:model-value="validarForm.cuentaId = $event ? String($event) : ''"
-              :options="
-                [
-                  { value: '', label: 'Ninguna (solo consulta de credencial)' },
-                  ...facturacionStore.cuentas
-                    .filter((c) => !validarForm.pacienteId || c.pacienteId === validarForm.pacienteId)
-                    .map((c) => ({
-                      value: c.id,
-                      label: `Cuenta #${c.id.slice(-6)} - ${c.tipo} (${c.estado})`,
-                    })),
-                ]
-              "
+              :options="[
+                { value: '', label: 'Ninguna (solo consulta de credencial)' },
+                ...facturacionStore.cuentas
+                  .filter((c) => !validarForm.pacienteId || c.pacienteId === validarForm.pacienteId)
+                  .map((c) => ({
+                    value: c.id,
+                    label: `Cuenta #${c.id.slice(-6)} - ${c.tipo} (${c.estado})`,
+                  })),
+              ]"
               placeholder="Seleccionar cuenta para aplicar descuento"
             />
           </div>
 
           <!-- Resultado -->
-          <div v-if="resultadoValidacion" class="resultado-box" :class="{ aprobada: resultadoValidacion.aprobada, rechazada: !resultadoValidacion.aprobada }">
+          <div
+            v-if="resultadoValidacion"
+            class="resultado-box"
+            :class="{
+              aprobada: resultadoValidacion.aprobada,
+              rechazada: !resultadoValidacion.aprobada,
+            }"
+          >
             <div class="resultado-header">
               <strong>Estado:</strong>
               <Badge :variant="resultadoValidacion.aprobada ? 'success' : 'danger'" size="md">
@@ -267,10 +287,13 @@ onMounted(() => {
             </div>
             <p v-if="resultadoValidacion.aprobada">
               Cobertura reconocida: <strong>{{ resultadoValidacion.porcentajeCobertura }}%</strong>
-              <span v-if="resultadoValidacion.cuentaActualizada" class="ml-sm text-success">(Cuenta actualizada correctamente)</span>
+              <span v-if="resultadoValidacion.cuentaActualizada" class="ml-sm text-success"
+                >(Cuenta actualizada correctamente)</span
+              >
             </p>
             <p v-else class="text-danger">
-              Motivo: {{ resultadoValidacion.motivoRechazo || 'Credencial inactiva o datos no coinciden' }}
+              Motivo:
+              {{ resultadoValidacion.motivoRechazo || 'Credencial inactiva o datos no coinciden' }}
             </p>
           </div>
         </div>
@@ -282,7 +305,9 @@ onMounted(() => {
           variant="primary"
           @click="ejecutarValidacion"
           :loading="facturacionStore.cargando"
-          :disabled="!validarForm.pacienteId || !validarForm.codigoObraSocial || !validarForm.numeroAfiliado"
+          :disabled="
+            !validarForm.pacienteId || !validarForm.codigoObraSocial || !validarForm.numeroAfiliado
+          "
         >
           Validar Credencial
         </Button>

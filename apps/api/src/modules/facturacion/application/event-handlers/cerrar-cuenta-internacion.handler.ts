@@ -66,7 +66,10 @@ export class CerrarCuentaInternacionHandler {
         `Cuenta ${cuenta.id} cerrada con ${dias} día(s) de cama (evento ${evento.eventoId})`,
       );
     } catch (error) {
-      this.logger.error(`Error al procesar alta de internación para evento ${evento.eventoId}`, error);
+      this.logger.error(
+        `Error al procesar alta de internación para evento ${evento.eventoId}`,
+        error,
+      );
     }
   }
 

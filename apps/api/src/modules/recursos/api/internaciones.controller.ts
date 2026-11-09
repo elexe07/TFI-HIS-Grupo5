@@ -79,10 +79,7 @@ export class InternacionesController {
   @ApiNotFoundResponse({ description: 'INTERNACION_NO_ENCONTRADA o CAMA_NO_ENCONTRADA' })
   @ApiConflictResponse({ description: 'INTERNACION_YA_FINALIZADA' })
   @ApiForbiddenResponse({ description: 'Requiere permiso internaciones:gestionar' })
-  alta(
-    @Param('id', ParseUUIDPipe) id: string,
-    @Body() dto: DarDeAltaDto,
-  ): Promise<InternacionDto> {
+  alta(@Param('id', ParseUUIDPipe) id: string, @Body() dto: DarDeAltaDto): Promise<InternacionDto> {
     return this.darDeAlta.ejecutar(
       new DarDeAltaCommand({
         internacionId: id,

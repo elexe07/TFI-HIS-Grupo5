@@ -31,7 +31,7 @@ const columns: TableColumn<CuentaDTO>[] = [
     format: (_value, row) => {
       const c = row as CuentaDTO;
       const p = c.paciente || admisionStore.pacientes.find((pac) => pac.id === c.pacienteId);
-      return p ? `${p.apellido}, ${p.nombre}` : (c.pacienteId ? c.pacienteId.slice(-6) : '-');
+      return p ? `${p.apellido}, ${p.nombre}` : c.pacienteId ? c.pacienteId.slice(-6) : '-';
     },
   },
   { key: 'tipo', label: 'Tipo', width: '120px' },
@@ -49,7 +49,8 @@ const columns: TableColumn<CuentaDTO>[] = [
     width: '120px',
     format: (value, row) => {
       const c = row as any;
-      const monto = typeof value === 'number' && !isNaN(value) ? value : (c?.totalBruto ?? c?.totalAPagar ?? 0);
+      const monto =
+        typeof value === 'number' && !isNaN(value) ? value : (c?.totalBruto ?? c?.totalAPagar ?? 0);
       return facturacionStore.formatearMonto(monto);
     },
   },
@@ -84,7 +85,8 @@ const tiposOptions = [
 
 const cuentasFiltradas = computed(() => {
   return facturacionStore.cuentas.filter((cuenta) => {
-    const p = cuenta.paciente || admisionStore.pacientes.find((pac) => pac.id === cuenta.pacienteId);
+    const p =
+      cuenta.paciente || admisionStore.pacientes.find((pac) => pac.id === cuenta.pacienteId);
     if (searchDocumento.value) {
       if (
         !p ||
@@ -111,7 +113,11 @@ async function buscarCuentas() {
 const cerrandoId = ref<string | null>(null);
 
 async function handleCerrarCuenta(id: string) {
-  if (!confirm('¿Confirma que desea cerrar esta cuenta? Una vez cerrada no se podrán registrar nuevos cargos.')) {
+  if (
+    !confirm(
+      '¿Confirma que desea cerrar esta cuenta? Una vez cerrada no se podrán registrar nuevos cargos.',
+    )
+  ) {
     return;
   }
   cerrandoId.value = id;
@@ -232,7 +238,12 @@ onMounted(() => {
         </template>
         <template #cell-actions="{ row }">
           <div class="action-buttons">
-            <Button size="sm" variant="ghost" @click="verDetalle(row as unknown as CuentaDTO)" title="Ver detalle">
+            <Button
+              size="sm"
+              variant="ghost"
+              @click="verDetalle(row as unknown as CuentaDTO)"
+              title="Ver detalle"
+            >
               <svg
                 width="16"
                 height="16"
@@ -371,7 +382,14 @@ onMounted(() => {
           >
             Cerrar Cuenta
           </Button>
-          <Button variant="secondary" @click="showDetalleModal = false; cuentaSeleccionada = null;">Volver</Button>
+          <Button
+            variant="secondary"
+            @click="
+              showDetalleModal = false;
+              cuentaSeleccionada = null;
+            "
+            >Volver</Button
+          >
         </div>
       </template>
     </Modal>

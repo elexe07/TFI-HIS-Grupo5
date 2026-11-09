@@ -1,10 +1,7 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 import type { EventosProcesadosRepository, InsumoRepository } from '../../domain';
-import {
-  EVENTOS_PROCESADOS_REPOSITORY,
-  INSUMO_REPOSITORY,
-} from '../ports/tokens';
+import { EVENTOS_PROCESADOS_REPOSITORY, INSUMO_REPOSITORY } from '../ports/tokens';
 
 export interface MedicacionAdministradaPayload {
   eventoId: string;
@@ -19,9 +16,7 @@ export const EVENTO_MEDICACION_ADMINISTRADA = 'enfermeria.medicacion-administrad
 
 @Injectable()
 export class DescontarInsumoAlAdministrarMedicacionHandler {
-  private readonly logger = new Logger(
-    DescontarInsumoAlAdministrarMedicacionHandler.name,
-  );
+  private readonly logger = new Logger(DescontarInsumoAlAdministrarMedicacionHandler.name);
 
   constructor(
     @Inject(INSUMO_REPOSITORY)
@@ -81,7 +76,11 @@ export class DescontarInsumoAlAdministrarMedicacionHandler {
       }
 
       // 3. Si la indicación es de curación, consume 2 gasas
-      if (medLower.includes('curacion') || medLower.includes('curación') || medLower.includes('gasa')) {
+      if (
+        medLower.includes('curacion') ||
+        medLower.includes('curación') ||
+        medLower.includes('gasa')
+      ) {
         const gasa = await this.insumos.buscarPorCodigo('GASA');
         if (gasa) {
           gasa.descontar(2);

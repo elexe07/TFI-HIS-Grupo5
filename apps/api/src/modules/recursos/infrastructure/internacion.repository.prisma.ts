@@ -1,11 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import type { Internacion as FilaInternacion } from '@prisma/client';
 import { PrismaService } from '../../../building-blocks/infrastructure/prisma/prisma.service';
-import {
-  EstadoInternacion,
-  Internacion,
-  type InternacionRepository,
-} from '../domain';
+import { EstadoInternacion, Internacion, type InternacionRepository } from '../domain';
 
 @Injectable()
 export class InternacionRepositoryPrisma implements InternacionRepository {

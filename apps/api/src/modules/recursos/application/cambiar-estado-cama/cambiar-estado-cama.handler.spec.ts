@@ -1,9 +1,4 @@
-import {
-  Cama,
-  CamaNoEncontrada,
-  EstadoCama,
-  TransicionDeCamaInvalida,
-} from '../../domain';
+import { Cama, CamaNoEncontrada, EstadoCama, TransicionDeCamaInvalida } from '../../domain';
 import { CamaRepositoryEnMemoria } from '../../testing';
 import { CambiarEstadoCamaCommand } from './cambiar-estado-cama.command';
 import { CambiarEstadoCamaHandler } from './cambiar-estado-cama.handler';
@@ -69,9 +64,7 @@ describe('CambiarEstadoCamaHandler (REC-03)', () => {
     );
 
     await expect(
-      handler.ejecutar(
-        new CambiarEstadoCamaCommand({ camaId, nuevoEstado: EstadoCama.LIBRE }),
-      ),
+      handler.ejecutar(new CambiarEstadoCamaCommand({ camaId, nuevoEstado: EstadoCama.LIBRE })),
     ).rejects.toThrow(TransicionDeCamaInvalida);
   });
 

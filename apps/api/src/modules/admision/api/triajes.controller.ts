@@ -61,8 +61,6 @@ export class TriajesController {
     @Param('id') id: string,
     @UsuarioActual() usuario: UsuarioAutenticado,
   ): Promise<TriajeDto> {
-    return this.atenderTriaje.ejecutar(
-      new AtenderTriajeCommand(id, usuario.id),
-    );
+    return this.atenderTriaje.ejecutar(new AtenderTriajeCommand(id, usuario.id));
   }
 }

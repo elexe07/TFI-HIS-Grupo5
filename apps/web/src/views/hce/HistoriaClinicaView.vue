@@ -538,7 +538,9 @@ const timelineEventos = computed(() => {
                 <div class="evolucion-meta">
                   <span>{{
                     hceStore.evoluciones[0]?.registradoEn
-                      ? new Date(hceStore.evoluciones[0].registradoEn).toLocaleString('es-AR', { hour12: false })
+                      ? new Date(hceStore.evoluciones[0].registradoEn).toLocaleString('es-AR', {
+                          hour12: false,
+                        })
                       : '-'
                   }}</span>
                   <span>por Dr. {{ hceStore.evoluciones[0]?.medicoNombre ?? 'Desconocido' }}</span>

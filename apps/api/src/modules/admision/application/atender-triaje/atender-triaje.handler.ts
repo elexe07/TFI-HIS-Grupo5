@@ -6,9 +6,7 @@ import type { AtenderTriajeCommand } from './atender-triaje.command';
 
 @Injectable()
 export class AtenderTriajeHandler implements CasoDeUso<AtenderTriajeCommand, TriajeDto> {
-  constructor(
-    @Inject(TRIAJE_REPOSITORY) private readonly triajes: TriajeRepository,
-  ) {}
+  constructor(@Inject(TRIAJE_REPOSITORY) private readonly triajes: TriajeRepository) {}
 
   async ejecutar(command: AtenderTriajeCommand): Promise<TriajeDto> {
     const triaje = await this.triajes.buscarPorId(command.triajeId);

@@ -15,9 +15,7 @@ import { CAMA_REPOSITORY, INTERNACION_REPOSITORY } from '../ports/tokens';
 import type { InternarPacienteCommand } from './internar-paciente.command';
 
 @Injectable()
-export class InternarPacienteHandler
-  implements CasoDeUso<InternarPacienteCommand, InternacionDto>
-{
+export class InternarPacienteHandler implements CasoDeUso<InternarPacienteCommand, InternacionDto> {
   constructor(
     @Inject(CAMA_REPOSITORY)
     private readonly camas: CamaRepository,

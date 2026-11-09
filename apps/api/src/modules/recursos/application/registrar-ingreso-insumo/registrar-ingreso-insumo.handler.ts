@@ -6,9 +6,10 @@ import { INSUMO_REPOSITORY } from '../ports/tokens';
 import type { RegistrarIngresoInsumoCommand } from './registrar-ingreso-insumo.command';
 
 @Injectable()
-export class RegistrarIngresoInsumoHandler
-  implements CasoDeUso<RegistrarIngresoInsumoCommand, InsumoDto>
-{
+export class RegistrarIngresoInsumoHandler implements CasoDeUso<
+  RegistrarIngresoInsumoCommand,
+  InsumoDto
+> {
   constructor(
     @Inject(INSUMO_REPOSITORY)
     private readonly insumos: InsumoRepository,

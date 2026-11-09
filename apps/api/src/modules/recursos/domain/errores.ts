@@ -20,10 +20,7 @@ export class CamaNoLibre extends Conflicto {
 
 export class PacienteYaInternado extends Conflicto {
   constructor(pacienteId: string) {
-    super(
-      `El paciente '${pacienteId}' ya posee una internación activa`,
-      'PACIENTE_YA_INTERNADO',
-    );
+    super(`El paciente '${pacienteId}' ya posee una internación activa`, 'PACIENTE_YA_INTERNADO');
   }
 }
 

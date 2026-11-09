@@ -267,7 +267,12 @@ onMounted(async () => {
             "
             placeholder="Seleccionar internación"
           />
-          <Input v-else v-model="internacionId" placeholder="Sin internación activa (o ingrese ID)" type="text" />
+          <Input
+            v-else
+            v-model="internacionId"
+            placeholder="Sin internación activa (o ingrese ID)"
+            type="text"
+          />
         </div>
         <Button
           variant="secondary"
@@ -379,7 +384,13 @@ onMounted(async () => {
             placeholder="Seleccione medicamento..."
             required
           />
-          <Input v-else v-model="medicamento" label="Medicamento" placeholder="Amoxicilina" required />
+          <Input
+            v-else
+            v-model="medicamento"
+            label="Medicamento"
+            placeholder="Amoxicilina"
+            required
+          />
           <Input v-model="dosis" label="Dosis" placeholder="500 mg" required />
         </div>
         <div class="form-row">

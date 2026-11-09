@@ -4,11 +4,7 @@ import { useRecursosStore } from '@/stores/recursos';
 import { useAdmisionStore } from '@/stores/admision';
 import { useToastStore } from '@/stores/toast';
 import { Card, Button, Select, Table, Badge, Modal, type TableColumn } from '@/components/ui';
-import type {
-  InternacionDTO,
-  InternarPacienteRequest,
-  EstadoInternacion,
-} from '@/types/api';
+import type { InternacionDTO, InternarPacienteRequest, EstadoInternacion } from '@/types/api';
 
 const recursosStore = useRecursosStore();
 const admisionStore = useAdmisionStore();
@@ -26,8 +22,12 @@ const columns: TableColumn<InternacionDTO>[] = [
     label: 'Paciente',
     width: '220px',
     format: (_v, row) => {
-      const p = (row as InternacionDTO).paciente || admisionStore.pacientes.find((pac) => pac.id === (row as InternacionDTO).pacienteId);
-      return p ? `${p.apellido}, ${p.nombre} (${p.tipoDocumento} ${p.numeroDocumento})` : ((row as InternacionDTO).pacienteId || '—');
+      const p =
+        (row as InternacionDTO).paciente ||
+        admisionStore.pacientes.find((pac) => pac.id === (row as InternacionDTO).pacienteId);
+      return p
+        ? `${p.apellido}, ${p.nombre} (${p.tipoDocumento} ${p.numeroDocumento})`
+        : (row as InternacionDTO).pacienteId || '—';
     },
   },
   {
@@ -35,10 +35,14 @@ const columns: TableColumn<InternacionDTO>[] = [
     label: 'Cama',
     width: '140px',
     format: (_v, row) => {
-      const c = (row as InternacionDTO).cama || recursosStore.camas.find((cam) => cam.id === (row as InternacionDTO).camaId);
+      const c =
+        (row as InternacionDTO).cama ||
+        recursosStore.camas.find((cam) => cam.id === (row as InternacionDTO).camaId);
       return c
         ? `${c.habitacion?.sector || ''} - ${c.habitacion?.numero || ''} / ${c.codigo}`
-        : ((row as InternacionDTO).camaId ? (row as InternacionDTO).camaId.slice(-6) : '—');
+        : (row as InternacionDTO).camaId
+          ? (row as InternacionDTO).camaId.slice(-6)
+          : '—';
     },
   },
   {
@@ -46,8 +50,12 @@ const columns: TableColumn<InternacionDTO>[] = [
     label: 'Médico',
     width: '180px',
     format: (_v, row) => {
-      const m = (row as InternacionDTO).medico || admisionStore.medicos.find((med) => med.id === (row as InternacionDTO).medicoId);
-      return m ? `${m.apellido}, ${m.nombre} (${m.especialidad})` : ((row as InternacionDTO).medicoId || '—');
+      const m =
+        (row as InternacionDTO).medico ||
+        admisionStore.medicos.find((med) => med.id === (row as InternacionDTO).medicoId);
+      return m
+        ? `${m.apellido}, ${m.nombre} (${m.especialidad})`
+        : (row as InternacionDTO).medicoId || '—';
     },
   },
   { key: 'motivo', label: 'Motivo', width: '200px' },
@@ -177,7 +185,11 @@ onMounted(() => {
       <Button
         variant="primary"
         @click="abrirModalInternar"
-        :disabled="!recursosStore.camasLibres.length || !admisionStore.pacientes.length || !admisionStore.medicos.length"
+        :disabled="
+          !recursosStore.camasLibres.length ||
+          !admisionStore.pacientes.length ||
+          !admisionStore.medicos.length
+        "
       >
         <svg
           width="18"

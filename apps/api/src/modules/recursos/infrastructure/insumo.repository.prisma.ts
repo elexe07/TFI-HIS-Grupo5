@@ -40,9 +40,7 @@ export class InsumoRepositoryPrisma implements InsumoRepository {
       if (!f.medicamentoAsociado) return false;
       const asociado = f.medicamentoAsociado.trim().toLowerCase();
       return (
-        medLimpio === asociado ||
-        medLimpio.startsWith(asociado) ||
-        asociado.startsWith(medLimpio)
+        medLimpio === asociado || medLimpio.startsWith(asociado) || asociado.startsWith(medLimpio)
       );
     });
     return coincidencia ? aDominio(coincidencia) : null;

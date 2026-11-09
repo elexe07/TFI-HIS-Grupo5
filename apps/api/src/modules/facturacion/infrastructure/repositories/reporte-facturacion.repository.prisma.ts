@@ -42,22 +42,26 @@ export class ReporteFacturacionRepositoryPrisma implements ReporteFacturacionRep
 
     // Collect unique pacienteIds to look up obra social
     const pacienteIds = [...new Set(cargos.map((c) => c.cuenta.pacienteId))];
-    const pacientes = pacienteIds.length > 0
-      ? await this.prisma.paciente.findMany({
-          where: { id: { in: pacienteIds } },
-          select: { id: true, obraSocialCodigo: true },
-        })
-      : [];
+    const pacientes =
+      pacienteIds.length > 0
+        ? await this.prisma.paciente.findMany({
+            where: { id: { in: pacienteIds } },
+            select: { id: true, obraSocialCodigo: true },
+          })
+        : [];
     const pacienteOSMap = new Map(pacientes.map((p) => [p.id, p.obraSocialCodigo]));
 
     // Look up obra social names
-    const osCodigos = [...new Set(pacientes.map((p) => p.obraSocialCodigo).filter(Boolean))] as string[];
-    const obrasSociales = osCodigos.length > 0
-      ? await this.prisma.obraSocial.findMany({
-          where: { codigo: { in: osCodigos } },
-          select: { codigo: true, nombre: true },
-        })
-      : [];
+    const osCodigos = [
+      ...new Set(pacientes.map((p) => p.obraSocialCodigo).filter(Boolean)),
+    ] as string[];
+    const obrasSociales =
+      osCodigos.length > 0
+        ? await this.prisma.obraSocial.findMany({
+            where: { codigo: { in: osCodigos } },
+            select: { codigo: true, nombre: true },
+          })
+        : [];
     const osNombreMap = new Map(obrasSociales.map((os) => [os.codigo, os.nombre]));
 
     // --- Por obra social ---

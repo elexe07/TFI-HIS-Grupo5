@@ -1,6 +1,9 @@
 import { Controller, Get, Inject } from '@nestjs/common';
 import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { OBRA_SOCIAL_REPOSITORY, type ObraSocialRepository } from '../domain/ports/obra-social.repository';
+import {
+  OBRA_SOCIAL_REPOSITORY,
+  type ObraSocialRepository,
+} from '../domain/ports/obra-social.repository';
 import { TARIFA_REPOSITORY, type TarifaRepository } from '../domain/ports/tarifa.repository';
 
 @ApiTags('facturacion')

@@ -21,6 +21,7 @@
     "prisma:migrate": "dotenv -e ../../.env -- prisma migrate dev",
     "prisma:deploy": "dotenv -e ../../.env -- prisma migrate deploy",
     "prisma:seed": "dotenv -e ../../.env -- ts-node --transpile-only prisma/seed.ts",
+    "prisma:clean": "dotenv -e ../../.env -- ts-node --transpile-only prisma/limpiar-datos.ts",
     "prisma:studio": "dotenv -e ../../.env -- prisma studio",
     "postinstall": "prisma generate"
   },

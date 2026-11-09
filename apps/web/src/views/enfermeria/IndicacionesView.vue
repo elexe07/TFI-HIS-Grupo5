@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { useEnfermeriaStore } from '@/stores/enfermeria';
 import { useAdmisionStore } from '@/stores/admision';
+import { useRecursosStore } from '@/stores/recursos';
 import { useToastStore } from '@/stores/toast';
 import { Card, Button, Input, Select, Badge, Modal, Table } from '@/components/ui';
 import type { TableColumn } from '@/components/ui/Table.types';
@@ -9,6 +10,7 @@ import type { EstadoIndicacion, IndicacionDTO } from '@/types/api';
 
 const enfermeriaStore = useEnfermeriaStore();
 const admisionStore = useAdmisionStore();
+const recursosStore = useRecursosStore();
 const toastStore = useToastStore();
 
 const pacienteId = ref('');
@@ -24,13 +26,63 @@ const dosis = ref('500 mg');
 const frecuenciaHoras = ref('8');
 const duracionDias = ref('1');
 
+const medicamentosDisponibles = computed(() => {
+  return recursosStore.insumos
+    .filter((i) => Boolean(i.medicamentoAsociado))
+    .map((i) => ({
+      value: i.medicamentoAsociado!,
+      label: `${i.nombre} (Stock: ${i.stockActual})`,
+    }));
+});
+
+watch(medicamento, (nuevoMed) => {
+  if (!nuevoMed) return;
+  const insumo = recursosStore.insumos.find(
+    (i) => i.medicamentoAsociado?.toLowerCase() === nuevoMed.toLowerCase(),
+  );
+  if (insumo) {
+    const matchDosis = insumo.nombre.match(/\d+\s*(mg|g|ml)/i);
+    if (matchDosis) {
+      dosis.value = matchDosis[0];
+    }
+  }
+});
+
+watch(
+  () => recursosStore.insumos,
+  (nuevosInsumos) => {
+    if (nuevosInsumos.length > 0) {
+      const existeActual = nuevosInsumos.some(
+        (i) => i.medicamentoAsociado?.toLowerCase() === medicamento.value.toLowerCase(),
+      );
+      if (!existeActual) {
+        const primeroConMed = nuevosInsumos.find((i) => Boolean(i.medicamentoAsociado));
+        if (primeroConMed?.medicamentoAsociado) {
+          medicamento.value = primeroConMed.medicamentoAsociado;
+        }
+      }
+    }
+  },
+  { immediate: true },
+);
+
 const columns: TableColumn<IndicacionDTO>[] = [
   { key: 'descripcion', label: 'Medicamento y Dosis', sortable: true },
   {
     key: 'programadaPara',
     label: 'Programada Para',
     width: '180px',
-    format: (v) => (v ? new Date(v as string).toLocaleString('es-AR') : '-'),
+    format: (v) =>
+      v
+        ? new Date(v as string).toLocaleString('es-AR', {
+            hour12: false,
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+          })
+        : '-',
   },
   { key: 'estado', label: 'Estado', width: '120px' },
   {
@@ -48,19 +100,24 @@ async function cargarDatos() {
 }
 
 async function generarIndicaciones() {
-  // Para demo, usamos datos simulados
-  await enfermeriaStore.generarIndicaciones({
-    prescripcionId: crypto.randomUUID(),
-    pacienteId: pacienteId.value,
-    internacionId: internacionId.value ?? undefined,
-    medicamento: 'Amoxicilina',
-    dosis: '500 mg',
-    frecuenciaHoras: 8,
-    duracionDias: 1,
-    inicioEn: new Date().toISOString(),
-  });
-  toastStore.success('Indicaciones generadas', '3 dosis programadas');
-  showGenerarModal.value = false;
+  try {
+    const idInternacion = internacionId.value.trim() || crypto.randomUUID();
+    await enfermeriaStore.generarIndicaciones({
+      prescripcionId: crypto.randomUUID(),
+      pacienteId: pacienteId.value,
+      internacionId: idInternacion,
+      medicamento: medicamento.value.trim() || 'Amoxicilina',
+      dosis: dosis.value.trim() || '500 mg',
+      frecuenciaHoras: Number(frecuenciaHoras.value) || 8,
+      duracionDias: Number(duracionDias.value) || 1,
+      inicioEn: new Date().toISOString(),
+    });
+    toastStore.success('Indicaciones generadas', 'Dosis programadas correctamente');
+    showGenerarModal.value = false;
+  } catch (err: any) {
+    const msg = err?.response?.data?.mensaje || err?.message || 'Error al generar indicaciones';
+    toastStore.error('Error', msg);
+  }
 }
 
 async function administrar(id: string) {
@@ -105,6 +162,28 @@ function getEstadoVariant(
   return variants[estado] ?? 'info';
 }
 
+const internacionesDelPaciente = computed(() => {
+  if (!pacienteId.value) return [];
+  return recursosStore.internaciones.filter(
+    (i) => i.pacienteId === pacienteId.value && i.estado === 'ACTIVA',
+  );
+});
+
+watch(pacienteId, (newId) => {
+  if (newId) {
+    const activa = recursosStore.internaciones.find(
+      (i) => i.pacienteId === newId && i.estado === 'ACTIVA',
+    );
+    if (activa) {
+      internacionId.value = activa.id;
+    } else {
+      internacionId.value = '';
+    }
+  } else {
+    internacionId.value = '';
+  }
+});
+
 watch(
   () => admisionStore.pacienteSeleccionado,
   (paciente) => {
@@ -115,7 +194,16 @@ watch(
   },
 );
 
-onMounted(() => {
+onMounted(async () => {
+  if (admisionStore.pacientes.length === 0) {
+    await admisionStore.cargarPacientes();
+  }
+  if (recursosStore.internaciones.length === 0) {
+    await recursosStore.cargarInternaciones();
+  }
+  if (recursosStore.insumos.length === 0) {
+    await recursosStore.cargarInsumos();
+  }
   if (admisionStore.pacienteSeleccionado) {
     pacienteId.value = admisionStore.pacienteSeleccionado.id;
     cargarDatos();
@@ -166,8 +254,20 @@ onMounted(() => {
           />
         </div>
         <div class="context-field">
-          <label>Internación (opcional)</label>
-          <Input v-model="internacionId" placeholder="ID de internación" type="text" />
+          <label>Internación</label>
+          <Select
+            v-if="internacionesDelPaciente.length > 0"
+            :model-value="internacionId"
+            @update:model-value="internacionId = $event ? String($event) : ''"
+            :options="
+              internacionesDelPaciente.map((i) => ({
+                value: i.id,
+                label: `Internación Activa #${i.id.slice(-6)} - Cama ${i.camaId ? i.camaId.slice(-6) : ''}`,
+              }))
+            "
+            placeholder="Seleccionar internación"
+          />
+          <Input v-else v-model="internacionId" placeholder="Sin internación activa (o ingrese ID)" type="text" />
         </div>
         <Button
           variant="secondary"
@@ -270,7 +370,16 @@ onMounted(() => {
           Esto creará 3 indicaciones (cada 8 horas por 1 día) para el paciente seleccionado.
         </p>
         <div class="form-row">
-          <Input v-model="medicamento" label="Medicamento" placeholder="Amoxicilina" required />
+          <Select
+            v-if="medicamentosDisponibles.length > 0"
+            :model-value="medicamento"
+            @update:model-value="medicamento = $event ? String($event) : ''"
+            :options="medicamentosDisponibles"
+            label="Medicamento (Insumos con Stock)"
+            placeholder="Seleccione medicamento..."
+            required
+          />
+          <Input v-else v-model="medicamento" label="Medicamento" placeholder="Amoxicilina" required />
           <Input v-model="dosis" label="Dosis" placeholder="500 mg" required />
         </div>
         <div class="form-row">

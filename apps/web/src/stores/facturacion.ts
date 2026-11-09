@@ -79,6 +79,27 @@ export const useFacturacionStore = defineStore('facturacion', () => {
     cuentaSeleccionada.value = null;
   }
 
+  async function cerrarCuenta(id: string) {
+    cargando.value = true;
+    error.value = null;
+    try {
+      const cuentaActualizada = await facturacionApi.cerrarCuenta(id);
+      const idx = cuentas.value.findIndex((c) => c.id === id);
+      if (idx !== -1) {
+        cuentas.value[idx] = { ...cuentas.value[idx], estado: 'CERRADA' } as CuentaDTO;
+      }
+      if (cuentaSeleccionada.value && cuentaSeleccionada.value.id === id) {
+        cuentaSeleccionada.value = { ...cuentaSeleccionada.value, estado: 'CERRADA' } as CuentaDTO;
+      }
+      return cuentaActualizada;
+    } catch (err) {
+      error.value = err instanceof Error ? err.message : 'Error al cerrar cuenta';
+      throw err;
+    } finally {
+      cargando.value = false;
+    }
+  }
+
   async function validarCobertura(
     data: ValidarCoberturaRequest,
   ): Promise<ValidarCoberturaResponse> {
@@ -205,6 +226,7 @@ export const useFacturacionStore = defineStore('facturacion', () => {
     // Actions
     cargarCuentas,
     obtenerCuenta,
+    cerrarCuenta,
     limpiarCuentaSeleccionada,
     validarCobertura,
     generarReporteFacturacion,

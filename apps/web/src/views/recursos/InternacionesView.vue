@@ -8,9 +8,6 @@ import type {
   InternacionDTO,
   InternarPacienteRequest,
   EstadoInternacion,
-  PacienteDTO,
-  CamaDTO,
-  MedicoDTO,
 } from '@/types/api';
 
 const recursosStore = useRecursosStore();
@@ -25,32 +22,32 @@ const internacionParaAlta = ref<InternacionDTO | null>(null);
 const columns: TableColumn<InternacionDTO>[] = [
   { key: 'id', label: 'ID', width: '80px', format: (v) => (v as string).slice(-8) },
   {
-    key: 'paciente',
+    key: 'pacienteId',
     label: 'Paciente',
     width: '220px',
-    format: (v) => {
-      const p = v as PacienteDTO | undefined;
-      return p ? `${p.apellido}, ${p.nombre} (${p.tipoDocumento} ${p.numeroDocumento})` : '—';
+    format: (_v, row) => {
+      const p = (row as InternacionDTO).paciente || admisionStore.pacientes.find((pac) => pac.id === (row as InternacionDTO).pacienteId);
+      return p ? `${p.apellido}, ${p.nombre} (${p.tipoDocumento} ${p.numeroDocumento})` : ((row as InternacionDTO).pacienteId || '—');
     },
   },
   {
-    key: 'cama',
+    key: 'camaId',
     label: 'Cama',
     width: '140px',
-    format: (v) => {
-      const c = v as CamaDTO | undefined;
+    format: (_v, row) => {
+      const c = (row as InternacionDTO).cama || recursosStore.camas.find((cam) => cam.id === (row as InternacionDTO).camaId);
       return c
         ? `${c.habitacion?.sector || ''} - ${c.habitacion?.numero || ''} / ${c.codigo}`
-        : '—';
+        : ((row as InternacionDTO).camaId ? (row as InternacionDTO).camaId.slice(-6) : '—');
     },
   },
   {
-    key: 'medico',
+    key: 'medicoId',
     label: 'Médico',
     width: '180px',
-    format: (v) => {
-      const m = v as MedicoDTO | undefined;
-      return m ? `${m.apellido}, ${m.nombre} (${m.especialidad})` : '—';
+    format: (_v, row) => {
+      const m = (row as InternacionDTO).medico || admisionStore.medicos.find((med) => med.id === (row as InternacionDTO).medicoId);
+      return m ? `${m.apellido}, ${m.nombre} (${m.especialidad})` : ((row as InternacionDTO).medicoId || '—');
     },
   },
   { key: 'motivo', label: 'Motivo', width: '200px' },
@@ -59,14 +56,35 @@ const columns: TableColumn<InternacionDTO>[] = [
     key: 'ingresoEn',
     label: 'Ingreso',
     width: '160px',
-    format: (v) => (v ? new Date(v as string).toLocaleString('es-AR') : '—'),
+    format: (v) =>
+      v
+        ? new Date(v as string).toLocaleString('es-AR', {
+            hour12: false,
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+          })
+        : '—',
   },
   {
     key: 'egresoEn',
     label: 'Egreso',
     width: '160px',
-    format: (v) => (v ? new Date(v as string).toLocaleString('es-AR') : '—'),
+    format: (v) =>
+      v
+        ? new Date(v as string).toLocaleString('es-AR', {
+            hour12: false,
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+          })
+        : '—',
   },
+  { key: 'actions', label: 'Acciones', width: '100px' },
 ];
 
 function getEstadoVariant(
@@ -82,7 +100,12 @@ function getEstadoVariant(
 
 async function cargarDatos() {
   try {
-    await Promise.all([recursosStore.cargarMapaCamas(), admisionStore.cargarPacientes()]);
+    await Promise.all([
+      recursosStore.cargarMapaCamas(),
+      recursosStore.cargarInternaciones(),
+      admisionStore.cargarPacientes(),
+      admisionStore.cargarMedicos(),
+    ]);
   } catch (err) {
     toastStore.error('Error', 'No se pudieron cargar los datos');
   }
@@ -101,8 +124,9 @@ async function internarPaciente() {
     toastStore.success('Internación creada', 'Paciente internado correctamente');
     showModal.value = false;
     editingInternacion.value = null;
-  } catch (err) {
-    // Error manejado en store
+  } catch (err: any) {
+    const msg = err?.response?.data?.message || err?.message || 'Error al internar paciente';
+    toastStore.error('Error al internar', Array.isArray(msg) ? msg.join(', ') : msg);
   }
 }
 
@@ -153,7 +177,7 @@ onMounted(() => {
       <Button
         variant="primary"
         @click="abrirModalInternar"
-        :disabled="!recursosStore.camasLibres.length || !admisionStore.pacientes.length"
+        :disabled="!recursosStore.camasLibres.length || !admisionStore.pacientes.length || !admisionStore.medicos.length"
       >
         <svg
           width="18"
@@ -217,7 +241,8 @@ onMounted(() => {
         <div class="form-field">
           <label class="label">Paciente *</label>
           <Select
-            v-model="editingInternacion.pacienteId"
+            :model-value="editingInternacion.pacienteId"
+            @update:model-value="editingInternacion.pacienteId = $event ? String($event) : ''"
             :options="
               admisionStore.pacientes.map((p) => ({
                 value: p.id,
@@ -231,7 +256,8 @@ onMounted(() => {
         <div class="form-field">
           <label class="label">Cama *</label>
           <Select
-            v-model="editingInternacion.camaId"
+            :model-value="editingInternacion.camaId"
+            @update:model-value="editingInternacion.camaId = $event ? String($event) : ''"
             :options="
               recursosStore.camasLibres.map((c) => ({
                 value: c.id,
@@ -245,7 +271,8 @@ onMounted(() => {
         <div class="form-field">
           <label class="label">Médico *</label>
           <Select
-            v-model="editingInternacion.medicoId"
+            :model-value="editingInternacion.medicoId"
+            @update:model-value="editingInternacion.medicoId = $event ? String($event) : ''"
             :options="
               admisionStore.medicos.map((m) => ({
                 value: m.id,

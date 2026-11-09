@@ -25,7 +25,7 @@ const columns: TableColumn[] = [
     key: 'registradoEn',
     label: 'Fecha',
     width: '160px',
-    format: (v) => (v ? new Date(v as string).toLocaleString('es-AR') : '-'),
+    format: (v) => (v ? new Date(v as string).toLocaleString('es-AR', { hour12: false }) : '-'),
   },
   { key: 'motivo', label: 'Motivo', width: '140px' },
   { key: 'diagnostico', label: 'Diagnóstico', width: '180px' },

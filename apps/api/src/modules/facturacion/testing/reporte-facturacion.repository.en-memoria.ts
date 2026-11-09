@@ -39,7 +39,7 @@ export class ReporteFacturacionRepositoryEnMemoria implements ReporteFacturacion
 
     const granTotal = Number(items.reduce((acc, it) => acc + it.montoTotal, 0).toFixed(2));
 
-    return { desde, hasta, items, granTotal };
+    return { desde, hasta, items, porObraSocial: [], granTotal };
   }
 
   private acumularCargos(

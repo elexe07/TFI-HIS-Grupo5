@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { useFacturacionStore } from '@/stores/facturacion';
+import { useAdmisionStore } from '@/stores/admision';
 import { useToastStore } from '@/stores/toast';
 import { Button, Input, Card, Table, Select, Modal, Badge } from '@/components/ui';
 import type { TableColumn } from '@/components/ui/Table.types';
 import type { CuentaDTO, EstadoCuenta, TipoCuenta, ConceptoCargo } from '@/types/api';
 
 const facturacionStore = useFacturacionStore();
+const admisionStore = useAdmisionStore();
 const toastStore = useToastStore();
 
 const searchDocumento = ref('');
@@ -24,10 +26,13 @@ const columns: TableColumn<CuentaDTO>[] = [
     format: (value) => (value ? new Date(value as string).toLocaleDateString('es-AR') : '-'),
   },
   {
-    key: 'paciente',
+    key: 'pacienteId',
     label: 'Paciente',
-    format: (_value, row) =>
-      row.paciente ? `${row.paciente.apellido}, ${row.paciente.nombre}` : '-',
+    format: (_value, row) => {
+      const c = row as CuentaDTO;
+      const p = c.paciente || admisionStore.pacientes.find((pac) => pac.id === c.pacienteId);
+      return p ? `${p.apellido}, ${p.nombre}` : (c.pacienteId ? c.pacienteId.slice(-6) : '-');
+    },
   },
   { key: 'tipo', label: 'Tipo', width: '120px' },
   { key: 'estado', label: 'Estado', width: '120px' },
@@ -42,7 +47,11 @@ const columns: TableColumn<CuentaDTO>[] = [
     key: 'total',
     label: 'Total',
     width: '120px',
-    format: (value) => facturacionStore.formatearMonto(value as number),
+    format: (value, row) => {
+      const c = row as any;
+      const monto = typeof value === 'number' && !isNaN(value) ? value : (c?.totalBruto ?? c?.totalAPagar ?? 0);
+      return facturacionStore.formatearMonto(monto);
+    },
   },
   { key: 'actions', label: 'Acciones', width: '100px' },
 ];
@@ -75,16 +84,17 @@ const tiposOptions = [
 
 const cuentasFiltradas = computed(() => {
   return facturacionStore.cuentas.filter((cuenta) => {
-    if (
-      searchDocumento.value &&
-      cuenta.paciente &&
-      !`${cuenta.paciente.tipoDocumento} ${cuenta.paciente.numeroDocumento}`.includes(
-        searchDocumento.value,
-      ) &&
-      !cuenta.paciente.nombre.toLowerCase().includes(searchDocumento.value.toLowerCase()) &&
-      !cuenta.paciente.apellido.toLowerCase().includes(searchDocumento.value.toLowerCase())
-    )
-      return false;
+    const p = cuenta.paciente || admisionStore.pacientes.find((pac) => pac.id === cuenta.pacienteId);
+    if (searchDocumento.value) {
+      if (
+        !p ||
+        (!`${p.tipoDocumento} ${p.numeroDocumento}`.includes(searchDocumento.value) &&
+          !p.nombre.toLowerCase().includes(searchDocumento.value.toLowerCase()) &&
+          !p.apellido.toLowerCase().includes(searchDocumento.value.toLowerCase()))
+      ) {
+        return false;
+      }
+    }
     if (estadoFiltro.value && cuenta.estado !== estadoFiltro.value) return false;
     if (tipoFiltro.value && cuenta.tipo !== tipoFiltro.value) return false;
     return true;
@@ -92,7 +102,31 @@ const cuentasFiltradas = computed(() => {
 });
 
 async function buscarCuentas() {
-  await facturacionStore.cargarCuentas();
+  await Promise.all([
+    facturacionStore.cargarCuentas(),
+    admisionStore.pacientes.length === 0 ? admisionStore.cargarPacientes() : Promise.resolve(),
+  ]);
+}
+
+const cerrandoId = ref<string | null>(null);
+
+async function handleCerrarCuenta(id: string) {
+  if (!confirm('¿Confirma que desea cerrar esta cuenta? Una vez cerrada no se podrán registrar nuevos cargos.')) {
+    return;
+  }
+  cerrandoId.value = id;
+  try {
+    await facturacionStore.cerrarCuenta(id);
+    toastStore.success('Cuenta cerrada', 'La cuenta ha sido cerrada correctamente');
+    if (cuentaSeleccionada.value?.id === id) {
+      cuentaSeleccionada.value = { ...cuentaSeleccionada.value, estado: 'CERRADA' };
+    }
+  } catch (err: any) {
+    const msg = err?.response?.data?.message || err?.message || 'Error al cerrar cuenta';
+    toastStore.error('Error', msg);
+  } finally {
+    cerrandoId.value = null;
+  }
 }
 
 async function verDetalle(cuenta: CuentaDTO) {
@@ -197,28 +231,51 @@ onMounted(() => {
           }}</Badge>
         </template>
         <template #cell-actions="{ row }">
-          <Button size="sm" variant="ghost" @click="verDetalle(row as unknown as CuentaDTO)">
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
+          <div class="action-buttons">
+            <Button size="sm" variant="ghost" @click="verDetalle(row as unknown as CuentaDTO)" title="Ver detalle">
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+            </Button>
+            <Button
+              v-if="(row as any).estado === 'ABIERTA'"
+              size="sm"
+              variant="ghost"
+              @click="handleCerrarCuenta((row as any).id)"
+              :loading="cerrandoId === (row as any).id"
+              title="Cerrar cuenta"
             >
-              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-              <circle cx="12" cy="12" r="3"></circle>
-            </svg>
-          </Button>
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+              </svg>
+            </Button>
+          </div>
         </template>
       </Table>
     </Card>
 
     <!-- Modal Detalle Cuenta -->
     <Modal
-      v-model="showDetalleModal"
+      v-model:model-value="showDetalleModal"
       title="Detalle de Cuenta"
       size="xl"
+      :closable="true"
       @close="
         showDetalleModal = false;
         cuentaSeleccionada = null;
@@ -304,11 +361,37 @@ onMounted(() => {
           </div>
         </div>
       </div>
+      <template #footer>
+        <div class="modal-footer-actions">
+          <Button
+            v-if="cuentaSeleccionada?.estado === 'ABIERTA'"
+            variant="danger"
+            @click="handleCerrarCuenta(cuentaSeleccionada.id)"
+            :loading="cerrandoId === cuentaSeleccionada?.id"
+          >
+            Cerrar Cuenta
+          </Button>
+          <Button variant="secondary" @click="showDetalleModal = false; cuentaSeleccionada = null;">Volver</Button>
+        </div>
+      </template>
     </Modal>
   </div>
 </template>
 
 <style scoped>
+.action-buttons {
+  display: flex;
+  gap: var(--space-xs);
+  align-items: center;
+}
+
+.modal-footer-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-sm);
+  width: 100%;
+}
+
 .view-header {
   display: flex;
   align-items: flex-start;

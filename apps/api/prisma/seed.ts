@@ -58,6 +58,20 @@ const INSUMOS = [
     stock: 300,
     minimo: 50,
   },
+  {
+    codigo: 'DEXA4',
+    nombre: 'Dexametasona 4 mg (Inyectable)',
+    medicamentoAsociado: 'Dexametasona Inyectable',
+    stock: 150,
+    minimo: 30,
+  },
+  {
+    codigo: 'CURA_GASA',
+    nombre: 'Curación con gasa',
+    medicamentoAsociado: 'Curación con gasa',
+    stock: 100,
+    minimo: 20,
+  },
   { codigo: 'GASA', nombre: 'Gasa estéril', medicamentoAsociado: null, stock: 500, minimo: 100 },
   { codigo: 'JER5', nombre: 'Jeringa 5 ml', medicamentoAsociado: null, stock: 400, minimo: 100 },
 ];

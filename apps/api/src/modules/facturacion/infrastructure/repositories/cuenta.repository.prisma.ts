@@ -31,9 +31,9 @@ export class CuentaRepositoryPrisma implements CuentaRepository {
     return fila ? this.aDominio(fila) : null;
   }
 
-  async listarPorPaciente(pacienteId: string): Promise<Cuenta[]> {
+  async listarPorPaciente(pacienteId?: string): Promise<Cuenta[]> {
     const filas = await this.prisma.cuenta.findMany({
-      where: { pacienteId },
+      where: pacienteId ? { pacienteId } : undefined,
       include: CON_CARGOS,
       orderBy: { createdAt: 'desc' },
     });

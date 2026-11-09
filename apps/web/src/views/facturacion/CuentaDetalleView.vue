@@ -41,7 +41,7 @@ const pagosColumns: TableColumn[] = [
     key: 'fecha',
     label: 'Fecha',
     width: '160px',
-    format: (v) => new Date(v as string).toLocaleString('es-AR'),
+    format: (v) => new Date(v as string).toLocaleString('es-AR', { hour12: false }),
   },
   { key: 'metodoPago', label: 'Método', width: '160px' },
   { key: 'monto', label: 'Monto', width: '140px' },

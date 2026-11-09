@@ -19,7 +19,10 @@ export class CuentaRepositoryEnMemoria implements CuentaRepository {
     return null;
   }
 
-  async listarPorPaciente(pacienteId: string): Promise<Cuenta[]> {
+  async listarPorPaciente(pacienteId?: string): Promise<Cuenta[]> {
+    if (!pacienteId) {
+      return this.listarTodas();
+    }
     const res: Cuenta[] = [];
     for (const cuenta of this.cuentas.values()) {
       if (cuenta.pacienteId === pacienteId) {

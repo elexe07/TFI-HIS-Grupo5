@@ -1,21 +1,32 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { useFacturacionStore } from '@/stores/facturacion';
-import { Button, Input, Card, Table, Modal, Badge } from '@/components/ui';
+import { useAdmisionStore } from '@/stores/admision';
+import { useToastStore } from '@/stores/toast';
+import { Button, Input, Card, Table, Modal, Badge, Select } from '@/components/ui';
 import type { TableColumn } from '@/components/ui/Table.types';
-import type { ObraSocialDTO, ConceptoCargo } from '@/types/api';
+import type { ConceptoCargo, ValidarCoberturaResponse } from '@/types/api';
 
 const facturacionStore = useFacturacionStore();
+const admisionStore = useAdmisionStore();
+const toastStore = useToastStore();
 
 const searchTerm = ref('');
-const showModal = ref(false);
-const editingObraSocial = ref<ObraSocialDTO | null>(null);
+const showValidarModal = ref(false);
+
+// Form validar cobertura
+const validarForm = ref({
+  pacienteId: '',
+  codigoObraSocial: '',
+  numeroAfiliado: '',
+  cuentaId: '',
+});
+const resultadoValidacion = ref<ValidarCoberturaResponse | null>(null);
 
 const columnsObrasSociales: TableColumn[] = [
   { key: 'codigo', label: 'Código', width: '100px' },
   { key: 'nombre', label: 'Nombre' },
   { key: 'porcentajeCobertura', label: '% Cobertura', width: '120px', format: (v) => `${v}%` },
-  { key: 'actions', label: 'Acciones', width: '120px' },
 ];
 
 const columnsTarifas: TableColumn[] = [
@@ -40,12 +51,13 @@ const obrasSocialesFiltradas = computed(() => {
   });
 });
 
-async function cargarObrasSociales() {
-  await facturacionStore.cargarObrasSociales();
-}
-
-async function cargarTarifas() {
-  await facturacionStore.cargarTarifas();
+async function cargarDatos() {
+  await Promise.all([
+    facturacionStore.cargarObrasSociales(),
+    facturacionStore.cargarTarifas(),
+    admisionStore.pacientes.length === 0 ? admisionStore.cargarPacientes() : Promise.resolve(),
+    facturacionStore.cuentas.length === 0 ? facturacionStore.cargarCuentas() : Promise.resolve(),
+  ]);
 }
 
 function getConceptoLabel(concepto: ConceptoCargo): string {
@@ -61,9 +73,55 @@ function limpiarFiltros() {
   searchTerm.value = '';
 }
 
+function abrirModalValidar() {
+  resultadoValidacion.value = null;
+  validarForm.value = {
+    pacienteId: '',
+    codigoObraSocial: facturacionStore.obrasSociales[0]?.codigo || '',
+    numeroAfiliado: '',
+    cuentaId: '',
+  };
+  showValidarModal.value = true;
+}
+
+function onPacienteChange(pacienteId: string | number | null) {
+  const pId = pacienteId ? String(pacienteId) : '';
+  validarForm.value.pacienteId = pId;
+  const p = admisionStore.pacientes.find((pac) => pac.id === pId);
+  if (p) {
+    if (p.obraSocialCodigo) validarForm.value.codigoObraSocial = p.obraSocialCodigo;
+    if (p.numeroAfiliado) validarForm.value.numeroAfiliado = p.numeroAfiliado;
+  }
+}
+
+async function ejecutarValidacion() {
+  if (!validarForm.value.pacienteId || !validarForm.value.codigoObraSocial || !validarForm.value.numeroAfiliado) {
+    toastStore.error('Campos obligatorios', 'Complete paciente, obra social y número de afiliado');
+    return;
+  }
+  try {
+    const res = await facturacionStore.validarCobertura({
+      pacienteId: validarForm.value.pacienteId,
+      codigoObraSocial: validarForm.value.codigoObraSocial,
+      numeroAfiliado: validarForm.value.numeroAfiliado,
+      cuentaId: validarForm.value.cuentaId || undefined,
+    });
+    resultadoValidacion.value = res;
+    if (res.aprobada) {
+      toastStore.success('Cobertura Aprobada', `Cobertura del ${res.porcentajeCobertura}% aplicada.`);
+      if (res.cuentaActualizada) {
+        await facturacionStore.cargarCuentas();
+      }
+    } else {
+      toastStore.warning('Cobertura Rechazada', res.motivoRechazo || 'Rechazado por la entidad');
+    }
+  } catch (err: any) {
+    toastStore.error('Error de validación', err?.message || 'No se pudo validar cobertura');
+  }
+}
+
 onMounted(() => {
-  cargarObrasSociales();
-  cargarTarifas();
+  cargarDatos();
 });
 </script>
 
@@ -71,14 +129,20 @@ onMounted(() => {
   <div class="cobertura-view">
     <div class="view-header">
       <div>
-        <h2>Obras Sociales y Tarifas</h2>
-        <p class="view-subtitle">Consulta de obras sociales registradas y tarifas de facturación</p>
+        <h2>Obras Sociales y Validación de Cobertura</h2>
+        <p class="view-subtitle">Consulta convenios, tarifas y valida coberturas en línea</p>
       </div>
+      <Button variant="primary" @click="abrirModalValidar">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+        Validar Cobertura
+      </Button>
     </div>
 
     <Card class="search-card">
       <div class="search-form">
-        <Input v-model="searchTerm" label="Buscar" placeholder="Nombre o código..." size="sm" />
+        <Input v-model="searchTerm" label="Buscar Obra Social" placeholder="Nombre o código..." size="sm" />
         <Button variant="ghost" @click="limpiarFiltros"> Limpiar </Button>
       </div>
     </Card>
@@ -86,7 +150,7 @@ onMounted(() => {
     <!-- Obras Sociales -->
     <Card class="mb-md">
       <template #header>
-        <h3>Obras Sociales</h3>
+        <h3>Obras Sociales Convenidas</h3>
       </template>
       <Table
         :columns="columnsObrasSociales"
@@ -105,7 +169,7 @@ onMounted(() => {
     <!-- Tarifas -->
     <Card>
       <template #header>
-        <h3>Tarifas de Facturación</h3>
+        <h3>Nomenclador de Tarifas Institucionales</h3>
       </template>
       <Table
         :columns="columnsTarifas"
@@ -121,65 +185,108 @@ onMounted(() => {
       </Table>
     </Card>
 
-    <!-- Modal Ver Obra Social (Solo lectura - informativo) -->
+    <!-- Modal Validar Cobertura -->
     <Modal
-      v-model="showModal"
-      :title="editingObraSocial ? 'Ver Obra Social' : ''"
-      size="md"
-      @close="showModal = false"
+      v-model:model-value="showValidarModal"
+      title="Validar Cobertura de Paciente"
+      size="lg"
+      :closable="true"
+      @close="showValidarModal = false"
     >
-      <div class="obra-social-form">
+      <div class="validar-form">
         <div class="form-grid">
-          <div class="form-row">
-            <Input
-              v-model="editingObraSocial!.codigo"
-              label="Código"
-              placeholder="Código único"
+          <div class="form-field">
+            <label class="label">Paciente *</label>
+            <Select
+              :model-value="validarForm.pacienteId"
+              @update:model-value="onPacienteChange($event)"
+              :options="
+                admisionStore.pacientes.map((p) => ({
+                  value: p.id,
+                  label: `${p.apellido}, ${p.nombre} (${p.tipoDocumento} ${p.numeroDocumento})`,
+                }))
+              "
+              placeholder="Seleccionar paciente"
               required
-              disabled
-            />
-            <Input
-              v-model="editingObraSocial!.nombre"
-              label="Nombre"
-              placeholder="Nombre de la obra social"
-              required
-              disabled
-            />
-          </div>
-          <div class="form-row">
-            <Input
-              :value="editingObraSocial?.porcentajeCobertura ?? 0"
-              label="% Cobertura"
-              type="number"
-              min="0"
-              max="100"
-              required
-              disabled
             />
           </div>
-        </div>
-        <div class="form-actions">
-          <Button variant="primary" @click="showModal = false">Cerrar</Button>
-        </div>
-        <div class="info-note">
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <circle cx="12" cy="12" r="10"></circle>
-            <line x1="12" y1="16" x2="12" y2="12"></line>
-            <line x1="12" y1="8" x2="12.01" y2="8"></line>
-          </svg>
-          <span
-            >La gestión de obras sociales se realiza desde el backend. Esta vista es solo de
-            consulta.</span
-          >
+
+          <div class="form-row">
+            <div class="form-field">
+              <label class="label">Obra Social / Seguro *</label>
+              <Select
+                :model-value="validarForm.codigoObraSocial"
+                @update:model-value="validarForm.codigoObraSocial = $event ? String($event) : ''"
+                :options="
+                  facturacionStore.obrasSociales.map((os) => ({
+                    value: os.codigo,
+                    label: `${os.nombre} (${os.codigo}) - ${os.porcentajeCobertura}%`,
+                  }))
+                "
+                placeholder="Seleccionar obra social"
+                required
+              />
+            </div>
+            <div class="form-field">
+              <label class="label">Número de Afiliado *</label>
+              <Input
+                v-model="validarForm.numeroAfiliado"
+                placeholder="Ej: 123456789"
+                required
+              />
+            </div>
+          </div>
+
+          <div class="form-field">
+            <label class="label">Cuenta a Impactar (Opcional)</label>
+            <Select
+              :model-value="validarForm.cuentaId"
+              @update:model-value="validarForm.cuentaId = $event ? String($event) : ''"
+              :options="
+                [
+                  { value: '', label: 'Ninguna (solo consulta de credencial)' },
+                  ...facturacionStore.cuentas
+                    .filter((c) => !validarForm.pacienteId || c.pacienteId === validarForm.pacienteId)
+                    .map((c) => ({
+                      value: c.id,
+                      label: `Cuenta #${c.id.slice(-6)} - ${c.tipo} (${c.estado})`,
+                    })),
+                ]
+              "
+              placeholder="Seleccionar cuenta para aplicar descuento"
+            />
+          </div>
+
+          <!-- Resultado -->
+          <div v-if="resultadoValidacion" class="resultado-box" :class="{ aprobada: resultadoValidacion.aprobada, rechazada: !resultadoValidacion.aprobada }">
+            <div class="resultado-header">
+              <strong>Estado:</strong>
+              <Badge :variant="resultadoValidacion.aprobada ? 'success' : 'danger'" size="md">
+                {{ resultadoValidacion.aprobada ? 'APROBADA' : 'RECHAZADA' }}
+              </Badge>
+            </div>
+            <p v-if="resultadoValidacion.aprobada">
+              Cobertura reconocida: <strong>{{ resultadoValidacion.porcentajeCobertura }}%</strong>
+              <span v-if="resultadoValidacion.cuentaActualizada" class="ml-sm text-success">(Cuenta actualizada correctamente)</span>
+            </p>
+            <p v-else class="text-danger">
+              Motivo: {{ resultadoValidacion.motivoRechazo || 'Credencial inactiva o datos no coinciden' }}
+            </p>
+          </div>
         </div>
       </div>
+
+      <template #footer>
+        <Button variant="secondary" @click="showValidarModal = false">Cerrar</Button>
+        <Button
+          variant="primary"
+          @click="ejecutarValidacion"
+          :loading="facturacionStore.cargando"
+          :disabled="!validarForm.pacienteId || !validarForm.codigoObraSocial || !validarForm.numeroAfiliado"
+        >
+          Validar Credencial
+        </Button>
+      </template>
     </Modal>
   </div>
 </template>

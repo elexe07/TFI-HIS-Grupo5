@@ -49,6 +49,14 @@ export interface EstudioDto {
   createdAt?: string;
 }
 
+export interface TriajeHceDto {
+  id: string;
+  nivel: string;
+  motivo: string;
+  estado: string;
+  llegadaEn: string;
+}
+
 export interface HistoriaClinicaDto {
   id: string;
   pacienteId: string;
@@ -59,4 +67,5 @@ export interface HistoriaClinicaDto {
   evoluciones: EvolucionDto[];
   prescripciones: PrescripcionDto[];
   estudios: EstudioDto[];
+  triajes?: TriajeHceDto[];
 }

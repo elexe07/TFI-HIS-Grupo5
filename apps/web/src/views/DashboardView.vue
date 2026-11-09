@@ -107,8 +107,6 @@ const quickActions = computed(() => {
     actions.push({ label: 'Internar Paciente', icon: BedIcon, path: '/recursos/internaciones' });
   if (authStore.tienePermiso('cobertura:validar'))
     actions.push({ label: 'Validar Cobertura', icon: ShieldIcon, path: '/facturacion/cobertura' });
-  if (authStore.tienePermiso('iam:usuarios:crear'))
-    actions.push({ label: 'Nuevo Usuario', icon: UserPlusIcon, path: '/admin/usuarios/nuevo' });
   return actions;
 });
 

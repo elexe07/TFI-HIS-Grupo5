@@ -304,6 +304,21 @@ export const useAdmisionStore = defineStore('admision', () => {
     }
   }
 
+  async function atenderTriaje(id: string) {
+    cargando.value = true;
+    error.value = null;
+    try {
+      const triaje = await admisionApi.atenderTriaje(id);
+      await cargarColaGuardia();
+      return triaje;
+    } catch (err) {
+      error.value = err instanceof Error ? err.message : 'Error al atender paciente en triaje';
+      throw err;
+    } finally {
+      cargando.value = false;
+    }
+  }
+
   async function registrarTriaje(data: RegistrarTriajeRequest) {
     cargando.value = true;
     error.value = null;
@@ -373,6 +388,7 @@ export const useAdmisionStore = defineStore('admision', () => {
     reservarTurno,
     cancelarTurno,
     registrarTriaje,
+    atenderTriaje,
     cargarColaGuardia,
     obtenerPaciente,
     actualizarPaciente,

@@ -10,8 +10,10 @@ const toastStore = useToastStore();
 
 const search = ref('');
 const showModal = ref(false);
+const showEgresoModal = ref(false);
 const editingInsumo = ref<InsumoDTO | null>(null);
 const cantidadIngreso = ref('');
+const cantidadEgreso = ref('');
 
 const columns: TableColumn<InsumoDTO>[] = [
   { key: 'codigo', label: 'Código', width: '120px' },
@@ -28,7 +30,7 @@ const columns: TableColumn<InsumoDTO>[] = [
     key: 'updatedAt',
     label: 'Actualizado',
     width: '160px',
-    format: (v: unknown) => (v ? new Date(v as string).toLocaleString('es-AR') : '—'),
+    format: (v: unknown) => (v ? new Date(v as string).toLocaleString('es-AR', { hour12: false }) : '—'),
   },
 ];
 
@@ -73,6 +75,31 @@ async function registrarIngreso() {
     showModal.value = false;
     editingInsumo.value = null;
     cantidadIngreso.value = '';
+  } catch (err) {
+    // Error manejado en store
+  }
+}
+
+function abrirModalEgreso(insumo: InsumoDTO) {
+  editingInsumo.value = insumo;
+  cantidadEgreso.value = '';
+  showEgresoModal.value = true;
+}
+
+async function registrarEgreso() {
+  if (!editingInsumo.value || !cantidadEgreso.value.trim()) return;
+  const cantidad = parseInt(cantidadEgreso.value, 10);
+  if (cantidad <= 0) return;
+  if (cantidad > editingInsumo.value.stockActual) {
+    toastStore.error('Stock insuficiente', `El stock actual es de ${editingInsumo.value.stockActual} unidades`);
+    return;
+  }
+  try {
+    await recursosStore.egresarInsumo(editingInsumo.value.id, cantidad);
+    toastStore.success('Stock actualizado', `Se descontaron ${cantidad} unidades`);
+    showEgresoModal.value = false;
+    editingInsumo.value = null;
+    cantidadEgreso.value = '';
   } catch (err) {
     // Error manejado en store
   }
@@ -138,7 +165,7 @@ onMounted(() => {
               size="sm"
               variant="ghost"
               @click.stop="abrirModalIngreso(row as unknown as InsumoDTO)"
-              title="Registrar ingreso de stock"
+              title="Registrar ingreso de stock (+)"
             >
               <svg
                 width="14"
@@ -149,6 +176,23 @@ onMounted(() => {
                 stroke-width="2"
               >
                 <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+            </Button>
+            <Button
+              size="sm"
+              variant="ghost"
+              @click.stop="abrirModalEgreso(row as unknown as InsumoDTO)"
+              title="Registrar consumo / egreso de stock (-)"
+            >
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
                 <line x1="5" y1="12" x2="19" y2="12"></line>
               </svg>
             </Button>
@@ -206,6 +250,61 @@ onMounted(() => {
           <Button variant="secondary" @click="showModal = false">Cancelar</Button>
           <Button variant="primary" @click="registrarIngreso" :loading="recursosStore.cargando"
             >Confirmar Ingreso</Button
+          >
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Registrar Egreso / Consumo -->
+    <div v-if="showEgresoModal" class="modal-overlay" @click="showEgresoModal = false">
+      <div class="modal modal-md" @click.stop>
+        <div class="modal-header">
+          <h3>Registrar Consumo / Egreso de Stock</h3>
+          <button class="modal-close" @click="showEgresoModal = false" aria-label="Cerrar">
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+        <div class="modal-body" v-if="editingInsumo">
+          <div class="form-grid">
+            <div class="form-field">
+              <label class="label">Insumo</label>
+              <input class="input" :value="editingInsumo.nombre" readonly />
+            </div>
+            <div class="form-field">
+              <label class="label">Stock Actual</label>
+              <input class="input" :value="editingInsumo.stockActual" readonly type="number" />
+            </div>
+            <div class="form-field">
+              <label class="label">Stock Mínimo</label>
+              <input class="input" :value="editingInsumo.stockMinimo" readonly type="number" />
+            </div>
+            <div class="form-field">
+              <label class="label">Cantidad a Descontar / Consumida *</label>
+              <Input
+                v-model="cantidadEgreso"
+                type="number"
+                placeholder="Ej. 10"
+                required
+                min="1"
+                :max="editingInsumo.stockActual"
+              />
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <Button variant="secondary" @click="showEgresoModal = false">Cancelar</Button>
+          <Button variant="danger" @click="registrarEgreso" :loading="recursosStore.cargando"
+            >Confirmar Consumo</Button
           >
         </div>
       </div>

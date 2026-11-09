@@ -293,12 +293,6 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@/views/iam/UsuariosView.vue'),
         meta: { title: 'Usuarios' },
       },
-      {
-        path: 'usuarios/nuevo',
-        name: 'admin.usuario.nuevo',
-        component: () => import('@/views/iam/UsuarioFormView.vue'),
-        meta: { permisos: ['iam:usuarios:crear'] as Permiso[], title: 'Nuevo Usuario' },
-      },
     ],
   },
 

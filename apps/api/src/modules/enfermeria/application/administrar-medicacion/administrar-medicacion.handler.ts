@@ -16,6 +16,11 @@ import {
   type AdministracionMedicacionRepository,
 } from '../../domain/administracion-medicacion.repository';
 import {
+  NOTA_ENFERMERIA_REPOSITORY,
+  type NotaEnfermeriaRepository,
+} from '../../domain/nota-enfermeria.repository';
+import { NotaDeEnfermeria } from '../../domain/nota-enfermeria';
+import {
   mapearAdministracionADto,
   type AdministracionMedicacionDto,
 } from '../dtos/administracion-medicacion.dto';
@@ -32,6 +37,8 @@ export class AdministrarMedicacionHandler implements CasoDeUso<
     private readonly indicacionRepo: IndicacionRepository,
     @Inject(ADMINISTRACION_MEDICACION_REPOSITORY)
     private readonly administracionRepo: AdministracionMedicacionRepository,
+    @Inject(NOTA_ENFERMERIA_REPOSITORY)
+    private readonly notaRepo: NotaEnfermeriaRepository,
     @Inject(EVENT_BUS)
     private readonly bus: EventBus,
     @Inject(CLOCK)
@@ -56,6 +63,17 @@ export class AdministrarMedicacionHandler implements CasoDeUso<
 
     await this.indicacionRepo.guardar(indicacion);
     await this.administracionRepo.guardar(administracion);
+
+    // Registro automático de nota de enfermería
+    const notaAutomatica = NotaDeEnfermeria.crear({
+      pacienteId: indicacion.pacienteId,
+      internacionId: indicacion.internacionId,
+      texto: `Se administró ${indicacion.descripcion}`,
+      registradoPor: command.administradaPor,
+      registradoEn: administradaEn,
+    });
+    await this.notaRepo.guardar(notaAutomatica);
+
     await this.bus.publicar(indicacion.extraerEventos());
 
     return mapearAdministracionADto(administracion);

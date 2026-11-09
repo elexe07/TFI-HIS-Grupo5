@@ -1,5 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { CasoDeUso } from '../../../../building-blocks/application';
+import { PrismaService } from '../../../../building-blocks/infrastructure/prisma/prisma.service';
 import { AccesoProhibidoHistoria } from '../../domain/errores';
 import { HistoriaClinica } from '../../domain/historia-clinica';
 import {
@@ -23,6 +24,7 @@ export class ConsultarHistoriaHandler implements CasoDeUso<
   constructor(
     @Inject(HISTORIA_CLINICA_REPOSITORY)
     private readonly repo: HistoriaClinicaRepository,
+    private readonly prisma: PrismaService,
   ) {}
 
   async ejecutar(query: ConsultarHistoriaQuery): Promise<HistoriaClinicaDto> {
@@ -38,6 +40,11 @@ export class ConsultarHistoriaHandler implements CasoDeUso<
       historia = HistoriaClinica.abrir(query.pacienteId, new Date());
       await this.repo.guardar(historia);
     }
+
+    const triajesPrisma = await this.prisma.triaje.findMany({
+      where: { pacienteId: query.pacienteId },
+      orderBy: { llegadaEn: 'desc' },
+    });
 
     return {
       id: historia.id,
@@ -89,6 +96,13 @@ export class ConsultarHistoriaHandler implements CasoDeUso<
         resultado: est.resultado,
         creadoEn: est.creadoEn.toISOString(),
         createdAt: est.creadoEn.toISOString(),
+      })),
+      triajes: triajesPrisma.map((t) => ({
+        id: t.id,
+        nivel: t.nivel,
+        motivo: t.motivo,
+        estado: t.estado,
+        llegadaEn: t.llegadaEn.toISOString(),
       })),
     };
   }

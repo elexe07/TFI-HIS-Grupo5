@@ -3,25 +3,47 @@ import { ref, onMounted, watch } from 'vue';
 import { useEnfermeriaStore } from '@/stores/enfermeria';
 import { useAdmisionStore } from '@/stores/admision';
 import { useToastStore } from '@/stores/toast';
-import { Card } from '@/components/ui';
-import { Button } from '@/components/ui';
+import { useAuthStore } from '@/stores/auth';
+import { Card, Button, Select } from '@/components/ui';
 
 const enfermeriaStore = useEnfermeriaStore();
 const admisionStore = useAdmisionStore();
+const authStore = useAuthStore();
 const toastStore = useToastStore();
 
 const pacienteId = ref('');
 const notaTexto = ref('');
 
+function obtenerNombreUsuario(userId: string) {
+  if (authStore.usuario?.id === userId) {
+    return authStore.usuario.nombre;
+  }
+  const u = authStore.usuariosSistema.find((user) => user.id === userId);
+  return u ? u.nombre : userId;
+}
+
+function cambiarPaciente(val: string | number | null) {
+  const id = val ? String(val) : '';
+  pacienteId.value = id;
+  if (id) {
+    enfermeriaStore.setContexto(id);
+    enfermeriaStore.cargarDatos();
+  }
+}
+
 async function guardarNota() {
-  if (!notaTexto.value.trim()) return;
-  await enfermeriaStore.crearNota({
-    pacienteId: pacienteId.value,
-    internacionId: undefined,
-    texto: notaTexto.value.trim(),
-  });
-  toastStore.success('Nota guardada', 'Nota de enfermería registrada');
-  notaTexto.value = '';
+  if (!notaTexto.value.trim() || !pacienteId.value) return;
+  try {
+    await enfermeriaStore.crearNota({
+      pacienteId: pacienteId.value,
+      internacionId: undefined,
+      texto: notaTexto.value.trim(),
+    });
+    toastStore.success('Nota guardada', 'Nota de enfermería registrada');
+    notaTexto.value = '';
+  } catch (err: any) {
+    toastStore.error('Error', err?.message || 'Error al guardar la nota');
+  }
 }
 
 watch(
@@ -35,7 +57,13 @@ watch(
   },
 );
 
-onMounted(() => {
+onMounted(async () => {
+  if (authStore.usuariosSistema.length === 0 && (authStore.esAdmin || authStore.tienePermiso('iam:usuarios:leer'))) {
+    authStore.cargarUsuariosSistema().catch(() => {});
+  }
+  if (admisionStore.pacientes.length === 0) {
+    await admisionStore.cargarPacientes();
+  }
   if (admisionStore.pacienteSeleccionado) {
     pacienteId.value = admisionStore.pacienteSeleccionado.id;
     enfermeriaStore.setContexto(pacienteId.value);
@@ -57,7 +85,8 @@ onMounted(() => {
       <div class="context-field">
         <label>Paciente</label>
         <Select
-          v-model="pacienteId"
+          :model-value="pacienteId"
+          @update:model-value="cambiarPaciente"
           :options="
             admisionStore.pacientes.map((p) => ({
               value: p.id,
@@ -80,7 +109,7 @@ onMounted(() => {
           <label class="label">Texto de la nota</label>
           <textarea
             v-model="notaTexto"
-            class="input textarea"
+            class="textarea-input"
             rows="4"
             placeholder="Detallar evolución, cuidados aplicados, respuesta del paciente, observaciones..."
             required
@@ -143,9 +172,16 @@ onMounted(() => {
           <div class="nota-header">
             <div class="nota-meta">
               <span class="nota-fecha">{{
-                new Date(nota.registradoEn).toLocaleString('es-AR')
+                new Date(nota.registradoEn).toLocaleString('es-AR', {
+                  hour12: false,
+                  year: 'numeric',
+                  month: '2-digit',
+                  day: '2-digit',
+                  hour: '2-digit',
+                  minute: '2-digit',
+                })
               }}</span>
-              <span class="nota-usuario">por {{ nota.registradoPor }}</span>
+              <span class="nota-usuario">por {{ obtenerNombreUsuario(nota.registradoPor) }}</span>
             </div>
           </div>
           <div class="nota-texto">{{ nota.texto }}</div>
@@ -199,6 +235,37 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   gap: var(--space-md);
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.form-field .label {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+}
+
+.textarea-input {
+  width: 100%;
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-family: inherit;
+  font-size: 0.875rem;
+  color: var(--color-text);
+  background-color: var(--color-surface);
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+.textarea-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-light);
 }
 
 .form-actions {

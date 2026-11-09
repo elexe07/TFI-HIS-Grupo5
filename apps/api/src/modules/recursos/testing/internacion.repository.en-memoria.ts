@@ -26,4 +26,12 @@ export class InternacionRepositoryEnMemoria implements InternacionRepository {
     );
     return Promise.resolve(activa ?? null);
   }
+
+  buscarTodas(params?: { estado?: string }): Promise<Internacion[]> {
+    let list = [...this.internaciones.values()];
+    if (params?.estado) {
+      list = list.filter((i) => i.estado === params.estado);
+    }
+    return Promise.resolve(list);
+  }
 }

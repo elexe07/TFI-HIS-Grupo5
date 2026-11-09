@@ -247,6 +247,13 @@ export interface HistoriaClinicaDTO {
   antecedentes: AntecedenteFamiliarDTO[];
   prescripciones: PrescripcionDTO[];
   estudios: EstudioDTO[];
+  triajes?: {
+    id: string;
+    nivel: NivelTriaje;
+    motivo: string;
+    estado: EstadoTriaje;
+    llegadaEn: string;
+  }[];
 }
 
 export interface EvolucionDTO {
@@ -580,12 +587,15 @@ export interface ValidarCoberturaRequest {
   pacienteId: string;
   codigoObraSocial: string;
   numeroAfiliado: string;
+  cuentaId?: string;
 }
 
 export interface ValidarCoberturaResponse {
   aprobada: boolean;
   porcentajeCobertura: number;
+  motivoRechazo?: string | null;
   mensaje?: string;
+  cuentaActualizada?: boolean;
 }
 
 export interface ReporteFacturacionDTO {

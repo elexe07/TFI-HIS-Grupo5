@@ -1,12 +1,14 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 import { CLOCK, type Clock } from '../../../../building-blocks/application';
+import { PrismaService } from '../../../../building-blocks/infrastructure/prisma/prisma.service';
 import { EVOLUCION_REGISTRADA, type EvolucionRegistrada } from '../../../hce/public';
 import { Cargo } from '../../domain/cargo';
 import { Cuenta } from '../../domain/cuenta';
 import { ConceptoCargo, TipoCuenta } from '../../domain/enums';
 import { TarifaNoEncontrada } from '../../domain/errores';
 import { CUENTA_REPOSITORY, type CuentaRepository } from '../../domain/ports/cuenta.repository';
+import { OBRA_SOCIAL_REPOSITORY, type ObraSocialRepository } from '../../domain/ports/obra-social.repository';
 import { TARIFA_REPOSITORY, type TarifaRepository } from '../../domain/ports/tarifa.repository';
 
 @Injectable()
@@ -18,6 +20,9 @@ export class AplicarCargoConsultaHandler {
     private readonly cuentaRepo: CuentaRepository,
     @Inject(TARIFA_REPOSITORY)
     private readonly tarifaRepo: TarifaRepository,
+    @Inject(OBRA_SOCIAL_REPOSITORY)
+    private readonly obraSocialRepo: ObraSocialRepository,
+    private readonly prisma: PrismaService,
     @Inject(CLOCK)
     private readonly clock: Clock,
   ) {}
@@ -66,6 +71,29 @@ export class AplicarCargoConsultaHandler {
     const cuentaCons = await this.cuentaRepo.buscarPorTipoYReferencia(TipoCuenta.CONSULTA, refId);
     if (cuentaCons) return cuentaCons;
 
-    return Cuenta.abrir({ pacienteId, tipo: TipoCuenta.CONSULTA, referenciaId: refId, ahora });
+    let porcentajeCobertura: number | null = null;
+    let coberturaValidada = false;
+
+    const paciente = await this.prisma.paciente.findUnique({
+      where: { id: pacienteId },
+      select: { obraSocialCodigo: true },
+    });
+
+    if (paciente?.obraSocialCodigo) {
+      const obraSocial = await this.obraSocialRepo.buscarPorCodigo(paciente.obraSocialCodigo);
+      if (obraSocial && obraSocial.porcentajeCobertura > 0) {
+        porcentajeCobertura = obraSocial.porcentajeCobertura;
+        coberturaValidada = true;
+      }
+    }
+
+    return Cuenta.abrir({
+      pacienteId,
+      tipo: TipoCuenta.CONSULTA,
+      referenciaId: refId,
+      coberturaValidada,
+      porcentajeCobertura,
+      ahora,
+    });
   }
 }

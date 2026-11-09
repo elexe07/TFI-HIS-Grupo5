@@ -218,6 +218,8 @@ export const admisionApi = {
   // Triaje
   registrarTriaje: (data: import('@/types/api').RegistrarTriajeRequest) =>
     post<import('@/types/api').TriajeDTO>('/triajes', data),
+  atenderTriaje: (id: string) =>
+    patch<import('@/types/api').TriajeDTO>(`/triajes/${id}/atender`),
   obtenerColaGuardia: () => get<import('@/types/api').ColaGuardiaItem[]>('/guardia/cola'),
 };
 
@@ -313,6 +315,8 @@ export const recursosApi = {
     get<import('@/types/api').InsumoDTO[]>('/insumos', { params }),
   ingresarInsumo: (id: string, cantidad: number) =>
     post<import('@/types/api').InsumoDTO>(`/insumos/${id}/ingresos`, { cantidad }),
+  egresarInsumo: (id: string, cantidad: number) =>
+    post<import('@/types/api').InsumoDTO>(`/insumos/${id}/egresos`, { cantidad }),
 };
 
 // --- FACTURACIÓN ---
@@ -321,6 +325,8 @@ export const facturacionApi = {
   listarCuentas: (params?: { pacienteId?: string }) =>
     get<import('@/types/api').CuentaDTO[]>('/cuentas', { params }),
   obtenerCuenta: (id: string) => get<import('@/types/api').CuentaDTO>(`/cuentas/${id}`),
+  cerrarCuenta: (id: string) =>
+    post<import('@/types/api').CuentaDTO>(`/cuentas/${id}/cerrar`),
 
   // Pagos
   registrarPago: (

@@ -245,7 +245,7 @@ const timelineEventos = computed(() => {
       type: 'hce',
       title: 'Historia Clínica Creada',
       timestamp: new Date(fechaApertura).getTime(),
-      time: new Date(fechaApertura).toLocaleString('es-AR'),
+      time: new Date(fechaApertura).toLocaleString('es-AR', { hour12: false }),
       description: `ID: ${historia.id.slice(-8)} - Apertura inicial de ficha médica`,
     });
   }
@@ -307,8 +307,21 @@ const timelineEventos = computed(() => {
       type: 'evolucion',
       title: 'Evolución Médica',
       timestamp: new Date(e.registradoEn).getTime(),
-      time: new Date(e.registradoEn).toLocaleString('es-AR'),
+      time: new Date(e.registradoEn).toLocaleString('es-AR', { hour12: false }),
       description: `${e.motivo}: ${e.diagnostico}${e.tratamiento ? ' | Tratamiento: ' + e.tratamiento : ''}`,
+    });
+  });
+
+  // Triajes / Guardia
+  historia.triajes?.forEach((t, i) => {
+    const tFecha = t.llegadaEn;
+    eventos.push({
+      id: `triaje-${t.id || i}`,
+      type: 'triaje',
+      title: `Guardia / Triaje (${t.nivel})`,
+      timestamp: tFecha ? new Date(tFecha).getTime() : 0,
+      time: tFecha ? new Date(tFecha).toLocaleString('es-AR', { hour12: false }) : '-',
+      description: `Motivo: ${t.motivo} | Estado: ${t.estado}`,
     });
   });
 
@@ -525,7 +538,7 @@ const timelineEventos = computed(() => {
                 <div class="evolucion-meta">
                   <span>{{
                     hceStore.evoluciones[0]?.registradoEn
-                      ? new Date(hceStore.evoluciones[0].registradoEn).toLocaleString('es-AR')
+                      ? new Date(hceStore.evoluciones[0].registradoEn).toLocaleString('es-AR', { hour12: false })
                       : '-'
                   }}</span>
                   <span>por Dr. {{ hceStore.evoluciones[0]?.medicoNombre ?? 'Desconocido' }}</span>
@@ -560,6 +573,10 @@ const timelineEventos = computed(() => {
                 <div class="stat-item">
                   <span class="stat-value">{{ hceStore.evoluciones?.length ?? 0 }}</span>
                   <span class="stat-label">Evoluciones</span>
+                </div>
+                <div class="stat-item" v-if="hceStore.historiaActual?.triajes">
+                  <span class="stat-value">{{ hceStore.historiaActual.triajes.length }}</span>
+                  <span class="stat-label">Guardias / Triajes</span>
                 </div>
               </div>
             </Card>
@@ -1178,6 +1195,9 @@ const timelineEventos = computed(() => {
 }
 .timeline-marker.evolucion {
   background-color: #8b5cf6;
+}
+.timeline-marker.triaje {
+  background-color: #f97316;
 }
 
 .form-grid {

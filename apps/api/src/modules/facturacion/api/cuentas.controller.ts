@@ -1,4 +1,4 @@
-import { Controller, Get, Param, ParseUUIDPipe, Query } from '@nestjs/common';
+import { Controller, Get, Param, ParseUUIDPipe, Post, Query } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiForbiddenResponse,
@@ -14,6 +14,7 @@ import {
   type UsuarioAutenticado,
 } from '../../iam/public';
 import { ConsultarCuentaHandler } from '../application/consultar-cuenta/consultar-cuenta.handler';
+import { CerrarCuentaManualHandler } from '../application/cerrar-cuenta/cerrar-cuenta.handler';
 import type { CuentaDetalleDto } from '../application/consultar-cuenta/cuenta-detalle.dto';
 import { ListarCuentasPacienteHandler } from '../application/listar-cuentas-paciente/listar-cuentas-paciente.handler';
 import { ConsultarCuentasDto } from './dto/consultar-cuentas.dto';
@@ -27,6 +28,7 @@ export class CuentasController {
   constructor(
     private readonly consultarCuentaHandler: ConsultarCuentaHandler,
     private readonly listarCuentasHandler: ListarCuentasPacienteHandler,
+    private readonly cerrarCuentaHandler: CerrarCuentaManualHandler,
   ) {}
 
   @Get()
@@ -39,10 +41,6 @@ export class CuentasController {
     // Si es un paciente autenticado, solo puede consultar sus propias cuentas
     const pacienteId = usuario.rol === 'PACIENTE' ? usuario.id : query.pacienteId;
 
-    if (!pacienteId) {
-      return [];
-    }
-
     return this.listarCuentasHandler.ejecutar({ pacienteId });
   }
 
@@ -52,5 +50,13 @@ export class CuentasController {
   @ApiNotFoundResponse({ description: 'CUENTA_NO_ENCONTRADA' })
   async obtenerPorId(@Param('id', ParseUUIDPipe) id: string): Promise<CuentaDetalleDto> {
     return this.consultarCuentaHandler.ejecutar({ cuentaId: id });
+  }
+
+  @Post(':id/cerrar')
+  @ApiOperation({ summary: 'Cerrar manualmente una cuenta (sea de internación o consulta)' })
+  @ApiOkResponse({ description: 'Cuenta cerrada exitosamente' })
+  @ApiNotFoundResponse({ description: 'CUENTA_NO_ENCONTRADA' })
+  async cerrar(@Param('id', ParseUUIDPipe) id: string): Promise<CuentaDetalleDto> {
+    return this.cerrarCuentaHandler.ejecutar(id);
   }
 }

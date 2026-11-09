@@ -1,11 +1,14 @@
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   HttpStatus,
+  Inject,
   Param,
   ParseUUIDPipe,
   Post,
+  Query,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -20,9 +23,11 @@ import {
 import { PERMISOS, RequierePermiso } from '../../iam/public';
 import { DarDeAltaCommand } from '../application/dar-de-alta/dar-de-alta.command';
 import { DarDeAltaHandler } from '../application/dar-de-alta/dar-de-alta.handler';
-import type { InternacionDto } from '../application/internacion.dto';
+import { mapearInternacionADto, type InternacionDto } from '../application/internacion.dto';
 import { InternarPacienteCommand } from '../application/internar-paciente/internar-paciente.command';
 import { InternarPacienteHandler } from '../application/internar-paciente/internar-paciente.handler';
+import { INTERNACION_REPOSITORY } from '../application/ports/tokens';
+import type { InternacionRepository } from '../domain';
 import { DarDeAltaDto } from './dto/dar-de-alta.dto';
 import { InternarPacienteDto } from './dto/internar-paciente.dto';
 
@@ -33,7 +38,18 @@ export class InternacionesController {
   constructor(
     private readonly internarPaciente: InternarPacienteHandler,
     private readonly darDeAlta: DarDeAltaHandler,
+    @Inject(INTERNACION_REPOSITORY)
+    private readonly internacionesRepo: InternacionRepository,
   ) {}
+
+  @Get()
+  @RequierePermiso(PERMISOS.INTERNACIONES_GESTIONAR)
+  @ApiOperation({ summary: 'Listar internaciones' })
+  @ApiOkResponse({ description: 'Lista de internaciones' })
+  async listar(@Query('estado') estado?: string): Promise<InternacionDto[]> {
+    const internaciones = await this.internacionesRepo.buscarTodas(estado ? { estado } : undefined);
+    return internaciones.map(mapearInternacionADto);
+  }
 
   @Post()
   @HttpCode(HttpStatus.CREATED)

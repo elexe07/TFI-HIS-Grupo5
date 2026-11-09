@@ -7,7 +7,7 @@ import {
 } from '../consultar-cuenta/cuenta-detalle.dto';
 
 export interface ListarCuentasPacienteQuery {
-  readonly pacienteId: string;
+  readonly pacienteId?: string;
 }
 
 @Injectable()

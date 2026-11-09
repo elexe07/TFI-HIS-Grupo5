@@ -34,15 +34,18 @@ export class InsumoRepositoryPrisma implements InsumoRepository {
   }
 
   async buscarPorMedicamentoAsociado(medicamento: string): Promise<Insumo | null> {
-    const fila = await this.prisma.insumo.findFirst({
-      where: {
-        medicamentoAsociado: {
-          equals: medicamento,
-          mode: 'insensitive',
-        },
-      },
+    const medLimpio = medicamento.trim().toLowerCase();
+    const filas = await this.prisma.insumo.findMany();
+    const coincidencia = filas.find((f) => {
+      if (!f.medicamentoAsociado) return false;
+      const asociado = f.medicamentoAsociado.trim().toLowerCase();
+      return (
+        medLimpio === asociado ||
+        medLimpio.startsWith(asociado) ||
+        asociado.startsWith(medLimpio)
+      );
     });
-    return fila ? aDominio(fila) : null;
+    return coincidencia ? aDominio(coincidencia) : null;
   }
 
   async listar(filtro?: FiltroInsumos): Promise<Insumo[]> {

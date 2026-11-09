@@ -37,6 +37,7 @@ const columnsCola: TableColumn[] = [
   { key: 'nivel', label: 'Nivel Urgencia', width: '150px' },
   { key: 'motivo', label: 'Motivo', width: '250px' },
   { key: 'estado', label: 'Estado', width: '120px' },
+  { key: 'actions', label: 'Acciones', width: '140px' },
 ];
 
 const nivelesUrgenciaOptions = [
@@ -65,6 +66,21 @@ const colaFiltrada = computed(() => {
 
 async function cargarColaGuardia() {
   await admisionStore.cargarColaGuardia();
+}
+
+const atendiendoId = ref<string | null>(null);
+
+async function handleAtender(row: any) {
+  if (!confirm(`¿Confirmar atención de ${row.pacienteApellido}, ${row.pacienteNombre}?`)) return;
+  atendiendoId.value = row.id;
+  try {
+    await admisionStore.atenderTriaje(row.id);
+    toastStore.success('Paciente atendido', 'El paciente fue marcado como atendido y retirado de la cola');
+  } catch (err) {
+    toastStore.error('Error', 'No se pudo registrar la atención');
+  } finally {
+    atendiendoId.value = null;
+  }
 }
 
 async function handleTriajeSave() {
@@ -188,6 +204,17 @@ onMounted(() => {
         </template>
         <template #cell-motivo="{ value }">
           <span class="motivo-text">{{ value }}</span>
+        </template>
+        <template #cell-actions="{ row }">
+          <Button
+            size="sm"
+            variant="primary"
+            :loading="atendiendoId === row.id"
+            @click.stop="handleAtender(row)"
+            title="Llamar y atender paciente"
+          >
+            Atender
+          </Button>
         </template>
       </Table>
     </Card>

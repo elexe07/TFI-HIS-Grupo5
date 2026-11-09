@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { onMounted, ref, computed } from 'vue';
 import { useAdmisionStore } from '@/stores/admision';
+import { useFacturacionStore } from '@/stores/facturacion';
 import { useToastStore } from '@/stores/toast';
 import { useRouter, useRoute } from 'vue-router';
 import { Card, Button, Input, Select } from '@/components/ui';
 import type { CrearPacienteRequest } from '@/types/api';
 
 const admisionStore = useAdmisionStore();
+const facturacionStore = useFacturacionStore();
 const toastStore = useToastStore();
 const router = useRouter();
 const route = useRoute();
@@ -93,8 +95,23 @@ function volver() {
   router.push({ name: 'admision.pacientes' });
 }
 
+const obraSocialOptions = computed(() => [
+  { value: '', label: 'Particular (Sin obra social)' },
+  ...facturacionStore.obrasSociales.map((os) => ({
+    value: os.codigo,
+    label: `${os.nombre} (${os.codigo}) - ${os.porcentajeCobertura}%`,
+  })),
+]);
+
+async function cargarDatos() {
+  await Promise.all([
+    cargarPaciente(),
+    facturacionStore.obrasSociales.length === 0 ? facturacionStore.cargarObrasSociales() : Promise.resolve(),
+  ]);
+}
+
 onMounted(() => {
-  cargarPaciente();
+  cargarDatos();
 });
 </script>
 
@@ -178,10 +195,12 @@ onMounted(() => {
         </template>
 
         <div class="form-row">
-          <Input
-            v-model="form.obraSocialCodigo"
-            label="Código Obra Social"
-            placeholder="OSDE, PAMI, etc."
+          <Select
+            :model-value="form.obraSocialCodigo"
+            @update:model-value="form.obraSocialCodigo = $event ? String($event) : ''"
+            :options="obraSocialOptions"
+            label="Obra Social / Seguro"
+            placeholder="Seleccionar obra social"
           />
           <Input v-model="form.numeroAfiliado" label="Número de Afiliado" placeholder="123456789" />
         </div>

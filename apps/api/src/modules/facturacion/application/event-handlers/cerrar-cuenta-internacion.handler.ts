@@ -24,46 +24,50 @@ export class CerrarCuentaInternacionHandler {
 
   @OnEvent(PACIENTE_DADO_DE_ALTA)
   async manejar(evento: PacienteDadoDeAlta): Promise<void> {
-    if (await this.cuentaRepo.existeCargoConOrigenEvento(evento.eventoId)) {
-      this.logger.debug(`Evento ${evento.eventoId} ya fue procesado`);
-      return;
-    }
+    try {
+      if (await this.cuentaRepo.existeCargoConOrigenEvento(evento.eventoId)) {
+        this.logger.debug(`Evento ${evento.eventoId} ya fue procesado`);
+        return;
+      }
 
-    const { internacionId, pacienteId, ingresoEn, egresoEn } = evento.payload;
-    const ahora = this.clock.ahora();
-    const cuenta =
-      (await this.cuentaRepo.buscarPorTipoYReferencia(TipoCuenta.INTERNACION, internacionId)) ??
-      Cuenta.abrir({
-        pacienteId,
-        tipo: TipoCuenta.INTERNACION,
-        referenciaId: internacionId,
+      const { internacionId, pacienteId, ingresoEn, egresoEn } = evento;
+      const ahora = this.clock.ahora();
+      const cuenta =
+        (await this.cuentaRepo.buscarPorTipoYReferencia(TipoCuenta.INTERNACION, internacionId)) ??
+        Cuenta.abrir({
+          pacienteId,
+          tipo: TipoCuenta.INTERNACION,
+          referenciaId: internacionId,
+          ahora,
+        });
+
+      const dias = this.calcularDias(ingresoEn, egresoEn);
+      const tarifa = await this.tarifaRepo.buscarPorConcepto(ConceptoCargo.DIA_CAMA);
+      if (!tarifa) {
+        throw new TarifaNoEncontrada(ConceptoCargo.DIA_CAMA);
+      }
+
+      cuenta.agregarCargo(
+        Cargo.crear({
+          cuentaId: cuenta.id,
+          concepto: ConceptoCargo.DIA_CAMA,
+          descripcion: dias === 1 ? '1 día de cama' : `${dias} días de cama`,
+          cantidad: dias,
+          montoUnitario: tarifa.monto,
+          origenEventoId: evento.eventoId,
+          createdAt: ahora,
+        }),
         ahora,
-      });
+      );
+      cuenta.cerrar(ahora);
 
-    const dias = this.calcularDias(ingresoEn, egresoEn);
-    const tarifa = await this.tarifaRepo.buscarPorConcepto(ConceptoCargo.DIA_CAMA);
-    if (!tarifa) {
-      throw new TarifaNoEncontrada(ConceptoCargo.DIA_CAMA);
+      await this.cuentaRepo.guardar(cuenta);
+      this.logger.log(
+        `Cuenta ${cuenta.id} cerrada con ${dias} día(s) de cama (evento ${evento.eventoId})`,
+      );
+    } catch (error) {
+      this.logger.error(`Error al procesar alta de internación para evento ${evento.eventoId}`, error);
     }
-
-    cuenta.agregarCargo(
-      Cargo.crear({
-        cuentaId: cuenta.id,
-        concepto: ConceptoCargo.DIA_CAMA,
-        descripcion: dias === 1 ? '1 día de cama' : `${dias} días de cama`,
-        cantidad: dias,
-        montoUnitario: tarifa.monto,
-        origenEventoId: evento.eventoId,
-        createdAt: ahora,
-      }),
-      ahora,
-    );
-    cuenta.cerrar(ahora);
-
-    await this.cuentaRepo.guardar(cuenta);
-    this.logger.log(
-      `Cuenta ${cuenta.id} cerrada con ${dias} día(s) de cama (evento ${evento.eventoId})`,
-    );
   }
 
   private calcularDias(ingresoEn: Date, egresoEn: Date): number {

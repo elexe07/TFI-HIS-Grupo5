@@ -20,6 +20,7 @@ export interface CuentaDetalleDto {
   readonly estado: EstadoCuenta;
   readonly coberturaValidada: boolean;
   readonly porcentajeCobertura: number | null;
+  readonly total: number;
   readonly totalBruto: number;
   readonly totalDescuento: number;
   readonly totalAPagar: number;
@@ -29,6 +30,7 @@ export interface CuentaDetalleDto {
 }
 
 export function mapearCuentaADetalleDto(cuenta: Cuenta): CuentaDetalleDto {
+  const totalAPagar = cuenta.calcularTotalAPagar();
   return {
     id: cuenta.id,
     pacienteId: cuenta.pacienteId,
@@ -37,9 +39,10 @@ export function mapearCuentaADetalleDto(cuenta: Cuenta): CuentaDetalleDto {
     estado: cuenta.estado,
     coberturaValidada: cuenta.coberturaValidada,
     porcentajeCobertura: cuenta.porcentajeCobertura,
+    total: totalAPagar,
     totalBruto: cuenta.calcularTotalBruto(),
     totalDescuento: cuenta.calcularTotalDescuento(),
-    totalAPagar: cuenta.calcularTotalAPagar(),
+    totalAPagar,
     cargos: cuenta.cargos.map((c) => ({
       id: c.id,
       concepto: c.concepto,

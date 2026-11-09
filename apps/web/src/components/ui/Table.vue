@@ -44,7 +44,7 @@ function formatCellValue(row: Record<string, unknown>, column: TableColumn): str
   if (column.format) return column.format(value, row);
   if (value === null || value === undefined) return '-';
   if (typeof value === 'boolean') return value ? 'Sí' : 'No';
-  if (value instanceof Date) return value.toLocaleString('es-AR');
+  if (value instanceof Date) return value.toLocaleString('es-AR', { hour12: false });
   return String(value);
 }
 

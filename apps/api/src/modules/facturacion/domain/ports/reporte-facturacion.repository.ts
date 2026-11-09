@@ -8,10 +8,17 @@ export interface ItemReporteFacturacion {
   readonly montoTotal: number;
 }
 
+export interface ItemPorObraSocial {
+  readonly obraSocial: string;
+  readonly cantidad: number;
+  readonly monto: number;
+}
+
 export interface ReporteFacturacionPeriodo {
   readonly desde: Date;
   readonly hasta: Date;
   readonly items: ItemReporteFacturacion[];
+  readonly porObraSocial: ItemPorObraSocial[];
   readonly granTotal: number;
 }
 

@@ -25,7 +25,10 @@ import { ListarInsumosQuery } from '../application/listar-insumos/listar-insumos
 import { RegistrarIngresoInsumoCommand } from '../application/registrar-ingreso-insumo/registrar-ingreso-insumo.command';
 import { RegistrarIngresoInsumoHandler } from '../application/registrar-ingreso-insumo/registrar-ingreso-insumo.handler';
 import { IngresoInsumoDto } from './dto/ingreso-insumo.dto';
+import { EgresoInsumoDto } from './dto/egreso-insumo.dto';
 import { ListarInsumosQueryDto } from './dto/listar-insumos-query.dto';
+import { RegistrarEgresoInsumoCommand } from '../application/registrar-egreso-insumo/registrar-egreso-insumo.command';
+import { RegistrarEgresoInsumoHandler } from '../application/registrar-egreso-insumo/registrar-egreso-insumo.handler';
 
 @ApiTags('insumos')
 @ApiBearerAuth()
@@ -35,6 +38,7 @@ import { ListarInsumosQueryDto } from './dto/listar-insumos-query.dto';
 export class InsumosController {
   constructor(
     private readonly registrarIngresoInsumo: RegistrarIngresoInsumoHandler,
+    private readonly registrarEgresoInsumo: RegistrarEgresoInsumoHandler,
     private readonly listarInsumos: ListarInsumosHandler,
   ) {}
 
@@ -58,6 +62,23 @@ export class InsumosController {
   ): Promise<InsumoDto> {
     return this.registrarIngresoInsumo.ejecutar(
       new RegistrarIngresoInsumoCommand({
+        insumoId: id,
+        cantidad: dto.cantidad,
+      }),
+    );
+  }
+
+  @Post(':id/egresos')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Registrar egreso o consumo manual de stock de insumo' })
+  @ApiOkResponse({ description: 'Stock descontado exitosamente' })
+  @ApiNotFoundResponse({ description: 'INSUMO_NO_ENCONTRADO' })
+  registrarEgreso(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() dto: EgresoInsumoDto,
+  ): Promise<InsumoDto> {
+    return this.registrarEgresoInsumo.ejecutar(
+      new RegistrarEgresoInsumoCommand({
         insumoId: id,
         cantidad: dto.cantidad,
       }),

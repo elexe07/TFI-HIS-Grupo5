@@ -8,6 +8,7 @@ export interface UsuarioDto {
   email: string;
   nombre: string;
   rol: NombreRol;
+  permisos: string[];
   activo: boolean;
   creadoEn: string;
 }
@@ -17,6 +18,7 @@ export const aUsuarioDto = (u: Usuario): UsuarioDto => ({
   email: u.email.valor,
   nombre: u.nombre,
   rol: u.rol.nombre,
+  permisos: [...u.rol.permisos],
   activo: u.activo,
   creadoEn: u.creadoEn.toISOString(),
 });

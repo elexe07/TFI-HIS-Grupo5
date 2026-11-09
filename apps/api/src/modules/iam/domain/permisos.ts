@@ -43,6 +43,7 @@ export const MATRIZ_PERMISOS: Readonly<Record<NombreRol, readonly Permiso[]>> = 
     P.USUARIOS_GESTIONAR,
     P.PACIENTES_REGISTRAR,
     P.PACIENTES_LEER,
+    P.TRIAJE_REGISTRAR,
     P.AGENDA_DEFINIR,
     P.TURNOS_RESERVAR,
     P.TURNOS_CANCELAR,
@@ -59,6 +60,7 @@ export const MATRIZ_PERMISOS: Readonly<Record<NombreRol, readonly Permiso[]>> = 
     P.PACIENTES_LEER,
     P.AGENDA_DEFINIR,
     P.GUARDIA_LEER,
+    P.TRIAJE_REGISTRAR,
     P.HCE_LEER,
     P.HCE_ESCRIBIR,
     P.PRESCRIPCIONES_CREAR,
@@ -79,6 +81,7 @@ export const MATRIZ_PERMISOS: Readonly<Record<NombreRol, readonly Permiso[]>> = 
   RECEPCIONISTA: [
     P.PACIENTES_REGISTRAR,
     P.PACIENTES_LEER,
+    P.TRIAJE_REGISTRAR,
     P.TURNOS_RESERVAR,
     P.TURNOS_CANCELAR,
     P.GUARDIA_LEER,

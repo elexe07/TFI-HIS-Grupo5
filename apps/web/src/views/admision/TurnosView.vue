@@ -27,11 +27,11 @@ function formatHoraTurno(fechaIso?: string): string {
   if (!fechaIso) return '-';
   const d = new Date(fechaIso);
   if (isNaN(d.getTime())) return '-';
-  return d.toLocaleTimeString('en-US', {
+  return d.toLocaleTimeString('es-AR', {
     hour: '2-digit',
     minute: '2-digit',
     timeZone: 'UTC',
-    hour12: true,
+    hour12: false,
   });
 }
 

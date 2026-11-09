@@ -1,8 +1,10 @@
 import { Module } from '@nestjs/common';
 import { CoberturaController } from './api/cobertura.controller';
 import { CuentasController } from './api/cuentas.controller';
+import { ObrasSocialesYTarifasController } from './api/obras-sociales.controller';
 import { ReportesController } from './api/reportes.controller';
 import { ConsultarCuentaHandler } from './application/consultar-cuenta/consultar-cuenta.handler';
+import { CerrarCuentaManualHandler } from './application/cerrar-cuenta/cerrar-cuenta.handler';
 import { AbrirCuentaInternacionHandler } from './application/event-handlers/abrir-cuenta-internacion.handler';
 import { AplicarCargoConsultaHandler } from './application/event-handlers/aplicar-cargo-consulta.handler';
 import { AplicarCargoMedicacionHandler } from './application/event-handlers/aplicar-cargo-medicacion.handler';
@@ -29,10 +31,16 @@ import { TarifaRepositoryPrisma } from './infrastructure/repositories/tarifa.rep
  * Responsable: Ezequiel
  */
 @Module({
-  controllers: [CuentasController, CoberturaController, ReportesController],
+  controllers: [
+    CuentasController,
+    CoberturaController,
+    ReportesController,
+    ObrasSocialesYTarifasController,
+  ],
   providers: [
     // Casos de uso / Handlers
     ConsultarCuentaHandler,
+    CerrarCuentaManualHandler,
     ListarCuentasPacienteHandler,
     ValidarCoberturaHandler,
     ReporteFacturacionHandler,

@@ -5,5 +5,6 @@ export interface InternacionRepository {
   buscarPorId(id: Id): Promise<Internacion | null>;
   buscarActivaPorPacienteId(pacienteId: Id): Promise<Internacion | null>;
   buscarActivaPorCamaId(camaId: Id): Promise<Internacion | null>;
+  buscarTodas(params?: { estado?: string }): Promise<Internacion[]>;
   guardar(internacion: Internacion): Promise<void>;
 }

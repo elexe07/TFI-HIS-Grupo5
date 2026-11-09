@@ -27,7 +27,13 @@ export class DescontarInsumoPorEventoHandler
       return;
     }
 
-    const insumo = await this.insumos.buscarPorMedicamentoAsociado(command.medicamento);
+    let insumo = null;
+    if (command.codigo) {
+      insumo = await this.insumos.buscarPorCodigo(command.codigo);
+    } else if (command.medicamento) {
+      insumo = await this.insumos.buscarPorMedicamentoAsociado(command.medicamento);
+    }
+
     if (!insumo) {
       await this.eventosProcesados.registrarProcesado(command.eventoId);
       return;

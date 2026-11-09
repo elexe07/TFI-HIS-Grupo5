@@ -204,6 +204,24 @@ export const useRecursosStore = defineStore('recursos', () => {
     }
   }
 
+  async function egresarInsumo(id: string, cantidad: number) {
+    cargando.value = true;
+    error.value = null;
+    try {
+      const actualizado = await recursosApi.egresarInsumo(id, cantidad);
+      const idx = insumos.value.findIndex((i) => i.id === id);
+      if (idx !== -1) {
+        insumos.value[idx] = actualizado;
+      }
+      return actualizado;
+    } catch (err) {
+      error.value = err instanceof Error ? err.message : 'Error al egresar insumo';
+      throw err;
+    } finally {
+      cargando.value = false;
+    }
+  }
+
   function clearError() {
     error.value = null;
   }
@@ -237,6 +255,7 @@ export const useRecursosStore = defineStore('recursos', () => {
     darAlta,
     cargarInsumos,
     ingresarInsumo,
+    egresarInsumo,
     clearError,
   };
 });

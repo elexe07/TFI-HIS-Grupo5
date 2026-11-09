@@ -17,6 +17,7 @@ import {
   INTERNACION_REPOSITORY,
 } from './application/ports/tokens';
 import { RegistrarIngresoInsumoHandler } from './application/registrar-ingreso-insumo/registrar-ingreso-insumo.handler';
+import { RegistrarEgresoInsumoHandler } from './application/registrar-egreso-insumo/registrar-egreso-insumo.handler';
 import { CamaRepositoryPrisma } from './infrastructure/cama.repository.prisma';
 import { EventosProcesadosRepositoryPrisma } from './infrastructure/eventos-procesados.repository.prisma';
 import { HabitacionRepositoryPrisma } from './infrastructure/habitacion.repository.prisma';
@@ -40,6 +41,7 @@ import { InternacionRepositoryPrisma } from './infrastructure/internacion.reposi
     CambiarEstadoCamaHandler,
     ObtenerMapaCamasHandler,
     RegistrarIngresoInsumoHandler,
+    RegistrarEgresoInsumoHandler,
     DescontarInsumoPorEventoHandler,
     ListarInsumosHandler,
     // Event listener
@@ -60,6 +62,7 @@ import { InternacionRepositoryPrisma } from './infrastructure/internacion.reposi
     CambiarEstadoCamaHandler,
     ObtenerMapaCamasHandler,
     RegistrarIngresoInsumoHandler,
+    RegistrarEgresoInsumoHandler,
     DescontarInsumoPorEventoHandler,
     ListarInsumosHandler,
   ],

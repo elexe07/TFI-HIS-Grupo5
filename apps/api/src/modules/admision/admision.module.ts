@@ -20,6 +20,7 @@ import { TURNO_REPOSITORY } from './application/ports/tokens';
 import { RegistrarMedicoHandler } from './application/registrar-medico/registrar-medico.handler';
 import { RegistrarPacienteHandler } from './application/registrar-paciente/registrar-paciente.handler';
 import { RegistrarTriajeHandler } from './application/registrar-triaje/registrar-triaje.handler';
+import { AtenderTriajeHandler } from './application/atender-triaje/atender-triaje.handler';
 import { ReservarTurnoHandler } from './application/reservar-turno/reservar-turno.handler';
 import { AgendaRepositoryPrisma } from './infrastructure/agenda.repository.prisma';
 import { MedicoRepositoryPrisma } from './infrastructure/medico.repository.prisma';
@@ -52,6 +53,7 @@ import { TurnoRepositoryPrisma } from './infrastructure/turno.repository.prisma'
     CancelarTurnoHandler,
     ListarTurnosHandler,
     RegistrarTriajeHandler,
+    AtenderTriajeHandler,
     ObtenerColaGuardiaHandler,
 
     // Puertos → Adaptadores Prisma

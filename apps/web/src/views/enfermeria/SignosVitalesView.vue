@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch, onMounted } from 'vue';
+import { ref, watch, onMounted, computed } from 'vue';
 import { useEnfermeriaStore } from '@/stores/enfermeria';
 import { useAdmisionStore } from '@/stores/admision';
 import { useToastStore } from '@/stores/toast';
@@ -19,12 +19,26 @@ const form = ref({
   saturacionO2: '',
 });
 
+// signos filtrados por paciente seleccionado
+const signosFiltrados = computed(() => {
+  return enfermeriaStore.signosVitales.filter((s) => s.pacienteId === pacienteId.value);
+});
 const columns: TableColumn[] = [
   {
     key: 'registradoEn',
     label: 'Fecha y Hora',
     width: '180px',
-    format: (value) => (value ? new Date(value as string).toLocaleString('es-AR') : '-'),
+    format: (value) =>
+      value
+        ? new Date(value as string).toLocaleString('es-AR', {
+            hour12: false,
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+          })
+        : '-',
   },
   {
     key: 'temperatura',
@@ -250,7 +264,7 @@ onMounted(() => {
 
       <Table
         :columns="columns"
-        :rows="enfermeriaStore.signosVitales"
+        :rows="signosFiltrados"
         rowKey="id"
         :hoverable="true"
         :striped="true"

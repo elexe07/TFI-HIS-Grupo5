@@ -15,7 +15,6 @@ const columns: TableColumn<UsuarioAutenticado>[] = [
   { key: 'nombre', label: 'Nombre' },
   { key: 'email', label: 'Email', width: '200px' },
   { key: 'rol', label: 'Rol', width: '140px' },
-  { key: 'permisos', label: 'Permisos', width: '200px', format: (v) => (v as string[]).join(', ') },
 ];
 
 const usuariosFiltrados = computed(() => {

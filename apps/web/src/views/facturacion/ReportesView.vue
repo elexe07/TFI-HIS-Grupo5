@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref } from 'vue';
 import { useFacturacionStore } from '@/stores/facturacion';
 import { useToastStore } from '@/stores/toast';
 import { Card, Button, Input, Table, Badge } from '@/components/ui';
@@ -28,9 +28,11 @@ async function generarReporte() {
   loading.value = true;
   try {
     if (reporteTipo.value === 'facturacion') {
+      const desdeIso = new Date(`${fechaDesde.value}T00:00:00Z`).toISOString();
+      const hastaIso = new Date(`${fechaHasta.value}T23:59:59Z`).toISOString();
       await facturacionStore.generarReporteFacturacion(
-        fechaDesde.value ?? '',
-        fechaHasta.value ?? '',
+        desdeIso,
+        hastaIso,
       );
       reporteFacturacionData.value = facturacionStore.reporteFacturacion;
       toastStore.success('Reporte generado', 'Reporte de facturación cargado');
@@ -159,9 +161,7 @@ function getOcupacionRows() {
   }));
 }
 
-onMounted(() => {
-  generarReporte();
-});
+// No auto-generate on mount to avoid permission errors before user interacts
 </script>
 
 <template>

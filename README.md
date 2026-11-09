@@ -93,7 +93,6 @@ reservar(@UsuarioActual() usuario: UsuarioAutenticado, @Body() dto: ReservarTurn
 Sin token → `401 TOKEN_INVALIDO`. Con token pero sin el permiso → `403 PERMISO_FALTANTE`.
 Endpoints: `POST /api/auth/login`, `GET /api/auth/me`, `GET|POST /api/usuarios`, `PATCH /api/usuarios/:id/rol`.
 
-
 ## Equipo
 
 | Módulo            | Responsable |

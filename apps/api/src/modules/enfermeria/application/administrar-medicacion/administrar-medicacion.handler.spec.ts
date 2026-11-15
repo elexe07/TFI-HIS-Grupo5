@@ -8,13 +8,14 @@ import {
 import { MEDICACION_ADMINISTRADA } from '../../domain/events/medicacion-administrada.event';
 import { AdministracionMedicacionRepositoryEnMemoria } from '../../testing/administracion-medicacion.repository.en-memoria';
 import { IndicacionRepositoryEnMemoria } from '../../testing/indicacion.repository.en-memoria';
+import { NotaEnfermeriaRepositoryEnMemoria } from '../../testing/nota-enfermeria.repository.en-memoria';
 import { AdministrarMedicacionCommand } from './administrar-medicacion.command';
 import { AdministrarMedicacionHandler } from './administrar-medicacion.handler';
 
 describe('AdministrarMedicacionHandler', () => {
   let indicacionRepo: IndicacionRepositoryEnMemoria;
   let administracionRepo: AdministracionMedicacionRepositoryEnMemoria;
-  let notaRepo: any;
+  let notaRepo: NotaEnfermeriaRepositoryEnMemoria;
   let bus: EventBusEnMemoria;
   let reloj: RelojFijo;
   let handler: AdministrarMedicacionHandler;
@@ -22,7 +23,7 @@ describe('AdministrarMedicacionHandler', () => {
   beforeEach(() => {
     indicacionRepo = new IndicacionRepositoryEnMemoria();
     administracionRepo = new AdministracionMedicacionRepositoryEnMemoria();
-    notaRepo = { guardar: jest.fn().mockResolvedValue(undefined) };
+    notaRepo = new NotaEnfermeriaRepositoryEnMemoria();
     bus = new EventBusEnMemoria();
     reloj = new RelojFijo(new Date('2026-10-23T12:00:00Z'));
     handler = new AdministrarMedicacionHandler(

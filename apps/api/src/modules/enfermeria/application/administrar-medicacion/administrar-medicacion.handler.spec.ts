@@ -25,7 +25,13 @@ describe('AdministrarMedicacionHandler', () => {
     notaRepo = { guardar: jest.fn().mockResolvedValue(undefined) };
     bus = new EventBusEnMemoria();
     reloj = new RelojFijo(new Date('2026-10-23T12:00:00Z'));
-    handler = new AdministrarMedicacionHandler(indicacionRepo, administracionRepo, notaRepo, bus, reloj);
+    handler = new AdministrarMedicacionHandler(
+      indicacionRepo,
+      administracionRepo,
+      notaRepo,
+      bus,
+      reloj,
+    );
   });
 
   it('administra la medicación, actualiza indicación y emite MedicacionAdministrada', async () => {

@@ -1,7 +1,11 @@
 import { RelojFijo } from '../../../../building-blocks/testing';
 import { MedicacionAdministrada } from '../../../enfermeria/public';
 import { ConceptoCargo, TipoCuenta } from '../../domain/enums';
-import { CuentaRepositoryEnMemoria, ObraSocialRepositoryEnMemoria, TarifaRepositoryEnMemoria } from '../../testing';
+import {
+  CuentaRepositoryEnMemoria,
+  ObraSocialRepositoryEnMemoria,
+  TarifaRepositoryEnMemoria,
+} from '../../testing';
 import { AplicarCargoMedicacionHandler } from './aplicar-cargo-medicacion.handler';
 
 describe('AplicarCargoMedicacionHandler', () => {

@@ -1,7 +1,11 @@
 import { RelojFijo } from '../../../../building-blocks/testing';
 import { EvolucionRegistrada } from '../../../hce/public';
 import { ConceptoCargo, TipoCuenta } from '../../domain/enums';
-import { CuentaRepositoryEnMemoria, ObraSocialRepositoryEnMemoria, TarifaRepositoryEnMemoria } from '../../testing';
+import {
+  CuentaRepositoryEnMemoria,
+  ObraSocialRepositoryEnMemoria,
+  TarifaRepositoryEnMemoria,
+} from '../../testing';
 import { AplicarCargoConsultaHandler } from './aplicar-cargo-consulta.handler';
 
 describe('AplicarCargoConsultaHandler', () => {

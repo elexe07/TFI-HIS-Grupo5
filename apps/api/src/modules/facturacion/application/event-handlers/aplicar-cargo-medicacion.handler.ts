@@ -6,7 +6,6 @@ import { MEDICACION_ADMINISTRADA, type MedicacionAdministrada } from '../../../e
 import { Cargo } from '../../domain/cargo';
 import { Cuenta } from '../../domain/cuenta';
 import { ConceptoCargo, EstadoCuenta, TipoCuenta } from '../../domain/enums';
-import { TarifaNoEncontrada } from '../../domain/errores';
 import { CUENTA_REPOSITORY, type CuentaRepository } from '../../domain/ports/cuenta.repository';
 import {
   OBRA_SOCIAL_REPOSITORY,

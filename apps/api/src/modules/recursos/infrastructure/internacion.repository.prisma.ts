@@ -56,7 +56,7 @@ export class InternacionRepositoryPrisma implements InternacionRepository {
 
   async buscarTodas(params?: { estado?: string }): Promise<Internacion[]> {
     const filas = await this.prisma.internacion.findMany({
-      where: params?.estado ? { estado: params.estado as any } : undefined,
+      where: params?.estado ? { estado: params.estado as EstadoInternacion } : undefined,
       orderBy: { createdAt: 'desc' },
     });
     return filas.map(aDominio);

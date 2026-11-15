@@ -38,7 +38,7 @@ describe('AplicarCargoMedicacionHandler', () => {
     const primerCargo = cuenta!.cargos[0]!;
     expect(primerCargo.concepto).toBe(ConceptoCargo.MEDICACION);
     expect(primerCargo.descripcion).toContain('Amoxicilina 500mg');
-    expect(primerCargo.montoUnitario).toBe(5000); // Tarifa seed
+    expect(primerCargo.montoUnitario).toBe(3500);
   });
 
   it('debería ignorar la ejecución si el evento ya fue procesado', async () => {

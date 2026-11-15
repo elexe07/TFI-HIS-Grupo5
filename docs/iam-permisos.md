@@ -12,7 +12,7 @@ Para pedir un permiso nuevo: agregarlo a `PERMISOS`, a la matriz y a esta tabla 
 | `agenda:definir`          |       ✔       |   ✔    |           |               |          |
 | `turnos:reservar`         |       ✔       |        |           |       ✔       |  propio  |
 | `turnos:cancelar`         |       ✔       |        |           |       ✔       |  propio  |
-| `triaje:registrar`        |               |        |     ✔     |               |          |
+| `triaje:registrar`        |       ✔       |   ✔    |     ✔     |       ✔       |          |
 | `guardia:leer`            |       ✔       |   ✔    |     ✔     |       ✔       |          |
 | `hce:leer`                |               |   ✔    |     ✔     |               |  propia  |
 | `hce:escribir`            |               |   ✔    |           |               |          |

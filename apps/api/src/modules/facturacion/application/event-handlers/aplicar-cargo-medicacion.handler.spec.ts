@@ -1,19 +1,21 @@
 import { RelojFijo } from '../../../../building-blocks/testing';
 import { MedicacionAdministrada } from '../../../enfermeria/public';
 import { ConceptoCargo, TipoCuenta } from '../../domain/enums';
-import { CuentaRepositoryEnMemoria, TarifaRepositoryEnMemoria } from '../../testing';
+import { CuentaRepositoryEnMemoria, ObraSocialRepositoryEnMemoria, TarifaRepositoryEnMemoria } from '../../testing';
 import { AplicarCargoMedicacionHandler } from './aplicar-cargo-medicacion.handler';
 
 describe('AplicarCargoMedicacionHandler', () => {
   let handler: AplicarCargoMedicacionHandler;
   let cuentaRepo: CuentaRepositoryEnMemoria;
   let tarifaRepo: TarifaRepositoryEnMemoria;
+  let obraSocialRepo: ObraSocialRepositoryEnMemoria;
   const reloj = new RelojFijo(new Date('2026-10-23T12:00:00Z'));
 
   beforeEach(() => {
     cuentaRepo = new CuentaRepositoryEnMemoria();
     tarifaRepo = new TarifaRepositoryEnMemoria();
-    handler = new AplicarCargoMedicacionHandler(cuentaRepo, tarifaRepo, reloj);
+    obraSocialRepo = new ObraSocialRepositoryEnMemoria();
+    handler = new AplicarCargoMedicacionHandler(cuentaRepo, tarifaRepo, obraSocialRepo, reloj);
   });
 
   it('debería registrar el cargo por medicación en la cuenta de internación', async () => {

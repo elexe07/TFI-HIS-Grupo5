@@ -14,6 +14,7 @@ import { AdministrarMedicacionHandler } from './administrar-medicacion.handler';
 describe('AdministrarMedicacionHandler', () => {
   let indicacionRepo: IndicacionRepositoryEnMemoria;
   let administracionRepo: AdministracionMedicacionRepositoryEnMemoria;
+  let notaRepo: any;
   let bus: EventBusEnMemoria;
   let reloj: RelojFijo;
   let handler: AdministrarMedicacionHandler;
@@ -21,9 +22,10 @@ describe('AdministrarMedicacionHandler', () => {
   beforeEach(() => {
     indicacionRepo = new IndicacionRepositoryEnMemoria();
     administracionRepo = new AdministracionMedicacionRepositoryEnMemoria();
+    notaRepo = { guardar: jest.fn().mockResolvedValue(undefined) };
     bus = new EventBusEnMemoria();
     reloj = new RelojFijo(new Date('2026-10-23T12:00:00Z'));
-    handler = new AdministrarMedicacionHandler(indicacionRepo, administracionRepo, bus, reloj);
+    handler = new AdministrarMedicacionHandler(indicacionRepo, administracionRepo, notaRepo, bus, reloj);
   });
 
   it('administra la medicación, actualiza indicación y emite MedicacionAdministrada', async () => {

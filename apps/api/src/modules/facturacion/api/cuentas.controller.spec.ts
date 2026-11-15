@@ -1,20 +1,24 @@
+import { RelojFijo } from '../../../building-blocks/testing';
 import { PERMISOS, type UsuarioAutenticado } from '../../iam/public';
 import { Cuenta } from '../domain/cuenta';
 import { TipoCuenta } from '../domain/enums';
 import { ConsultarCuentaHandler } from '../application/consultar-cuenta/consultar-cuenta.handler';
 import { ListarCuentasPacienteHandler } from '../application/listar-cuentas-paciente/listar-cuentas-paciente.handler';
+import { CerrarCuentaManualHandler } from '../application/cerrar-cuenta/cerrar-cuenta.handler';
 import { CuentaRepositoryEnMemoria } from '../testing';
 import { CuentasController } from './cuentas.controller';
 
 describe('CuentasController', () => {
   let controller: CuentasController;
   let cuentaRepo: CuentaRepositoryEnMemoria;
+  const reloj = new RelojFijo(new Date('2026-10-23T10:00:00Z'));
 
   beforeEach(() => {
     cuentaRepo = new CuentaRepositoryEnMemoria();
     const consultarHandler = new ConsultarCuentaHandler(cuentaRepo);
     const listarHandler = new ListarCuentasPacienteHandler(cuentaRepo);
-    controller = new CuentasController(consultarHandler, listarHandler);
+    const cerrarHandler = new CerrarCuentaManualHandler(cuentaRepo, reloj);
+    controller = new CuentasController(consultarHandler, listarHandler, cerrarHandler);
   });
 
   it('debería retornar las cuentas del paciente', async () => {

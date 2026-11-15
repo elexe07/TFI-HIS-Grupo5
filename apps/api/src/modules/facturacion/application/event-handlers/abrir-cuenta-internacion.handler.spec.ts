@@ -1,17 +1,19 @@
 import { RelojFijo } from '../../../../building-blocks/testing';
 import { PacienteInternado } from '../../../recursos/public';
 import { EstadoCuenta, TipoCuenta } from '../../domain/enums';
-import { CuentaRepositoryEnMemoria } from '../../testing';
+import { CuentaRepositoryEnMemoria, ObraSocialRepositoryEnMemoria } from '../../testing';
 import { AbrirCuentaInternacionHandler } from './abrir-cuenta-internacion.handler';
 
 describe('AbrirCuentaInternacionHandler', () => {
   let handler: AbrirCuentaInternacionHandler;
   let cuentaRepo: CuentaRepositoryEnMemoria;
+  let obraSocialRepo: ObraSocialRepositoryEnMemoria;
   const reloj = new RelojFijo(new Date('2026-10-23T10:00:00Z'));
 
   beforeEach(() => {
     cuentaRepo = new CuentaRepositoryEnMemoria();
-    handler = new AbrirCuentaInternacionHandler(cuentaRepo, reloj);
+    obraSocialRepo = new ObraSocialRepositoryEnMemoria();
+    handler = new AbrirCuentaInternacionHandler(cuentaRepo, obraSocialRepo, reloj);
   });
 
   it('debería abrir la cuenta de internación en estado ABIERTA', async () => {

@@ -13,12 +13,12 @@ Monolito modular en TypeScript con 6 módulos de negocio:
 
 ## 🛠️ Stack Tecnológico
 
-| Capa | Tecnologías |
-| :--- | :--- |
-| **Backend (API)** | Node.js (>=20) · TypeScript · NestJS 11 · Prisma ORM 6 · PostgreSQL 16 (Multi-Schema) |
-| **Frontend (Web)** | Vue 3 (Composition API) · Pinia · Vite · Vue Router · TypeScript · Axios · Zod |
-| **Infraestructura**| Docker & Docker Compose (PostgreSQL 16) |
-| **Calidad & Tests** | Jest · ESLint · Prettier · dependency-cruiser · GitHub Actions CI |
+| Capa                | Tecnologías                                                                           |
+| :------------------ | :------------------------------------------------------------------------------------ |
+| **Backend (API)**   | Node.js (>=20) · TypeScript · NestJS 11 · Prisma ORM 6 · PostgreSQL 16 (Multi-Schema) |
+| **Frontend (Web)**  | Vue 3 (Composition API) · Pinia · Vite · Vue Router · TypeScript · Axios · Zod        |
+| **Infraestructura** | Docker & Docker Compose (PostgreSQL 16)                                               |
+| **Calidad & Tests** | Jest · ESLint · Prettier · dependency-cruiser · GitHub Actions CI                     |
 
 ---
 
@@ -58,18 +58,20 @@ Desde la raíz del repositorio:
 pnpm install
 ```
 
-*(Instala todos los paquetes del monorepo y dispara automáticamente `prisma generate` para generar el cliente Prisma de la API).*
+_(Instala todos los paquetes del monorepo y dispara automáticamente `prisma generate` para generar el cliente Prisma de la API)._
 
 ---
 
 ### 4. Levantar la Base de Datos y Sembrar Datos Iniciales
 
 1. **Iniciar el contenedor de PostgreSQL:**
+
    ```bash
    pnpm db:up
    ```
 
 2. **Aplicar las migraciones (creación de esquemas y tablas):**
+
    ```bash
    pnpm db:migrate
    ```
@@ -78,7 +80,7 @@ pnpm install
    ```bash
    pnpm db:seed
    ```
-   *Esto inicializa roles, permisos, usuario Administrador, médicos con sus respectivas agendas, pacientes, obras sociales, tarifas, habitaciones, camas e insumos hospitalarios con stock.*
+   _Esto inicializa roles, permisos, usuario Administrador, médicos con sus respectivas agendas, pacientes, obras sociales, tarifas, habitaciones, camas e insumos hospitalarios con stock._
 
 ---
 
@@ -110,32 +112,32 @@ pnpm web dev
 
 ## 🔑 Credenciales por Defecto (Seed)
 
-| Rol | Email | Contraseña |
-| :--- | :--- | :--- |
-| **Administrador** | `admin@his.local` | `Admin1234!` |
-| **Médico** (Clínica Médica) | `dr.garcia@his.local` | `Medico1234!` |
-| **Médica** (Pediatría) | `dra.gomez@his.local` | `Medico1234!` |
-| **Médico** (Traumatología) | `dr.fernandez@his.local` | `Medico1234!` |
+| Rol                         | Email                    | Contraseña    |
+| :-------------------------- | :----------------------- | :------------ |
+| **Administrador**           | `admin@his.local`        | `Admin1234!`  |
+| **Médico** (Clínica Médica) | `dr.garcia@his.local`    | `Medico1234!` |
+| **Médica** (Pediatría)      | `dra.gomez@his.local`    | `Medico1234!` |
+| **Médico** (Traumatología)  | `dr.fernandez@his.local` | `Medico1234!` |
 
-*(Para probar roles como **Enfermero** o **Recepcionista**, se pueden crear nuevos usuarios o gestionar roles desde la administración del sistema con la cuenta de Administrador).*
+_(Para probar roles como **Enfermero** o **Recepcionista**, se pueden crear nuevos usuarios o gestionar roles desde la administración del sistema con la cuenta de Administrador)._
 
 ---
 
 ## 🧰 Comandos Útiles
 
-| Comando | Descripción |
-| :--- | :--- |
-| `pnpm dev` | Levanta el backend en modo desarrollo con auto-reload. |
-| `pnpm web dev` | Levanta el frontend en modo desarrollo con Vite. |
-| `pnpm build` | Compila tanto API (`nest build`) como Web (`vue-tsc && vite build`). |
-| `pnpm test` | Ejecuta todos los tests unitarios del monorepo con Jest. |
-| `pnpm test:integration` | Ejecuta tests de integración de la API contra la base de datos PostgreSQL. |
-| `pnpm arch` | Valida reglas de aislamiento arquitectónico entre módulos con dependency-cruiser. |
-| `pnpm lint` / `pnpm typecheck` | Chequeo estático de linter y validación de tipos TypeScript. |
-| `pnpm format` | Formatea archivos con Prettier. |
-| `pnpm api prisma:studio` | Abre interfaz gráfica de Prisma para explorar la base de datos en el navegador. |
-| `pnpm api prisma:clean` | Limpia los datos transaccionales de prueba preservando catálogos y configuración. |
-| `pnpm db:down` | Detiene y remueve los contenedores de Docker. |
+| Comando                        | Descripción                                                                       |
+| :----------------------------- | :-------------------------------------------------------------------------------- |
+| `pnpm dev`                     | Levanta el backend en modo desarrollo con auto-reload.                            |
+| `pnpm web dev`                 | Levanta el frontend en modo desarrollo con Vite.                                  |
+| `pnpm build`                   | Compila tanto API (`nest build`) como Web (`vue-tsc && vite build`).              |
+| `pnpm test`                    | Ejecuta todos los tests unitarios del monorepo con Jest.                          |
+| `pnpm test:integration`        | Ejecuta tests de integración de la API contra la base de datos PostgreSQL.        |
+| `pnpm arch`                    | Valida reglas de aislamiento arquitectónico entre módulos con dependency-cruiser. |
+| `pnpm lint` / `pnpm typecheck` | Chequeo estático de linter y validación de tipos TypeScript.                      |
+| `pnpm format`                  | Formatea archivos con Prettier.                                                   |
+| `pnpm api prisma:studio`       | Abre interfaz gráfica de Prisma para explorar la base de datos en el navegador.   |
+| `pnpm api prisma:clean`        | Limpia los datos transaccionales de prueba preservando catálogos y configuración. |
+| `pnpm db:down`                 | Detiene y remueve los contenedores de Docker.                                     |
 
 ---
 
@@ -166,4 +168,3 @@ pnpm web dev
 ```
 
 ---
-

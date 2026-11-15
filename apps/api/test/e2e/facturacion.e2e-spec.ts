@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import type { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { ADMIN, crearAppDePrueba, loguear } from './app-de-prueba';
@@ -34,7 +35,7 @@ describe('Facturación (e2e)', () => {
         .post('/api/cobertura/validar')
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
-          pacienteId: '00000000-0000-0000-0000-000000000001',
+          pacienteId: randomUUID(),
           codigoObraSocial: 'OSDE',
           numeroAfiliado: '123456789',
         })
@@ -51,7 +52,7 @@ describe('Facturación (e2e)', () => {
         .post('/api/cobertura/validar')
         .set('Authorization', `Bearer ${tokenAdmin}`)
         .send({
-          pacienteId: '00000000-0000-0000-0000-000000000001',
+          pacienteId: randomUUID(),
           codigoObraSocial: 'OSDE',
           numeroAfiliado: 'RECHAZADO-01',
         })

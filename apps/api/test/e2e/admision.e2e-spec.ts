@@ -14,7 +14,7 @@ describe('Admisión y Turnos (e2e)', () => {
     email: `recep-${sufijo}@his.local`,
     password: 'Clave1234!',
     nombre: 'Recepcionista Test',
-    rol: 'ADMINISTRATIVO',
+    rol: 'RECEPCIONISTA',
   };
 
   const enfermero = {

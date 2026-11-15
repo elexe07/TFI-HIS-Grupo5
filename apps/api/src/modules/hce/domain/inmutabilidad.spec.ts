@@ -3,7 +3,10 @@ import { HistoriaClinicaRepositoryPrisma } from '../infrastructure/historia-clin
 
 describe('Inmutabilidad de la HCE (ADR-008)', () => {
   it('el repositorio en memoria no debe exponer métodos de actualización ni borrado de evoluciones', () => {
-    const proto = HistoriaClinicaRepositoryEnMemoria.prototype as unknown as Record<string, unknown>;
+    const proto = HistoriaClinicaRepositoryEnMemoria.prototype as unknown as Record<
+      string,
+      unknown
+    >;
     expect(proto.actualizarEvolucion).toBeUndefined();
     expect(proto.eliminarEvolucion).toBeUndefined();
     expect(proto.actualizarAntecedente).toBeUndefined();

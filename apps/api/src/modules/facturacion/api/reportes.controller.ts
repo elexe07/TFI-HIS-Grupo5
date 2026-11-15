@@ -25,7 +25,9 @@ export class ReportesController {
   @Get('facturacion')
   @ApiOperation({ summary: 'Reporte de facturación por período' })
   @ApiOkResponse({ description: 'Totales facturados discriminados por concepto' })
-  async obtenerReporteFacturacion(@Query() query: RangoFechasDto): Promise<Record<string, unknown>> {
+  async obtenerReporteFacturacion(
+    @Query() query: RangoFechasDto,
+  ): Promise<Record<string, unknown>> {
     const raw = await this.reporteFacturacionHandler.ejecutar({
       desde: new Date(query.desde),
       hasta: new Date(query.hasta),

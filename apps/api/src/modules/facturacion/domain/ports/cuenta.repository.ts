@@ -9,4 +9,5 @@ export interface CuentaRepository {
   listarPorPaciente(pacienteId?: string): Promise<Cuenta[]>;
   guardar(cuenta: Cuenta): Promise<void>;
   existeCargoConOrigenEvento(origenEventoId: string): Promise<boolean>;
+  existeInternacion?(internacionId: string): Promise<boolean>;
 }

@@ -2,7 +2,6 @@ import { Inject, Injectable, Logger } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 import { randomUUID } from 'node:crypto';
 import { CLOCK, type Clock } from '../../../../building-blocks/application';
-import { PrismaService } from '../../../../building-blocks/infrastructure/prisma/prisma.service';
 import { MEDICACION_ADMINISTRADA, type MedicacionAdministrada } from '../../../enfermeria/public';
 import { Cargo } from '../../domain/cargo';
 import { Cuenta } from '../../domain/cuenta';
@@ -26,7 +25,6 @@ export class AplicarCargoMedicacionHandler {
     private readonly tarifaRepo: TarifaRepository,
     @Inject(OBRA_SOCIAL_REPOSITORY)
     private readonly obraSocialRepo: ObraSocialRepository,
-    private readonly prisma: PrismaService,
     @Inject(CLOCK)
     private readonly clock: Clock,
   ) {}
@@ -134,22 +132,18 @@ export class AplicarCargoMedicacionHandler {
     ahora: Date,
   ): Promise<Cuenta> {
     // Verificar si realmente existe una internación para este paciente en la base de datos
-    let internacionReal = null;
+    let existeInternacion = false;
     if (internacionId) {
-      try {
-        internacionReal = await this.prisma.internacion.findUnique({
-          where: { id: internacionId },
-        });
-      } catch {
-        internacionReal = null;
-      }
+      existeInternacion = this.cuentaRepo.existeInternacion
+        ? await this.cuentaRepo.existeInternacion(internacionId)
+        : true;
     }
 
     // Si el paciente ESTÁ internado efectivamente:
-    if (internacionReal) {
+    if (internacionId && existeInternacion) {
       const cuentaInt = await this.cuentaRepo.buscarPorTipoYReferencia(
         TipoCuenta.INTERNACION,
-        internacionReal.id,
+        internacionId,
       );
       if (cuentaInt) {
         return cuentaInt;
@@ -159,7 +153,7 @@ export class AplicarCargoMedicacionHandler {
       return Cuenta.abrir({
         pacienteId,
         tipo: TipoCuenta.INTERNACION,
-        referenciaId: internacionReal.id,
+        referenciaId: internacionId,
         coberturaValidada: cobertura.coberturaValidada,
         porcentajeCobertura: cobertura.porcentajeCobertura,
         ahora,
@@ -190,19 +184,15 @@ export class AplicarCargoMedicacionHandler {
     pacienteId: string,
   ): Promise<{ coberturaValidada: boolean; porcentajeCobertura: number | null }> {
     try {
-      const paciente = await this.prisma.paciente.findUnique({
-        where: { id: pacienteId },
-        select: { obraSocialCodigo: true },
-      });
+      const infoOS = this.obraSocialRepo.buscarPorPacienteId
+        ? await this.obraSocialRepo.buscarPorPacienteId(pacienteId)
+        : null;
 
-      if (paciente?.obraSocialCodigo) {
-        const obraSocial = await this.obraSocialRepo.buscarPorCodigo(paciente.obraSocialCodigo);
-        if (obraSocial && obraSocial.porcentajeCobertura > 0) {
-          return {
-            porcentajeCobertura: obraSocial.porcentajeCobertura,
-            coberturaValidada: true,
-          };
-        }
+      if (infoOS && infoOS.porcentajeCobertura > 0) {
+        return {
+          porcentajeCobertura: infoOS.porcentajeCobertura,
+          coberturaValidada: true,
+        };
       }
     } catch {
       // Cobertura por defecto

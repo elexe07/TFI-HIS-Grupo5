@@ -15,6 +15,17 @@ export class ObraSocialRepositoryPrisma implements ObraSocialRepository {
     return fila ? this.aDominio(fila) : null;
   }
 
+  async buscarPorPacienteId(pacienteId: string): Promise<{ codigo: string; porcentajeCobertura: number } | null> {
+    const paciente = await this.prisma.paciente.findUnique({
+      where: { id: pacienteId },
+      select: { obraSocialCodigo: true },
+    });
+    if (!paciente?.obraSocialCodigo) return null;
+    const os = await this.buscarPorCodigo(paciente.obraSocialCodigo);
+    if (!os) return null;
+    return { codigo: os.codigo, porcentajeCobertura: os.porcentajeCobertura };
+  }
+
   async guardar(obraSocial: ObraSocial): Promise<void> {
     await this.prisma.obraSocial.upsert({
       where: { codigo: obraSocial.codigo },

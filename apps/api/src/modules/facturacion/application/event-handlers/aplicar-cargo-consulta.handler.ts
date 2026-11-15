@@ -1,7 +1,6 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 import { CLOCK, type Clock } from '../../../../building-blocks/application';
-import { PrismaService } from '../../../../building-blocks/infrastructure/prisma/prisma.service';
 import { EVOLUCION_REGISTRADA, type EvolucionRegistrada } from '../../../hce/public';
 import { Cargo } from '../../domain/cargo';
 import { Cuenta } from '../../domain/cuenta';
@@ -25,7 +24,6 @@ export class AplicarCargoConsultaHandler {
     private readonly tarifaRepo: TarifaRepository,
     @Inject(OBRA_SOCIAL_REPOSITORY)
     private readonly obraSocialRepo: ObraSocialRepository,
-    private readonly prisma: PrismaService,
     @Inject(CLOCK)
     private readonly clock: Clock,
   ) {}
@@ -77,17 +75,13 @@ export class AplicarCargoConsultaHandler {
     let porcentajeCobertura: number | null = null;
     let coberturaValidada = false;
 
-    const paciente = await this.prisma.paciente.findUnique({
-      where: { id: pacienteId },
-      select: { obraSocialCodigo: true },
-    });
+    const infoOS = this.obraSocialRepo.buscarPorPacienteId
+      ? await this.obraSocialRepo.buscarPorPacienteId(pacienteId)
+      : null;
 
-    if (paciente?.obraSocialCodigo) {
-      const obraSocial = await this.obraSocialRepo.buscarPorCodigo(paciente.obraSocialCodigo);
-      if (obraSocial && obraSocial.porcentajeCobertura > 0) {
-        porcentajeCobertura = obraSocial.porcentajeCobertura;
-        coberturaValidada = true;
-      }
+    if (infoOS && infoOS.porcentajeCobertura > 0) {
+      porcentajeCobertura = infoOS.porcentajeCobertura;
+      coberturaValidada = true;
     }
 
     return Cuenta.abrir({

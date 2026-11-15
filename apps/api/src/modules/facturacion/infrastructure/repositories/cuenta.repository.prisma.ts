@@ -98,6 +98,18 @@ export class CuentaRepositoryPrisma implements CuentaRepository {
     return cargo !== null;
   }
 
+  async existeInternacion(internacionId: string): Promise<boolean> {
+    try {
+      const int = await this.prisma.internacion.findUnique({
+        where: { id: internacionId },
+        select: { id: true },
+      });
+      return int !== null;
+    } catch {
+      return false;
+    }
+  }
+
   private aDominio(fila: FilaCuentaConCargos): Cuenta {
     const cargos = fila.cargos.map((c) =>
       Cargo.rehidratar(

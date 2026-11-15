@@ -160,6 +160,20 @@ export class HistoriaClinicaRepositoryPrisma implements HistoriaClinicaRepositor
     });
     return fila ? aDominio(fila) : null;
   }
+
+  async obtenerTriajesPorPaciente(pacienteId: string) {
+    return this.prisma.triaje.findMany({
+      where: { pacienteId },
+      orderBy: { llegadaEn: 'desc' },
+      select: {
+        id: true,
+        nivel: true,
+        motivo: true,
+        estado: true,
+        llegadaEn: true,
+      },
+    });
+  }
 }
 
 function aDominio(fila: FilaHistoria): HistoriaClinica {

@@ -1,6 +1,6 @@
 import { Cuenta } from '../../domain/cuenta';
 import { TipoCuenta } from '../../domain/enums';
-import { CuentaRepositoryEnMemoria } from '../../testing';
+import { CuentaRepositoryEnMemoria, DirectorioDePacientesEnMemoria } from '../../testing';
 import { ListarCuentasPacienteHandler } from './listar-cuentas-paciente.handler';
 
 describe('ListarCuentasPacienteHandler', () => {
@@ -9,7 +9,7 @@ describe('ListarCuentasPacienteHandler', () => {
 
   beforeEach(() => {
     cuentaRepo = new CuentaRepositoryEnMemoria();
-    handler = new ListarCuentasPacienteHandler(cuentaRepo);
+    handler = new ListarCuentasPacienteHandler(cuentaRepo, new DirectorioDePacientesEnMemoria());
   });
 
   it('debería retornar todas las cuentas del paciente', async () => {

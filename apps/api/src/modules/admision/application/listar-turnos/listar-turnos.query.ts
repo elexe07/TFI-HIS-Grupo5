@@ -1,15 +1,20 @@
+import type { Solicitante } from '../../../../building-blocks/application';
+
 export class ListarTurnosQuery {
   readonly pacienteId?: string;
   readonly medicoId?: string;
   readonly desde?: Date;
   readonly hasta?: Date;
 
-  constructor(filtros?: {
-    pacienteId?: string;
-    medicoId?: string;
-    desde?: string;
-    hasta?: string;
-  }) {
+  constructor(
+    filtros?: {
+      pacienteId?: string;
+      medicoId?: string;
+      desde?: string;
+      hasta?: string;
+    },
+    readonly solicitante?: Solicitante,
+  ) {
     this.pacienteId = filtros?.pacienteId;
     this.medicoId = filtros?.medicoId;
     this.desde = filtros?.desde ? new Date(filtros.desde) : undefined;

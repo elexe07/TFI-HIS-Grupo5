@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { AdmisionModule } from '../admision/public';
 import { CoberturaController } from './api/cobertura.controller';
 import { CuentasController } from './api/cuentas.controller';
 import { ObrasSocialesYTarifasController } from './api/obras-sociales.controller';
@@ -17,6 +18,7 @@ import { ReporteOcupacionHandler } from './application/reportes/reporte-ocupacio
 import { ValidarCoberturaHandler } from './application/validar-cobertura/validar-cobertura.handler';
 import { CONSULTOR_DE_OCUPACION } from './domain/consultor-de-ocupacion';
 import { CUENTA_REPOSITORY } from './domain/cuenta.repository';
+import { DIRECTORIO_DE_PACIENTES } from './domain/directorio-de-pacientes';
 import { OBRA_SOCIAL_REPOSITORY } from './domain/obra-social.repository';
 import { REPORTE_FACTURACION_REPOSITORY } from './domain/reporte-facturacion.repository';
 import { TARIFA_REPOSITORY } from './domain/tarifa.repository';
@@ -24,6 +26,7 @@ import { VALIDADOR_DE_COBERTURA } from './domain/validador-de-cobertura';
 import { ConsultorDeOcupacionPrisma } from './infrastructure/consultor-de-ocupacion.prisma';
 import { ValidadorDeCoberturaSimulado } from './infrastructure/validador-de-cobertura.simulado';
 import { CuentaRepositoryPrisma } from './infrastructure/cuenta.repository.prisma';
+import { DirectorioDePacientesAdmision } from './infrastructure/directorio-de-pacientes.admision';
 import { ObraSocialRepositoryPrisma } from './infrastructure/obra-social.repository.prisma';
 import { ReporteFacturacionRepositoryPrisma } from './infrastructure/reporte-facturacion.repository.prisma';
 import { TarifaRepositoryPrisma } from './infrastructure/tarifa.repository.prisma';
@@ -33,6 +36,8 @@ import { TarifaRepositoryPrisma } from './infrastructure/tarifa.repository.prism
  * Responsable: Ezequiel
  */
 @Module({
+  // Admisión aporta 'el paciente del usuario logueado' para el portal del paciente.
+  imports: [AdmisionModule],
   controllers: [
     CuentasController,
     CoberturaController,
@@ -63,6 +68,7 @@ import { TarifaRepositoryPrisma } from './infrastructure/tarifa.repository.prism
     { provide: VALIDADOR_DE_COBERTURA, useClass: ValidadorDeCoberturaSimulado },
     { provide: CONSULTOR_DE_OCUPACION, useClass: ConsultorDeOcupacionPrisma },
     { provide: REPORTE_FACTURACION_REPOSITORY, useClass: ReporteFacturacionRepositoryPrisma },
+    { provide: DIRECTORIO_DE_PACIENTES, useClass: DirectorioDePacientesAdmision },
   ],
   exports: [CUENTA_REPOSITORY, TARIFA_REPOSITORY, OBRA_SOCIAL_REPOSITORY],
 })

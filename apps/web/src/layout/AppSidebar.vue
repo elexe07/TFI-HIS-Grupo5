@@ -41,7 +41,7 @@ interface NavItem {
   label: string;
   icon?: any;
   permisos?: Permiso[];
-  children?: { path: string; label: string }[];
+  children?: { path: string; label: string; permisos?: Permiso[] }[];
   badge?: {
     variant: 'primary' | 'success' | 'warning' | 'danger' | 'info' | 'neutral';
     text: string;
@@ -53,95 +53,141 @@ interface NavSection {
   items: NavItem[];
 }
 
-const navSections = computed<NavSection[]>(() =>
-  [
-    {
-      label: 'Principal',
-      items: [{ path: '/', label: 'Dashboard', icon: HomeIcon, permisos: [] }],
-    },
-    {
-      label: 'Módulos Clínicos',
-      items: [
-        {
-          path: '/admision',
-          label: 'Admisión y Turnos',
-          icon: UsersIcon,
-          permisos: ['pacientes:leer'] as Permiso[],
-          children: [
-            { path: '/admision', label: 'Pacientes' },
-            { path: '/admision/agenda', label: 'Agenda Médica' },
-            { path: '/admision/turnos', label: 'Turnos' },
-            { path: '/admision/triaje', label: 'Triaje y Guardia' },
-          ],
-        },
-        {
-          path: '/hce',
-          label: 'Historia Clínica',
-          icon: FileTextIcon,
-          permisos: ['hce:leer'] as Permiso[],
-          children: [
-            { path: '/hce/paciente/:pacienteId', label: 'Ver Historia' },
-            { path: '/hce/paciente/:pacienteId/evolucion/nueva', label: 'Nueva Evolución' },
-          ],
-        },
-        {
-          path: '/enfermeria',
-          label: 'Enfermería',
-          icon: HeartIcon,
-          permisos: ['enfermeria:indicaciones:leer'] as Permiso[],
-          children: [
-            { path: '/enfermeria', label: 'Indicaciones' },
-            { path: '/enfermeria/signos-vitales', label: 'Signos Vitales' },
-            { path: '/enfermeria/notas', label: 'Notas' },
-          ],
-        },
-      ],
-    },
-    {
-      label: 'Operaciones',
-      items: [
-        {
-          path: '/recursos',
-          label: 'Recursos y Camas',
-          icon: BuildingIcon,
-          permisos: ['camas:leer'] as Permiso[],
-          children: [
-            { path: '/recursos', label: 'Mapa de Camas' },
-            { path: '/recursos/internaciones', label: 'Internaciones' },
-            { path: '/recursos/insumos', label: 'Insumos' },
-          ],
-        },
-        {
-          path: '/facturacion',
-          label: 'Facturación',
-          icon: DollarSignIcon,
-          permisos: ['facturacion:leer'] as Permiso[],
-          children: [
-            { path: '/facturacion', label: 'Cuentas' },
-            { path: '/facturacion/cobertura', label: 'Validar Cobertura' },
-            { path: '/facturacion/reportes', label: 'Reportes' },
-          ],
-        },
-      ],
-    },
-    {
-      label: 'Administración',
-      items: [
-        {
-          path: '/admin',
-          label: 'Usuarios y Roles',
-          icon: SettingsIcon,
-          permisos: ['usuarios:gestionar'] as Permiso[],
-          children: [{ path: '/admin/usuarios', label: 'Usuarios' }],
-        },
-      ],
-    },
-  ].filter((section) =>
-    section.items.some(
-      (item) => !item.permisos?.length || authStore.tieneCualquierPermiso(item.permisos),
-    ),
-  ),
-);
+/** Un ítem se ve si no pide permisos o si el usuario tiene alguno (mismo criterio que sus rutas). */
+const puedeVer = (permisos?: Permiso[]) =>
+  !permisos?.length || authStore.tieneCualquierPermiso(permisos);
+
+/** El paciente no usa los módulos del personal: su único destino es el portal. */
+const SECCIONES_PACIENTE: NavSection[] = [
+  { label: 'Principal', items: [{ path: '/mi-portal', label: 'Mi portal', icon: HomeIcon }] },
+];
+
+/** Menú del personal del hospital, sin filtrar. */
+const SECCIONES_PERSONAL: NavSection[] = [
+  {
+    label: 'Principal',
+    items: [{ path: '/', label: 'Dashboard', icon: HomeIcon, permisos: [] }],
+  },
+  {
+    label: 'Módulos Clínicos',
+    items: [
+      {
+        path: '/admision',
+        label: 'Admisión y Turnos',
+        icon: UsersIcon,
+        permisos: ['pacientes:leer'] as Permiso[],
+        children: [
+          { path: '/admision', label: 'Pacientes' },
+          {
+            path: '/admision/agenda',
+            label: 'Agenda Médica',
+            permisos: ['agenda:definir'] as Permiso[],
+          },
+          { path: '/admision/turnos', label: 'Turnos', permisos: ['turnos:reservar'] as Permiso[] },
+          {
+            path: '/admision/triaje',
+            label: 'Triaje y Guardia',
+            permisos: ['triaje:registrar', 'guardia:leer'] as Permiso[],
+          },
+        ],
+      },
+      {
+        path: '/hce',
+        label: 'Historia Clínica',
+        icon: FileTextIcon,
+        permisos: ['hce:leer'] as Permiso[],
+        children: [
+          { path: '/hce/paciente/:pacienteId', label: 'Ver Historia' },
+          {
+            path: '/hce/paciente/:pacienteId/evolucion/nueva',
+            label: 'Nueva Evolución',
+            permisos: ['hce:escribir'] as Permiso[],
+          },
+        ],
+      },
+      {
+        path: '/enfermeria',
+        label: 'Enfermería',
+        icon: HeartIcon,
+        permisos: ['enfermeria:indicaciones:leer'] as Permiso[],
+        children: [
+          { path: '/enfermeria', label: 'Indicaciones' },
+          { path: '/enfermeria/signos-vitales', label: 'Signos Vitales' },
+          { path: '/enfermeria/notas', label: 'Notas' },
+        ],
+      },
+    ],
+  },
+  {
+    label: 'Operaciones',
+    items: [
+      {
+        path: '/recursos',
+        label: 'Recursos y Camas',
+        icon: BuildingIcon,
+        permisos: ['camas:leer'] as Permiso[],
+        children: [
+          { path: '/recursos', label: 'Mapa de Camas' },
+          {
+            path: '/recursos/internaciones',
+            label: 'Internaciones',
+            permisos: ['internaciones:gestionar'] as Permiso[],
+          },
+          {
+            path: '/recursos/insumos',
+            label: 'Insumos',
+            permisos: ['insumos:gestionar'] as Permiso[],
+          },
+        ],
+      },
+      {
+        path: '/facturacion',
+        label: 'Facturación',
+        icon: DollarSignIcon,
+        permisos: ['facturacion:leer'] as Permiso[],
+        children: [
+          { path: '/facturacion', label: 'Cuentas' },
+          {
+            path: '/facturacion/cobertura',
+            label: 'Validar Cobertura',
+            permisos: ['cobertura:validar'] as Permiso[],
+          },
+          {
+            path: '/facturacion/reportes',
+            label: 'Reportes',
+            permisos: ['reportes:leer'] as Permiso[],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    label: 'Administración',
+    items: [
+      {
+        path: '/admin',
+        label: 'Usuarios y Roles',
+        icon: SettingsIcon,
+        permisos: ['usuarios:gestionar'] as Permiso[],
+        children: [{ path: '/admin/usuarios', label: 'Usuarios' }],
+      },
+    ],
+  },
+];
+
+// Se filtran ítems y sub-ítems por permiso: el menú no muestra lo que la ruta después no deja abrir.
+const navSections = computed<NavSection[]>(() => {
+  if (authStore.esPaciente) return SECCIONES_PACIENTE;
+  return SECCIONES_PERSONAL.map((section) => ({
+    ...section,
+    items: section.items
+      .filter((item) => puedeVer(item.permisos))
+      .map((item) => ({
+        ...item,
+        children: item.children?.filter((child) => puedeVer(child.permisos)),
+      })),
+  })).filter((section) => section.items.length > 0);
+});
 
 // Auto-expandir sección activa
 watch(

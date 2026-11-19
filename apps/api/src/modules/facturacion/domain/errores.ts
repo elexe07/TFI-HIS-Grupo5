@@ -1,4 +1,9 @@
-import { Conflicto, ErrorDeValidacion, NoEncontrado } from '../../../building-blocks/domain';
+import {
+  Conflicto,
+  ErrorDeValidacion,
+  NoEncontrado,
+  Prohibido,
+} from '../../../building-blocks/domain';
 
 export class CuentaNoEncontrada extends NoEncontrado {
   constructor(mensaje = 'La cuenta solicitada no existe') {
@@ -33,5 +38,12 @@ export class CargoDuplicado extends Conflicto {
 export class CoberturaRechazada extends ErrorDeValidacion {
   constructor(motivo: string) {
     super(`Validación de cobertura rechazada: ${motivo}`, 'COBERTURA_RECHAZADA');
+  }
+}
+
+/** Un paciente intentó ver una cuenta que no es suya. */
+export class CuentaAjena extends Prohibido {
+  constructor() {
+    super('Solo podés ver tus propias cuentas', 'CUENTA_AJENA');
   }
 }

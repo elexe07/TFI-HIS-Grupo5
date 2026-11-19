@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref, computed } from 'vue';
 import { useAuthStore } from '@/modules/iam/auth.store';
+import { useAdmisionStore } from '@/modules/admision/admision.store';
 import { useToastStore } from '@/shared/stores/toast';
 import {
   Card,
@@ -15,6 +16,7 @@ import {
 import type { CrearUsuarioRequest, NombreRol, UsuarioDTO } from '@/modules/iam/iam.types';
 
 const authStore = useAuthStore();
+const admisionStore = useAdmisionStore();
 const toastStore = useToastStore();
 
 const search = ref('');
@@ -80,30 +82,66 @@ const nuevoUsuario = ref<CrearUsuarioRequest>(formularioVacio());
 const guardando = ref(false);
 const errorFormulario = ref<string | null>(null);
 
+// Un usuario PACIENTE tiene que quedar vinculado a su ficha de Admisión: así el portal sabe
+// qué turnos y cuentas mostrarle. Solo se ofrecen fichas que todavía no tienen usuario.
+const pacienteId = ref('');
+const esPaciente = computed(() => nuevoUsuario.value.rol === 'PACIENTE');
+const fichasSinUsuario = computed(() =>
+  admisionStore.pacientes
+    .filter((p) => !p.usuarioId)
+    .map((p) => ({
+      value: p.id,
+      label: `${p.apellido}, ${p.nombre} (${p.tipoDocumento} ${p.numeroDocumento})`,
+    })),
+);
+/** Si el usuario se creó pero el vínculo falló, el reintento solo vincula (no lo crea de nuevo). */
+const usuarioSinVincular = ref<string | null>(null);
+
 const formularioCompleto = computed(() => {
   const { nombre, email, password } = nuevoUsuario.value;
-  return nombre.trim() !== '' && email.trim() !== '' && password !== '';
+  const datosCompletos = nombre.trim() !== '' && email.trim() !== '' && password !== '';
+  return datosCompletos && (!esPaciente.value || pacienteId.value !== '');
 });
 
 function abrirFormulario() {
   nuevoUsuario.value = formularioVacio();
+  pacienteId.value = '';
+  usuarioSinVincular.value = null;
   errorFormulario.value = null;
   mostrarFormulario.value = true;
+  admisionStore.cargarPacientes().catch(() => {
+    errorFormulario.value = 'No se pudieron cargar las fichas de pacientes';
+  });
 }
 
 async function crearUsuario() {
   guardando.value = true;
   errorFormulario.value = null;
   try {
-    const creado = await authStore.crearUsuario({
-      ...nuevoUsuario.value,
-      nombre: nuevoUsuario.value.nombre.trim(),
-      email: nuevoUsuario.value.email.trim(),
-    });
-    toastStore.success('Usuario creado', `${creado.nombre} (${creado.rol})`);
+    let usuarioId = usuarioSinVincular.value;
+    if (!usuarioId) {
+      const creado = await authStore.crearUsuario({
+        ...nuevoUsuario.value,
+        nombre: nuevoUsuario.value.nombre.trim(),
+        email: nuevoUsuario.value.email.trim(),
+      });
+      usuarioId = creado.id;
+    }
+    if (esPaciente.value) {
+      usuarioSinVincular.value = usuarioId;
+      await admisionStore.vincularUsuario(pacienteId.value, usuarioId);
+      usuarioSinVincular.value = null;
+    }
+    toastStore.success(
+      'Usuario creado',
+      `${nuevoUsuario.value.nombre} (${nuevoUsuario.value.rol})`,
+    );
     mostrarFormulario.value = false;
   } catch (err) {
-    errorFormulario.value = err instanceof Error ? err.message : 'No se pudo crear el usuario';
+    const mensaje = err instanceof Error ? err.message : 'No se pudo crear el usuario';
+    errorFormulario.value = usuarioSinVincular.value
+      ? `El usuario se creó, pero no se pudo vincular a la ficha: ${mensaje}`
+      : mensaje;
   } finally {
     guardando.value = false;
   }
@@ -185,6 +223,17 @@ onMounted(() => {
           @update:model-value="nuevoUsuario.rol = $event as NombreRol"
           label="Rol"
           :options="ROLES"
+          :disabled="usuarioSinVincular !== null"
+          required
+        />
+        <Select
+          v-if="esPaciente"
+          :model-value="pacienteId"
+          @update:model-value="pacienteId = String($event ?? '')"
+          label="Ficha de paciente"
+          placeholder="Seleccionar paciente"
+          :options="fichasSinUsuario"
+          hint="Solo aparecen pacientes de Admisión que todavía no tienen usuario"
           required
         />
         <p v-if="errorFormulario" class="form-error" role="alert">{{ errorFormulario }}</p>
@@ -196,7 +245,7 @@ onMounted(() => {
           :loading="guardando"
           :disabled="!formularioCompleto"
           @click="crearUsuario"
-          >Crear usuario</Button
+          >{{ usuarioSinVincular ? 'Reintentar vínculo' : 'Crear usuario' }}</Button
         >
       </template>
     </Modal>

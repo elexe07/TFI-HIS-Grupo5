@@ -19,6 +19,7 @@ import { hceRoutes } from '@/modules/hce/hce.routes';
 import { enfermeriaRoutes } from '@/modules/enfermeria/enfermeria.routes';
 import { recursosRoutes } from '@/modules/recursos/recursos.routes';
 import { facturacionRoutes } from '@/modules/facturacion/facturacion.routes';
+import { portalRoutes } from '@/modules/portal/portal.routes';
 
 // ============================================================================
 // TIPOS PARA META DE RUTAS
@@ -47,6 +48,7 @@ const routes: RouteRecordRaw[] = [
   ...enfermeriaRoutes,
   ...recursosRoutes,
   ...facturacionRoutes,
+  ...portalRoutes,
 
   // --- 404 (siempre al final) ---
   {
@@ -79,6 +81,9 @@ const router = createRouter({
 // GUARDS DE NAVEGACIÓN
 // ============================================================================
 
+/** Lo único que puede ver un PACIENTE. El resto del sistema es para el personal del hospital. */
+const RUTAS_DEL_PACIENTE = new Set(['portal', 'perfil', 'login']);
+
 router.beforeEach(
   async (
     to: RouteLocationNormalized,
@@ -103,12 +108,17 @@ router.beforeEach(
       return next({ name: 'login', query: { redirect: to.fullPath } });
     }
 
-    // 2. Si ya está autenticado e intenta ir a login, redirigir a dashboard
+    // 2. Si ya está autenticado e intenta ir a login, redirigir a su inicio
     if (to.name === 'login' && authStore.isAuthenticated) {
-      return next({ name: 'dashboard' });
+      return next({ name: authStore.esPaciente ? 'portal' : 'dashboard' });
     }
 
-    // 3. Verificar permisos
+    // 3. Un paciente solo navega por su portal y su perfil (incluye '/' después del login)
+    if (authStore.esPaciente && !RUTAS_DEL_PACIENTE.has(String(to.name))) {
+      return next({ name: 'portal' });
+    }
+
+    // 4. Verificar permisos
     if (requiresAuth && requiredPermisos.length > 0) {
       if (authStore.esAdmin) {
         if (to.meta.title) {
@@ -131,7 +141,7 @@ router.beforeEach(
       }
     }
 
-    // 4. Actualizar título del documento
+    // 5. Actualizar título del documento
     if (to.meta.title) {
       document.title = `${to.meta.title} - HIS`;
     }

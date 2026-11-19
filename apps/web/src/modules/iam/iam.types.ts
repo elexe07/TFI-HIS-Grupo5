@@ -34,6 +34,7 @@ export type Permiso =
   | 'internaciones:gestionar'
   | 'insumos:gestionar'
   | 'facturacion:leer'
+  | 'facturacion:gestionar'
   | 'cobertura:validar'
   | 'reportes:leer'
   | 'usuarios:gestionar';

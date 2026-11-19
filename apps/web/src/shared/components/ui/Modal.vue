@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, nextTick } from 'vue';
+import { ref, watch, onUnmounted, nextTick } from 'vue';
 import type { ModalProps } from './Modal.types';
 
 const props = defineProps<ModalProps>();
@@ -46,19 +46,26 @@ const trapFocus = (event: KeyboardEvent) => {
   }
 };
 
-onMounted(() => {
-  document.body.style.overflow = 'hidden';
-  // Focus first focusable element
-  nextTick(() => {
-    const firstFocusable = overlayRef.value?.querySelector<HTMLElement>(
-      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
-    );
-    firstFocusable?.focus();
-  });
-});
+const enfocarPrimerElemento = () => {
+  const firstFocusable = overlayRef.value?.querySelector<HTMLElement>(
+    'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+  );
+  firstFocusable?.focus();
+};
+
+// Bloquea el scroll de la página solo mientras el modal está ABIERTO. Las vistas montan su <Modal>
+// aunque esté cerrado; si se bloqueara al montar, la página entera quedaría sin scroll.
+watch(
+  () => props.modelValue,
+  (abierto) => {
+    document.body.style.overflow = abierto ? 'hidden' : '';
+    if (abierto) nextTick(enfocarPrimerElemento);
+  },
+  { immediate: true },
+);
 
 onUnmounted(() => {
-  document.body.style.overflow = '';
+  if (props.modelValue) document.body.style.overflow = '';
 });
 </script>
 

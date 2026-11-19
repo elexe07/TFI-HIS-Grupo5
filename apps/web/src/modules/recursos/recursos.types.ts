@@ -13,25 +13,39 @@ export interface HabitacionDTO {
   camas: CamaDTO[];
 }
 
+/**
+ * Cama del mapa. El backend la manda adentro de su habitación; `habitacion` la completa el store
+ * al cargar el mapa para poder mostrar "Sector - Nro / Código" en listas sueltas.
+ */
 export interface CamaDTO {
   id: string;
-  habitacionId: string;
   codigo: string;
   estado: EstadoCama;
-  updatedAt: string;
-  habitacion?: HabitacionDTO;
+  habitacionId?: string;
+  updatedAt?: string;
+  habitacion?: Pick<HabitacionDTO, 'id' | 'sector' | 'numero'>;
   internacionActiva?: InternacionDTO | null;
 }
 
+/** Respuesta de `GET /camas/mapa` (backend: application/obtener-mapa-camas/mapa-camas.dto.ts). */
 export interface MapaCamasResponse {
   habitaciones: HabitacionDTO[];
-  resumen: {
+  totales: {
     total: number;
-    libres: number;
-    ocupadas: number;
+    libre: number;
+    ocupada: number;
     enLimpieza: number;
-    bloqueadas: number;
+    bloqueada: number;
   };
+}
+
+/** Contadores que muestra el mapa de camas. */
+export interface ResumenCamas {
+  total: number;
+  libres: number;
+  ocupadas: number;
+  enLimpieza: number;
+  bloqueadas: number;
 }
 
 export interface CambiarEstadoCamaRequest {

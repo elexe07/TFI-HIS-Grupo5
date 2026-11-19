@@ -1,5 +1,7 @@
 # 🏥 Módulo de Facturación y Administración Hospitalaria (HIS)
+
 ### Documentación Técnica y de Funcionamiento — Backend (NestJS) y Frontend (Vue 3)
+
 **Cátedra:** Programación IV (TSP - UTN) · **Responsable:** Ezequiel · **Fase:** 7 (Cierre / Integrador de Eventos)
 
 ---
@@ -9,6 +11,7 @@
 El módulo de **Facturación y Administración** es el núcleo económico y de back-office del Hospital Information System (HIS). Su función principal es **centralizar los consumos y prestaciones sanitarias generadas en el hospital, imputar cargos automáticos, validar coberturas con financiadores de salud (Obras Sociales / Prepagas) y generar reportes financieros y de ocupación en tiempo real**.
 
 A diferencia de los módulos asistenciales (como Admisión o Enfermería), Facturación tiene una naturaleza predominantemente **reactiva (Event-Driven)**:
+
 - **No depende de que un administrativo cree manualmente los cargos:** cuando un médico atiende una consulta en Guardia/HCE, cuando un enfermero suministra medicación o cuando se le da el alta a una internación, el módulo escucha esos sucesos en segundo plano y genera las cuentas y cargos correspondientes.
 - **Provee una interfaz administrativa en el Frontend (Vue 3):** permite a los auditores y administradores consultar el estado de las cuentas de pacientes, cerrar cuentas pendientes, validar carnets de cobertura médica y analizar reportes contables y de ocupación hospitalaria.
 
@@ -16,15 +19,15 @@ A diferencia de los módulos asistenciales (como Admisión o Enfermería), Factu
 
 ## 📋 2. Matriz de Casos de Uso (ROADMAP §6)
 
-| ID | Caso de Uso | Tipo / Disparador | Regla de Negocio Principal |
-| :--- | :--- | :--- | :--- |
-| **FAC-01** | **Cargo por Consulta Médica** | Evento: `hce.evolucion-registrada` | Idempotente (`origen_evento_id` único). Busca o crea la cuenta de tipo `CONSULTA` del paciente y aplica la tarifa vigente de consulta. |
-| **FAC-02** | **Cargo por Medicación / Insumos** | Evento: `enfermeria.medicacion-administrada` | Idempotente. Imputa el costo unitario de la medicación administrada sobre la cuenta activa de tipo `INTERNACION`. |
-| **FAC-03** | **Ciclo de Cuenta de Internación** | Eventos: `recursos.paciente-internado` y `recursos.paciente-dado-de-alta` | Abre la cuenta al ingresar. Al dar el alta, calcula: `días = egreso − ingreso` (mínimo 1 día), imputa el cargo `DIA_CAMA × días` y cierra la cuenta. |
-| **FAC-04** | **Validación de Cobertura Médica** | HTTP POST `/api/cobertura/validar` | Valida credenciales contra la obra social (vía adapter simulado/fake). Retorna porcentaje de cobertura y permite imputar el descuento a una cuenta abierta. |
-| **FAC-05** | **Consulta de Cuentas y Detalle** | HTTP GET `/api/cuentas` y `/api/cuentas/:id` | Calcula en tiempo real: `Total Bruto = Σ(cargos)`, `Descuento = Bruto × % Cobertura` y `Total a Pagar = Bruto − Descuento`. |
-| **FAC-06** | **Reporte Financiero por Período** | HTTP GET `/api/reportes/facturacion?desde=&hasta=` | Agrupa los cargos emitidos por concepto (`CONSULTA`, `MEDICACION`, `DIA_CAMA`) y por obra social en un intervalo temporal. |
-| **FAC-07** | **Reporte de Ocupación Hospitalaria** | HTTP GET `/api/reportes/ocupacion` | Consulta el contrato público del módulo de Recursos para informar el total de camas ocupadas, libres, en limpieza y porcentaje de ocupación. |
+| ID         | Caso de Uso                           | Tipo / Disparador                                                         | Regla de Negocio Principal                                                                                                                                  |
+| :--------- | :------------------------------------ | :------------------------------------------------------------------------ | :---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **FAC-01** | **Cargo por Consulta Médica**         | Evento: `hce.evolucion-registrada`                                        | Idempotente (`origen_evento_id` único). Busca o crea la cuenta de tipo `CONSULTA` del paciente y aplica la tarifa vigente de consulta.                      |
+| **FAC-02** | **Cargo por Medicación / Insumos**    | Evento: `enfermeria.medicacion-administrada`                              | Idempotente. Imputa el costo unitario de la medicación administrada sobre la cuenta activa de tipo `INTERNACION`.                                           |
+| **FAC-03** | **Ciclo de Cuenta de Internación**    | Eventos: `recursos.paciente-internado` y `recursos.paciente-dado-de-alta` | Abre la cuenta al ingresar. Al dar el alta, calcula: `días = egreso − ingreso` (mínimo 1 día), imputa el cargo `DIA_CAMA × días` y cierra la cuenta.        |
+| **FAC-04** | **Validación de Cobertura Médica**    | HTTP POST `/api/cobertura/validar`                                        | Valida credenciales contra la obra social (vía adapter simulado/fake). Retorna porcentaje de cobertura y permite imputar el descuento a una cuenta abierta. |
+| **FAC-05** | **Consulta de Cuentas y Detalle**     | HTTP GET `/api/cuentas` y `/api/cuentas/:id`                              | Calcula en tiempo real: `Total Bruto = Σ(cargos)`, `Descuento = Bruto × % Cobertura` y `Total a Pagar = Bruto − Descuento`.                                 |
+| **FAC-06** | **Reporte Financiero por Período**    | HTTP GET `/api/reportes/facturacion?desde=&hasta=`                        | Agrupa los cargos emitidos por concepto (`CONSULTA`, `MEDICACION`, `DIA_CAMA`) y por obra social en un intervalo temporal.                                  |
+| **FAC-07** | **Reporte de Ocupación Hospitalaria** | HTTP GET `/api/reportes/ocupacion`                                        | Consulta el contrato público del módulo de Recursos para informar el total de camas ocupadas, libres, en limpieza y porcentaje de ocupación.                |
 
 ---
 
@@ -69,6 +72,7 @@ Siguiendo el **Diagrama de Flujo de NestJS** y los principios de la cátedra de 
 ```
 
 ### 3.1. Estructura de Directorios del Backend
+
 ```
 apps/api/src/modules/facturacion/
 ├── domain/                     # Núcleo puro de negocio (sin dependencias de NestJS ni Prisma)
@@ -116,7 +120,9 @@ apps/api/src/modules/facturacion/
 ```
 
 ### 3.2. Idempotencia y Concurrencia (Concepto Clave de Programación IV)
+
 En sistemas de reservas y facturación concurrentes, procesar el mismo evento dos veces o permitir carreras de datos causaría cobros dobles ilegítimos. Facturación implementa dos barreras de seguridad:
+
 1. **Barrera de Aplicación:** Cada evento de dominio tiene un `eventoId` único. Antes de agregar un cargo, el handler invoca `cuenta.tieneCargoConOrigenEvento(eventoId)` o `cuentaRepo.existeCargoConOrigenEvento(eventoId)`. Si ya fue procesado, se descarta silenciosamente con log de depuración.
 2. **Barrera de Base de Datos:** La columna `cargos.origen_evento_id` tiene una restricción `UNIQUE` en PostgreSQL, y la tabla `cuentas` posee `UNIQUE(tipo, referencia_id)`. Cualquier colisión concurrente a nivel base de datos es rechazada por el motor SQL.
 
@@ -127,6 +133,7 @@ En sistemas de reservas y facturación concurrentes, procesar el mismo evento do
 El frontend de Facturación reside en `apps/web/src/modules/facturacion` y está construido íntegramente con **Vue 3 Composition API** (`<script setup>`), **Pinia** para la reactividad global y **Vue Router** con control de acceso basado en roles (RBAC).
 
 ### 4.1. Arquitectura del Módulo Web
+
 ```
 apps/web/src/modules/facturacion/
 ├── facturacion.routes.ts       # Rutas: /facturacion, /cuenta/:id, /cobertura, /reportes
@@ -142,7 +149,9 @@ apps/web/src/modules/facturacion/
 ```
 
 ### 4.2. Flujo de Datos y Reactividad en Vue 3
+
 Siguiendo las pautas de **Vue Mastery / Apunte de Vue.js**:
+
 1. **Vista (`views/*.vue`):** Presentación pura. Se vincula al estado mediante `v-model`, `v-for`, `v-if`. Al interactuar (ej. hacer clic en "Validar Cobertura" o "Cerrar Cuenta"), dispara métodos que invocan acciones del store.
 2. **Store de Pinia (`facturacion.store.ts`):**
    - **State (`ref`):** Mantiene `cuentas`, `cuentaSeleccionada`, `obrasSociales`, `tarifas`, `reportes`, estados de `cargando: boolean` y `error: string | null`.
@@ -153,6 +162,7 @@ Siguiendo las pautas de **Vue Mastery / Apunte de Vue.js**:
 ### 4.3. Vistas y Experiencia de Usuario (UI)
 
 #### A. Gestión de Cuentas (`CuentasView.vue` y `CuentaDetalleView.vue`)
+
 - **Filtros rápidos:** Filtra cuentas por estado (`TODAS`, `ABIERTA`, `CERRADA`) y tipo (`CONSULTA`, `INTERNACION`).
 - **Búsqueda por Paciente:** Permite ingresar un UUID de paciente para auditar su historial completo de consumos.
 - **Detalle de Cuenta:**
@@ -162,11 +172,13 @@ Siguiendo las pautas de **Vue Mastery / Apunte de Vue.js**:
   - Acción: Botón **"Cerrar Cuenta"** para asentar el fin de los consumos administrativos.
 
 #### B. Validador de Cobertura (`CoberturaView.vue`)
+
 - Formulario con selector de Obra Social (`OSDE`, `SWISS_MEDICAL`, `PAMI`, `PARTICULAR`), campo para el ID del Paciente y Número de Carnet/Afiliado.
 - Opción de ingresar el ID de una cuenta abierta para impactar la cobertura automáticamente si resulta aprobada.
 - **Feedback visual instantáneo:** Badges verdes/rojos indicando si la afiliación está habilitada, el porcentaje cubierto o el motivo de rechazo devuelto por la entidad.
 
 #### C. Reportes Gerenciales (`ReportesView.vue`)
+
 - **Reporte de Facturación:** Selector de fechas `desde` y `hasta`. Muestra tarjetas métricas (`Total Facturado`, `Total Consultas`, `Total Medicación`, `Total Días Cama`) y un desglose tabular por concepto y financiador.
 - **Reporte de Ocupación:** Gráfica o métricas en tiempo real con total de camas del hospital, camas ocupadas, libres, en limpieza y el porcentaje de ocupación global.
 
@@ -175,6 +187,7 @@ Siguiendo las pautas de **Vue Mastery / Apunte de Vue.js**:
 ## 🔄 5. Recorrido Integral de los Flujos (End-to-End Traces)
 
 ### 🏥 Escenario 1: Atención en Guardia y Cargo Automático de Consulta (Event-Driven)
+
 1. **Médico en HCE:** En `HistoriaClinicaView.vue`, el médico atiende al paciente que ingresó por guardia y guarda una evolución clínica.
 2. **Publicación del Evento:** El módulo HCE persiste la evolución y emite el evento:
    ```json
@@ -197,6 +210,7 @@ Siguiendo las pautas de **Vue Mastery / Apunte de Vue.js**:
 ---
 
 ### 💳 Escenario 2: Validación y Aplicación de Cobertura (Interactivo)
+
 1. El usuario navega a `/facturacion/cobertura` en el Frontend.
 2. Completa los datos: Paciente `pac-123`, Obra Social `OSDE`, Afiliado `123456789`, Cuenta `cta-789` y presiona **"Validar"**.
 3. **Front:** `facturacionStore.validarCobertura(data)` llama a `POST /api/cobertura/validar`.
@@ -212,11 +226,11 @@ Siguiendo las pautas de **Vue Mastery / Apunte de Vue.js**:
 
 El acceso a las funcionalidades y endpoints está protegido en ambos extremos:
 
-| Permiso | Propósito | Roles con Acceso |
-| :--- | :--- | :--- |
-| `facturacion:leer` | Consultar listado de cuentas y detalles de facturación | `ADMINISTRADOR`, `RECEPCIONISTA` |
+| Permiso             | Propósito                                               | Roles con Acceso                           |
+| :------------------ | :------------------------------------------------------ | :----------------------------------------- |
+| `facturacion:leer`  | Consultar listado de cuentas y detalles de facturación  | `ADMINISTRADOR`, `RECEPCIONISTA`           |
 | `cobertura:validar` | Ejecutar validaciones de credenciales de obras sociales | `ADMINISTRADOR`, `RECEPCIONISTA`, `MEDICO` |
-| `reportes:leer` | Ver reportes financieros globales y ocupación de camas | `ADMINISTRADOR` |
+| `reportes:leer`     | Ver reportes financieros globales y ocupación de camas  | `ADMINISTRADOR`                            |
 
 - **En Backend:** Los controladores están decorados con `@RequierePermiso(PERMISOS.FACTURACION_LEER)` y validados por el `PermisosGuard` con tokens JWT firmados.
 - **En Frontend:** `facturacion.routes.ts` define `meta: { permisos: ['facturacion:leer'] }`. El router guard global (`router.beforeEach`) intercepta la navegación y redirige al Dashboard o Login si el usuario no cuenta con el permiso requerido.

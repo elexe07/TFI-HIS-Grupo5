@@ -147,21 +147,19 @@ onMounted(() => {
       </Input>
     </Card>
 
-    <Card class="table-card">
-      <div class="table-scroll-container">
-        <Table
-          :columns="columns"
-          :rows="usuariosFiltrados"
-          rowKey="id"
-          :hoverable="true"
-          :striped="true"
-          emptyText="No hay usuarios registrados."
-        >
-          <template #cell-rol="{ value }">
-            <Badge :variant="getRolVariant(value as NombreRol)" size="sm">{{ value }}</Badge>
-          </template>
-        </Table>
-      </div>
+    <Card>
+      <Table
+        :columns="columns"
+        :rows="usuariosFiltrados"
+        rowKey="id"
+        :hoverable="true"
+        :striped="true"
+        emptyText="No hay usuarios registrados."
+      >
+        <template #cell-rol="{ value }">
+          <Badge :variant="getRolVariant(value as NombreRol)" size="sm">{{ value }}</Badge>
+        </template>
+      </Table>
     </Card>
     <Modal v-model:modelValue="mostrarFormulario" title="Nuevo usuario" size="md" :closable="true">
       <form class="form-usuario" @submit.prevent="crearUsuario">
@@ -253,21 +251,5 @@ onMounted(() => {
 
 .text-muted {
   color: var(--color-text-muted);
-}
-
-.usuarios-view {
-  overflow-y: auto;
-  max-height: calc(100vh - 100px);
-  padding-right: var(--space-xs);
-}
-
-.table-card {
-  overflow: hidden;
-}
-
-.table-scroll-container {
-  overflow-x: auto;
-  overflow-y: auto;
-  max-height: 60vh;
 }
 </style>

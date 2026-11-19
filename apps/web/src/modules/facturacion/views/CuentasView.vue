@@ -229,71 +229,69 @@ onMounted(() => {
       </div>
     </Card>
 
-    <Card class="table-card">
-      <div class="table-scroll-container">
-        <Table
-          :columns="columns"
-          :rows="cuentasFiltradas"
-          rowKey="id"
-          :hoverable="true"
-          :striped="true"
-          emptyText="No se encontraron cuentas con los filtros aplicados."
-        >
-          <template #cell-tipo="{ value }">
-            <Badge variant="neutral" size="sm">{{ getTipoLabel(value as TipoCuenta) }}</Badge>
-          </template>
-          <template #cell-estado="{ value }">
-            <Badge :variant="getEstadoVariant(value as EstadoCuenta)" size="sm">{{ value }}</Badge>
-          </template>
-          <template #cell-coberturaValidada="{ value }">
-            <Badge :variant="value ? 'success' : 'warning'" size="sm">{{
-              value ? 'Validada' : 'Pendiente'
-            }}</Badge>
-          </template>
-          <template #cell-actions="{ row }">
-            <div class="action-buttons">
-              <Button
-                size="sm"
-                variant="ghost"
-                @click="verDetalle(row as unknown as CuentaDTO)"
-                title="Ver detalle"
+    <Card>
+      <Table
+        :columns="columns"
+        :rows="cuentasFiltradas"
+        rowKey="id"
+        :hoverable="true"
+        :striped="true"
+        emptyText="No se encontraron cuentas con los filtros aplicados."
+      >
+        <template #cell-tipo="{ value }">
+          <Badge variant="neutral" size="sm">{{ getTipoLabel(value as TipoCuenta) }}</Badge>
+        </template>
+        <template #cell-estado="{ value }">
+          <Badge :variant="getEstadoVariant(value as EstadoCuenta)" size="sm">{{ value }}</Badge>
+        </template>
+        <template #cell-coberturaValidada="{ value }">
+          <Badge :variant="value ? 'success' : 'warning'" size="sm">{{
+            value ? 'Validada' : 'Pendiente'
+          }}</Badge>
+        </template>
+        <template #cell-actions="{ row }">
+          <div class="action-buttons">
+            <Button
+              size="sm"
+              variant="ghost"
+              @click="verDetalle(row as unknown as CuentaDTO)"
+              title="Ver detalle"
+            >
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
               >
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                  <circle cx="12" cy="12" r="3"></circle>
-                </svg>
-              </Button>
-              <Button
-                v-if="(row as any).estado === 'ABIERTA'"
-                size="sm"
-                variant="ghost"
-                @click="handleCerrarCuenta((row as any).id)"
-                :loading="cerrandoId === (row as any).id"
-                title="Cerrar cuenta"
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+            </Button>
+            <Button
+              v-if="(row as any).estado === 'ABIERTA'"
+              size="sm"
+              variant="ghost"
+              @click="handleCerrarCuenta((row as any).id)"
+              :loading="cerrandoId === (row as any).id"
+              title="Cerrar cuenta"
+            >
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
               >
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                  <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                </svg>
-              </Button>
-            </div>
-          </template>
-        </Table>
-      </div>
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+              </svg>
+            </Button>
+          </div>
+        </template>
+      </Table>
     </Card>
 
     <!-- Modal Detalle Cuenta -->
@@ -526,21 +524,5 @@ onMounted(() => {
 
 .text-muted {
   color: var(--color-text-muted);
-}
-
-.cuentas-view {
-  overflow-y: auto;
-  max-height: calc(100vh - 100px);
-  padding-right: var(--space-xs);
-}
-
-.table-card {
-  overflow: hidden;
-}
-
-.table-scroll-container {
-  overflow-x: auto;
-  overflow-y: auto;
-  max-height: 60vh;
 }
 </style>

@@ -164,12 +164,16 @@ onUnmounted(() => {
 }
 
 .modal-content {
+  /* Ocupa el alto disponible del contenedor (max 90vh) y deja que solo el cuerpo haga scroll:
+     así el header y el footer con los botones siempre quedan a la vista. */
   display: flex;
   flex-direction: column;
-  height: 100%;
+  flex: 1;
+  min-height: 0;
 }
 
 .modal-header {
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -206,11 +210,13 @@ onUnmounted(() => {
 
 .modal-body {
   flex: 1;
+  min-height: 0;
   padding: var(--space-lg);
   overflow-y: auto;
 }
 
 .modal-footer {
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: flex-end;

@@ -27,35 +27,27 @@ const editingInternacion = ref<Partial<InternacionDTO> | null>(null);
 const showAltaModal = ref(false);
 const internacionParaAlta = ref<InternacionDTO | null>(null);
 
+/** El backend devuelve solo el id del paciente: el nombre se busca en los pacientes de Admisión. */
+function describirPaciente(pacienteId: string): string {
+  const p = admisionStore.pacientes.find((pac) => pac.id === pacienteId);
+  return p
+    ? `${p.apellido}, ${p.nombre} (${p.tipoDocumento} ${p.numeroDocumento})`
+    : pacienteId || '—';
+}
+
 const columns: TableColumn<InternacionDTO>[] = [
   { key: 'id', label: 'ID', width: '80px', format: (v) => (v as string).slice(-8) },
   {
     key: 'pacienteId',
     label: 'Paciente',
     width: '220px',
-    format: (_v, row) => {
-      const p =
-        (row as InternacionDTO).paciente ||
-        admisionStore.pacientes.find((pac) => pac.id === (row as InternacionDTO).pacienteId);
-      return p
-        ? `${p.apellido}, ${p.nombre} (${p.tipoDocumento} ${p.numeroDocumento})`
-        : (row as InternacionDTO).pacienteId || '—';
-    },
+    format: (_v, row) => describirPaciente((row as InternacionDTO).pacienteId),
   },
   {
     key: 'camaId',
     label: 'Cama',
     width: '140px',
-    format: (_v, row) => {
-      const c =
-        (row as InternacionDTO).cama ||
-        recursosStore.camas.find((cam) => cam.id === (row as InternacionDTO).camaId);
-      return c
-        ? `${c.habitacion?.sector || ''} - ${c.habitacion?.numero || ''} / ${c.codigo}`
-        : (row as InternacionDTO).camaId
-          ? (row as InternacionDTO).camaId.slice(-6)
-          : '—';
-    },
+    format: (_v, row) => recursosStore.etiquetaCama((row as InternacionDTO).camaId),
   },
   {
     key: 'medicoId',
@@ -285,7 +277,7 @@ onMounted(() => {
             :options="
               recursosStore.camasLibres.map((c) => ({
                 value: c.id,
-                label: `${c.habitacion?.sector || ''} - ${c.habitacion?.numero || ''} / ${c.codigo}`,
+                label: recursosStore.etiquetaCama(c.id),
               }))
             "
             placeholder="Seleccionar cama disponible"
@@ -340,16 +332,10 @@ onMounted(() => {
       <div v-if="internacionParaAlta" class="confirm-dialog">
         <p>
           ¿Confirma dar alta médica a la internación del paciente
-          <strong
-            >{{ internacionParaAlta.paciente?.apellido }},
-            {{ internacionParaAlta.paciente?.nombre }}</strong
+          <strong>{{ describirPaciente(internacionParaAlta.pacienteId) }}</strong
           >?
         </p>
-        <p class="text-muted">
-          Cama: {{ internacionParaAlta.cama?.habitacion?.sector }} -
-          {{ internacionParaAlta.cama?.habitacion?.numero }} /
-          {{ internacionParaAlta.cama?.codigo }}
-        </p>
+        <p class="text-muted">Cama: {{ recursosStore.etiquetaCama(internacionParaAlta.camaId) }}</p>
       </div>
       <template #footer>
         <Button variant="secondary" @click="showAltaModal = false">Cancelar</Button>

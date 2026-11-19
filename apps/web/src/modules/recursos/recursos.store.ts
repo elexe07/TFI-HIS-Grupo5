@@ -7,7 +7,7 @@ import { ref, computed } from 'vue';
 import { recursosApi } from './recursos.api';
 import type {
   HabitacionDTO,
-  MapaCamasResponse,
+  ResumenCamas,
   EstadoCama,
   InternacionDTO,
   EstadoInternacion,
@@ -20,13 +20,6 @@ export const useRecursosStore = defineStore('recursos', () => {
   const habitaciones = ref<HabitacionDTO[]>([]);
   const internaciones = ref<InternacionDTO[]>([]);
   const insumos = ref<InsumoDTO[]>([]);
-  const resumenCamas = ref<MapaCamasResponse['resumen']>({
-    total: 0,
-    libres: 0,
-    ocupadas: 0,
-    enLimpieza: 0,
-    bloqueadas: 0,
-  });
 
   const cargando = ref(false);
   const error = ref<string | null>(null);
@@ -42,6 +35,25 @@ export const useRecursosStore = defineStore('recursos', () => {
   const camasOcupadas = computed(() => camasPorEstado.value('OCUPADA'));
   const camasEnLimpieza = computed(() => camasPorEstado.value('EN_LIMPIEZA'));
   const camasBloqueadas = computed(() => camasPorEstado.value('BLOQUEADA'));
+
+  /** "Clínica Médica - 101 / CM-101A". Si la cama no está en el mapa cargado, muestra el final del id. */
+  const etiquetaCama = computed(() => (camaId: string) => {
+    const cama = camas.value.find((c) => c.id === camaId);
+    if (!cama) return camaId ? camaId.slice(-6) : '—';
+    const { habitacion } = cama;
+    return habitacion
+      ? `${habitacion.sector} - ${habitacion.numero} / ${cama.codigo}`
+      : cama.codigo;
+  });
+
+  /** Se calcula de las camas cargadas: siempre coincide con el mapa, también después de cambiar un estado. */
+  const resumenCamas = computed<ResumenCamas>(() => ({
+    total: camas.value.length,
+    libres: camasLibres.value.length,
+    ocupadas: camasOcupadas.value.length,
+    enLimpieza: camasEnLimpieza.value.length,
+    bloqueadas: camasBloqueadas.value.length,
+  }));
 
   const internacionesActivas = computed(() =>
     internaciones.value.filter((i) => i.estado === 'ACTIVA'),
@@ -76,8 +88,13 @@ export const useRecursosStore = defineStore('recursos', () => {
     error.value = null;
     try {
       const response = await recursosApi.obtenerMapaCamas();
-      habitaciones.value = response.habitaciones;
-      resumenCamas.value = response.resumen;
+      habitaciones.value = response.habitaciones.map((h) => ({
+        ...h,
+        camas: h.camas.map((c) => ({
+          ...c,
+          habitacion: { id: h.id, sector: h.sector, numero: h.numero },
+        })),
+      }));
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Error al cargar mapa de camas';
       throw err;
@@ -91,16 +108,10 @@ export const useRecursosStore = defineStore('recursos', () => {
     error.value = null;
     try {
       const camaActualizada = await recursosApi.cambiarEstadoCama(camaId, nuevoEstado);
-      // Actualizar en el estado local
-      for (const habitacion of habitaciones.value) {
-        const idx = habitacion.camas.findIndex((c) => c.id === camaId);
-        if (idx !== -1) {
-          habitacion.camas[idx] = camaActualizada;
-          break;
-        }
-      }
-      // Recalcular resumen
-      await recalcularResumen();
+      // Se mezcla con la cama local para no perder `habitacion` ni `internacionActiva`,
+      // que la respuesta del PATCH no trae.
+      const cama = camas.value.find((c) => c.id === camaId);
+      if (cama) Object.assign(cama, camaActualizada);
       return camaActualizada;
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Error al cambiar estado de cama';
@@ -108,17 +119,6 @@ export const useRecursosStore = defineStore('recursos', () => {
     } finally {
       cargando.value = false;
     }
-  }
-
-  async function recalcularResumen() {
-    const todasLasCamas = camas.value;
-    resumenCamas.value = {
-      total: todasLasCamas.length,
-      libres: todasLasCamas.filter((c) => c.estado === 'LIBRE').length,
-      ocupadas: todasLasCamas.filter((c) => c.estado === 'OCUPADA').length,
-      enLimpieza: todasLasCamas.filter((c) => c.estado === 'EN_LIMPIEZA').length,
-      bloqueadas: todasLasCamas.filter((c) => c.estado === 'BLOQUEADA').length,
-    };
   }
 
   async function cargarInternaciones(params?: { estado?: EstadoInternacion }) {
@@ -237,6 +237,7 @@ export const useRecursosStore = defineStore('recursos', () => {
     // Getters
     camas,
     camasPorEstado,
+    etiquetaCama,
     camasLibres,
     camasOcupadas,
     camasEnLimpieza,
@@ -249,7 +250,6 @@ export const useRecursosStore = defineStore('recursos', () => {
     // Actions
     cargarMapaCamas,
     cambiarEstadoCama,
-    recalcularResumen,
     cargarInternaciones,
     internarPaciente,
     darAlta,

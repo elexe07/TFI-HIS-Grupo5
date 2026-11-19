@@ -22,7 +22,7 @@ export const iamRoutes: RouteRecordRaw[] = [
     component: () => import('@/modules/iam/views/AdminLayout.vue'),
     meta: {
       requiresAuth: true,
-      permisos: ['iam:usuarios:leer'] as Permiso[],
+      permisos: ['usuarios:gestionar'] as Permiso[],
       layout: 'default',
       title: 'Administración',
     },

@@ -60,7 +60,7 @@ watch(
 onMounted(async () => {
   if (
     authStore.usuariosSistema.length === 0 &&
-    (authStore.esAdmin || authStore.tienePermiso('iam:usuarios:leer'))
+    (authStore.esAdmin || authStore.tienePermiso('usuarios:gestionar'))
   ) {
     authStore.cargarUsuariosSistema().catch(() => {});
   }

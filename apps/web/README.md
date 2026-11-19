@@ -274,7 +274,7 @@ interface Props {
 'camas:leer' | 'camas:actualizar' | 'internaciones:gestionar';
 'insumos:gestionar' | 'movimientos:registrar';
 'facturacion:leer' | 'cobertura:validar' | 'reportes:leer';
-'iam:usuarios:leer' | 'iam:usuarios:crear' | 'iam:roles:gestionar';
+('usuarios:gestionar');
 ```
 
 ## 📦 Módulos Funcionales

@@ -16,7 +16,7 @@ const tabs = computed(() => [
     path: '/admin/usuarios',
     label: 'Usuarios',
     icon: UsersIcon,
-    permisos: ['iam:usuarios:leer'] as Permiso[],
+    permisos: ['usuarios:gestionar'] as Permiso[],
   },
 ]);
 

@@ -2,7 +2,13 @@
  * Endpoints del módulo IAM: login, usuario actual y gestión de usuarios (backend: modules/iam/api).
  */
 import { get, post, patch } from '@/shared/http/client';
-import type { UsuarioAutenticado, LoginResponse } from './iam.types';
+import type {
+  CrearUsuarioRequest,
+  LoginResponse,
+  NombreRol,
+  UsuarioAutenticado,
+  UsuarioDTO,
+} from './iam.types';
 
 export const authApi = {
   login: (credentials: { email: string; password: string }) =>
@@ -10,10 +16,8 @@ export const authApi = {
 
   me: () => get<UsuarioAutenticado>('/auth/me'),
 
-  // Usuarios (solo ADMIN)
-  listarUsuarios: () => get<UsuarioAutenticado[]>('/usuarios'),
-  crearUsuario: (data: { email: string; password: string; nombre: string; rolId: string }) =>
-    post<UsuarioAutenticado>('/usuarios', data),
-  asignarRol: (id: string, rolId: string) =>
-    patch<UsuarioAutenticado>(`/usuarios/${id}/rol`, { rolId }),
+  // Usuarios (requiere usuarios:gestionar → solo ADMINISTRADOR)
+  listarUsuarios: () => get<UsuarioDTO[]>('/usuarios'),
+  crearUsuario: (data: CrearUsuarioRequest) => post<UsuarioDTO>('/usuarios', data),
+  asignarRol: (id: string, rol: NombreRol) => patch<UsuarioDTO>(`/usuarios/${id}/rol`, { rol }),
 };

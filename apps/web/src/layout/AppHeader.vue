@@ -117,7 +117,7 @@ const navItems = computed(() =>
       path: '/admin',
       label: 'Admin',
       icon: SettingsIcon,
-      permisos: ['iam:usuarios:leer'] as Permiso[],
+      permisos: ['usuarios:gestionar'] as Permiso[],
     },
   ].filter((item) => !item.permisos || authStore.tieneCualquierPermiso(item.permisos)),
 );

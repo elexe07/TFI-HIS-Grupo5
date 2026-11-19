@@ -10,8 +10,8 @@ Para pedir un permiso nuevo: agregarlo a `PERMISOS`, a la matriz y a esta tabla 
 | `pacientes:registrar`     |       ✔       |        |           |       ✔       |          |
 | `pacientes:leer`          |       ✔       |   ✔    |     ✔     |       ✔       |  propio  |
 | `agenda:definir`          |       ✔       |   ✔    |           |               |          |
-| `turnos:reservar`         |       ✔       |        |           |       ✔       |  propio  |
-| `turnos:cancelar`         |       ✔       |        |           |       ✔       |  propio  |
+| `turnos:reservar`         |       ✔       |        |           |       ✔       |          |
+| `turnos:cancelar`         |       ✔       |        |           |       ✔       |          |
 | `triaje:registrar`        |       ✔       |   ✔    |     ✔     |       ✔       |          |
 | `guardia:leer`            |       ✔       |   ✔    |     ✔     |       ✔       |          |
 | `hce:leer`                |               |   ✔    |     ✔     |               |  propia  |
@@ -24,7 +24,8 @@ Para pedir un permiso nuevo: agregarlo a `PERMISOS`, a la matriz y a esta tabla 
 | `internaciones:gestionar` |       ✔       |   ✔    |           |       ✔       |          |
 | `insumos:gestionar`       |       ✔       |        |           |               |          |
 | `facturacion:leer`        |       ✔       |        |           |       ✔       |  propio  |
+| `facturacion:gestionar`   |       ✔       |        |           |       ✔       |          |
 | `cobertura:validar`       |       ✔       |        |           |       ✔       |          |
 | `reportes:leer`           |       ✔       |        |           |               |          |
 
-"propio/propia" = el permiso existe pero el caso de uso además verifica que el recurso pertenezca al usuario logueado.
+"propio/propia" = el permiso existe pero el caso de uso además verifica que el recurso pertenezca al usuario logueado. El paciente se identifica por el `usuarioId` de su ficha en Admisión (`GET /pacientes/yo`).

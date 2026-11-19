@@ -102,6 +102,12 @@ export const useAdmisionStore = defineStore('admision', () => {
     }
   }
 
+  async function vincularUsuario(pacienteId: string, usuarioId: string) {
+    const vinculado = await admisionApi.vincularUsuario(pacienteId, usuarioId);
+    pacientes.value = pacientes.value.map((p) => (p.id === vinculado.id ? vinculado : p));
+    return vinculado;
+  }
+
   async function crearPaciente(data: CrearPacienteRequest) {
     cargando.value = true;
     error.value = null;
@@ -377,6 +383,7 @@ export const useAdmisionStore = defineStore('admision', () => {
     // Actions
     cargarPacientes,
     crearPaciente,
+    vincularUsuario,
     seleccionarPaciente,
     cargarMedicos,
     crearMedico,

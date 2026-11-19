@@ -2,7 +2,7 @@ import { Cargo } from '../../domain/cargo';
 import { Cuenta } from '../../domain/cuenta';
 import { ConceptoCargo, TipoCuenta } from '../../domain/enums';
 import { CuentaNoEncontrada } from '../../domain/errores';
-import { CuentaRepositoryEnMemoria } from '../../testing';
+import { CuentaRepositoryEnMemoria, DirectorioDePacientesEnMemoria } from '../../testing';
 import { ConsultarCuentaHandler } from './consultar-cuenta.handler';
 
 describe('ConsultarCuentaHandler', () => {
@@ -11,7 +11,7 @@ describe('ConsultarCuentaHandler', () => {
 
   beforeEach(() => {
     cuentaRepo = new CuentaRepositoryEnMemoria();
-    handler = new ConsultarCuentaHandler(cuentaRepo);
+    handler = new ConsultarCuentaHandler(cuentaRepo, new DirectorioDePacientesEnMemoria());
   });
 
   it('debería retornar el detalle completo de la cuenta y sus cargos', async () => {

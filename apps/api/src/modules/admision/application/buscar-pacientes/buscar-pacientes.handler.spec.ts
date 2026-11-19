@@ -57,4 +57,25 @@ describe('BuscarPacientesHandler (ADM-02)', () => {
     const res = await handler.ejecutar(new BuscarPacientesQuery());
     expect(res).toHaveLength(2);
   });
+
+  it('un paciente solo se encuentra a sí mismo', async () => {
+    const propio = Paciente.crear(
+      {
+        usuarioId: 'usuario-paciente',
+        documento: Documento.crear(TipoDocumento.DNI, '30111222'),
+        nombre: 'Juan',
+        apellido: 'Pérez',
+        fechaNacimiento: new Date('1990-05-15'),
+        sexo: Sexo.M,
+      },
+      ahora,
+    );
+    await repo.guardar(propio);
+
+    const lista = await handler.ejecutar(
+      new BuscarPacientesQuery({}, { usuarioId: 'usuario-paciente', esPaciente: true }),
+    );
+
+    expect(lista.map((p) => p.id)).toEqual([propio.id]);
+  });
 });

@@ -1,5 +1,5 @@
 import { Documento } from '../../domain/documento';
-import { PacienteNoEncontrado } from '../../domain/errores';
+import { PacienteAjeno, PacienteNoEncontrado } from '../../domain/errores';
 import { Paciente } from '../../domain/paciente';
 import { Sexo, TipoDocumento } from '../../domain/tipos';
 import { PacienteRepositoryEnMemoria } from '../../testing/paciente.repository.en-memoria';
@@ -38,5 +38,26 @@ describe('BuscarPacientePorIdHandler', () => {
     await expect(handler.ejecutar(new BuscarPacientePorIdQuery('inexistente'))).rejects.toThrow(
       PacienteNoEncontrado,
     );
+  });
+
+  it('un paciente no puede ver la ficha de otro paciente', async () => {
+    const otro = Paciente.crear(
+      {
+        usuarioId: 'usuario-otro',
+        documento: Documento.crear(TipoDocumento.DNI, '11223344'),
+        nombre: 'Carla',
+        apellido: 'Ruiz',
+        fechaNacimiento: new Date('1980-02-02'),
+        sexo: Sexo.F,
+      },
+      ahora,
+    );
+    await repo.guardar(otro);
+
+    await expect(
+      handler.ejecutar(
+        new BuscarPacientePorIdQuery(otro.id, { usuarioId: 'usuario-paciente', esPaciente: true }),
+      ),
+    ).rejects.toThrow(PacienteAjeno);
   });
 });

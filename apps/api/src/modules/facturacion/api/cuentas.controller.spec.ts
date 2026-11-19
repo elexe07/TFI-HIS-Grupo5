@@ -5,18 +5,21 @@ import { TipoCuenta } from '../domain/enums';
 import { ConsultarCuentaHandler } from '../application/consultar-cuenta/consultar-cuenta.handler';
 import { ListarCuentasPacienteHandler } from '../application/listar-cuentas-paciente/listar-cuentas-paciente.handler';
 import { CerrarCuentaManualHandler } from '../application/cerrar-cuenta/cerrar-cuenta.handler';
-import { CuentaRepositoryEnMemoria } from '../testing';
+import { CuentaAjena } from '../domain/errores';
+import { CuentaRepositoryEnMemoria, DirectorioDePacientesEnMemoria } from '../testing';
 import { CuentasController } from './cuentas.controller';
 
 describe('CuentasController', () => {
   let controller: CuentasController;
   let cuentaRepo: CuentaRepositoryEnMemoria;
+  let directorio: DirectorioDePacientesEnMemoria;
   const reloj = new RelojFijo(new Date('2026-10-23T10:00:00Z'));
 
   beforeEach(() => {
     cuentaRepo = new CuentaRepositoryEnMemoria();
-    const consultarHandler = new ConsultarCuentaHandler(cuentaRepo);
-    const listarHandler = new ListarCuentasPacienteHandler(cuentaRepo);
+    directorio = new DirectorioDePacientesEnMemoria();
+    const consultarHandler = new ConsultarCuentaHandler(cuentaRepo, directorio);
+    const listarHandler = new ListarCuentasPacienteHandler(cuentaRepo, directorio);
     const cerrarHandler = new CerrarCuentaManualHandler(cuentaRepo, reloj);
     controller = new CuentasController(consultarHandler, listarHandler, cerrarHandler);
   });
@@ -55,9 +58,11 @@ describe('CuentasController', () => {
     });
     await cuentaRepo.guardar(cuentaPropia);
     await cuentaRepo.guardar(cuentaAjena);
+    // El usuario y la ficha de paciente tienen ids distintos: los vincula Admisión.
+    directorio.vincular('usuario-pac', 'pac-mio');
 
     const usuarioPaciente: UsuarioAutenticado = {
-      id: 'pac-mio',
+      id: 'usuario-pac',
       email: 'paciente@his.local',
       nombre: 'Juan Paciente',
       rol: 'PACIENTE',
@@ -68,5 +73,26 @@ describe('CuentasController', () => {
     const res = await controller.listar({ pacienteId: 'pac-otro' }, usuarioPaciente);
     expect(res).toHaveLength(1);
     expect(res[0]?.id).toBe(cuentaPropia.id);
+  });
+
+  it('un PACIENTE no puede ver el detalle de una cuenta de otro paciente', async () => {
+    const cuentaAjena = Cuenta.abrir({
+      pacienteId: 'pac-otro',
+      tipo: TipoCuenta.CONSULTA,
+      referenciaId: 'ref-otro',
+    });
+    await cuentaRepo.guardar(cuentaAjena);
+    directorio.vincular('usuario-pac', 'pac-mio');
+    const usuarioPaciente: UsuarioAutenticado = {
+      id: 'usuario-pac',
+      email: 'paciente@his.local',
+      nombre: 'Juan Paciente',
+      rol: 'PACIENTE',
+      permisos: [PERMISOS.FACTURACION_LEER],
+    };
+
+    await expect(controller.obtenerPorId(cuentaAjena.id, usuarioPaciente)).rejects.toThrow(
+      CuentaAjena,
+    );
   });
 });

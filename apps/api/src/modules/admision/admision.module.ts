@@ -11,6 +11,8 @@ import { DefinirAgendaHandler } from './application/definir-agenda/definir-agend
 import { ListarMedicosHandler } from './application/listar-medicos/listar-medicos.handler';
 import { ListarTurnosHandler } from './application/listar-turnos/listar-turnos.handler';
 import { ObtenerAgendaHandler } from './application/obtener-agenda/obtener-agenda.handler';
+import { ObtenerPacienteDelUsuarioHandler } from './application/obtener-paciente-del-usuario/obtener-paciente-del-usuario.handler';
+import { VincularUsuarioHandler } from './application/vincular-usuario/vincular-usuario.handler';
 import { ObtenerColaGuardiaHandler } from './application/obtener-cola-guardia/obtener-cola-guardia.handler';
 import { AGENDA_REPOSITORY } from './domain/agenda.repository';
 import { MEDICO_REPOSITORY } from './domain/medico.repository';
@@ -45,6 +47,8 @@ import { TurnoRepositoryPrisma } from './infrastructure/turno.repository.prisma'
     RegistrarPacienteHandler,
     BuscarPacientesHandler,
     BuscarPacientePorIdHandler,
+    ObtenerPacienteDelUsuarioHandler,
+    VincularUsuarioHandler,
     RegistrarMedicoHandler,
     ListarMedicosHandler,
     DefinirAgendaHandler,
@@ -64,6 +68,8 @@ import { TurnoRepositoryPrisma } from './infrastructure/turno.repository.prisma'
     { provide: TRIAJE_REPOSITORY, useClass: TriajeRepositoryPrisma },
   ],
   exports: [
+    // Lo usan otros módulos (vía public/) para resolver "el paciente del usuario logueado".
+    ObtenerPacienteDelUsuarioHandler,
     PACIENTE_REPOSITORY,
     MEDICO_REPOSITORY,
     AGENDA_REPOSITORY,

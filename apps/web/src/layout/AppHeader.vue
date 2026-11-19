@@ -81,45 +81,48 @@ function getThemeIcon(mode: 'light' | 'dark' | 'system'): any {
 }
 
 const navItems = computed(() =>
-  [
-    { path: '/', label: 'Dashboard', icon: HomeIcon },
-    {
-      path: '/admision',
-      label: 'Admisión',
-      icon: UsersIcon,
-      permisos: ['pacientes:leer'] as Permiso[],
-    },
-    {
-      path: '/hce',
-      label: 'Historia Clínica',
-      icon: FileTextIcon,
-      permisos: ['hce:leer'] as Permiso[],
-    },
-    {
-      path: '/enfermeria',
-      label: 'Enfermería',
-      icon: HeartIcon,
-      permisos: ['enfermeria:indicaciones:leer'] as Permiso[],
-    },
-    {
-      path: '/recursos',
-      label: 'Recursos',
-      icon: BuildingIcon,
-      permisos: ['camas:leer'] as Permiso[],
-    },
-    {
-      path: '/facturacion',
-      label: 'Facturación',
-      icon: DollarSignIcon,
-      permisos: ['facturacion:leer'] as Permiso[],
-    },
-    {
-      path: '/admin',
-      label: 'Admin',
-      icon: SettingsIcon,
-      permisos: ['usuarios:gestionar'] as Permiso[],
-    },
-  ].filter((item) => !item.permisos || authStore.tieneCualquierPermiso(item.permisos)),
+  // El paciente no usa los módulos del personal: su único destino es el portal.
+  authStore.esPaciente
+    ? [{ path: '/mi-portal', label: 'Mi portal', icon: HomeIcon }]
+    : [
+        { path: '/', label: 'Dashboard', icon: HomeIcon },
+        {
+          path: '/admision',
+          label: 'Admisión',
+          icon: UsersIcon,
+          permisos: ['pacientes:leer'] as Permiso[],
+        },
+        {
+          path: '/hce',
+          label: 'Historia Clínica',
+          icon: FileTextIcon,
+          permisos: ['hce:leer'] as Permiso[],
+        },
+        {
+          path: '/enfermeria',
+          label: 'Enfermería',
+          icon: HeartIcon,
+          permisos: ['enfermeria:indicaciones:leer'] as Permiso[],
+        },
+        {
+          path: '/recursos',
+          label: 'Recursos',
+          icon: BuildingIcon,
+          permisos: ['camas:leer'] as Permiso[],
+        },
+        {
+          path: '/facturacion',
+          label: 'Facturación',
+          icon: DollarSignIcon,
+          permisos: ['facturacion:leer'] as Permiso[],
+        },
+        {
+          path: '/admin',
+          label: 'Admin',
+          icon: SettingsIcon,
+          permisos: ['usuarios:gestionar'] as Permiso[],
+        },
+      ].filter((item) => !item.permisos || authStore.tieneCualquierPermiso(item.permisos)),
 );
 
 function isActiveRoute(path: string): boolean {

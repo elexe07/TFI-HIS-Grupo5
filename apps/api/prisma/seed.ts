@@ -302,13 +302,103 @@ async function sembrarAdmision(): Promise<void> {
   }
 }
 
+/** Usuario de demo del portal del paciente, vinculado a la ficha de Juan Pérez. */
+const PACIENTE_DEMO = { email: 'paciente@his.local', password: 'Paciente1234!' };
+
+/**
+ * Portal del paciente: usuario rol PACIENTE vinculado a Juan Pérez, con un turno atendido, uno
+ * próximo y una cuenta con un cargo, para que el portal muestre algo. Solo crea lo que falte.
+ */
+async function sembrarPortalPaciente(): Promise<void> {
+  const rolPaciente = await prisma.rol.findUniqueOrThrow({ where: { nombre: 'PACIENTE' } });
+  const usuario = await prisma.usuario.upsert({
+    where: { email: PACIENTE_DEMO.email },
+    update: { activo: true, rolId: rolPaciente.id },
+    create: {
+      id: randomUUID(),
+      email: PACIENTE_DEMO.email,
+      nombre: 'Juan Pérez',
+      passwordHash: await hash(PACIENTE_DEMO.password, 10),
+      rolId: rolPaciente.id,
+    },
+  });
+  const juan = await prisma.paciente.update({
+    where: {
+      tipoDocumento_numeroDocumento: {
+        tipoDocumento: TipoDocumento.DNI,
+        numeroDocumento: '12345678',
+      },
+    },
+    data: { usuarioId: usuario.id },
+  });
+
+  const admin = await prisma.usuario.findUniqueOrThrow({
+    where: { email: ADMIN.email.toLowerCase() },
+  });
+  const usuarioGarcia = await prisma.usuario.findUniqueOrThrow({
+    where: { email: 'dr.garcia@his.local' },
+  });
+  const garcia = await prisma.medico.findUniqueOrThrow({ where: { usuarioId: usuarioGarcia.id } });
+
+  if ((await prisma.turno.count({ where: { pacienteId: juan.id } })) === 0) {
+    const enDias = (dias: number, hora: number): Date => {
+      const fecha = new Date();
+      fecha.setDate(fecha.getDate() + dias);
+      fecha.setHours(hora, 0, 0, 0);
+      return fecha;
+    };
+    const turno = (inicio: Date, estado: 'ATENDIDO' | 'RESERVADO', motivo: string) => ({
+      id: randomUUID(),
+      pacienteId: juan.id,
+      medicoId: garcia.id,
+      inicio,
+      fin: new Date(inicio.getTime() + 30 * 60_000),
+      estado,
+      motivoConsulta: motivo,
+      creadoPor: admin.id,
+    });
+    await prisma.turno.createMany({
+      data: [
+        turno(enDias(-7, 9), 'ATENDIDO', 'Control anual'),
+        turno(enDias(7, 10), 'RESERVADO', 'Resultados de laboratorio'),
+      ],
+    });
+  }
+
+  if ((await prisma.cuenta.count({ where: { pacienteId: juan.id } })) === 0) {
+    const tarifa = await prisma.tarifa.findUniqueOrThrow({
+      where: { concepto: ConceptoCargo.CONSULTA },
+    });
+    await prisma.cuenta.create({
+      data: {
+        id: randomUUID(),
+        pacienteId: juan.id,
+        tipo: 'CONSULTA',
+        referenciaId: randomUUID(),
+        cargos: {
+          create: {
+            id: randomUUID(),
+            concepto: ConceptoCargo.CONSULTA,
+            descripcion: 'Consulta médica - Clínica médica',
+            cantidad: 1,
+            montoUnitario: tarifa.monto,
+            montoTotal: tarifa.monto,
+            origenEventoId: randomUUID(),
+          },
+        },
+      },
+    });
+  }
+}
+
 async function main(): Promise<void> {
   await sembrarIam();
   await sembrarFacturacion();
   await sembrarRecursos();
   await sembrarAdmision();
+  await sembrarPortalPaciente();
   console.log(
-    `Seed OK: roles y permisos, admin ${ADMIN.email}, obras sociales, tarifas, habitaciones, camas, insumos, médicos y pacientes.`,
+    `Seed OK: roles y permisos, admin ${ADMIN.email}, obras sociales, tarifas, habitaciones, camas, insumos, médicos, pacientes y portal (${PACIENTE_DEMO.email}).`,
   );
 }
 

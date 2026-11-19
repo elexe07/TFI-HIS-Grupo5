@@ -10,6 +10,7 @@
 import { ref, computed, onMounted } from 'vue';
 import { useFacturacionStore } from '@/modules/facturacion/facturacion.store';
 import { useAdmisionStore } from '@/modules/admision/admision.store';
+import { useAuthStore } from '@/modules/iam/auth.store';
 import { useToastStore } from '@/shared/stores/toast';
 import { Button, Input, Card, Table, Select, Modal, Badge } from '@/shared/components/ui';
 import type { TableColumn } from '@/shared/components/ui/Table.types';
@@ -23,7 +24,11 @@ import type { PacienteDTO } from '@/modules/admision/admision.types';
 
 const facturacionStore = useFacturacionStore();
 const admisionStore = useAdmisionStore();
+const authStore = useAuthStore();
 const toastStore = useToastStore();
+
+/** Cerrar una cuenta exige `facturacion:gestionar` en el backend: sin él no se ofrece el botón. */
+const puedeCerrarCuentas = computed(() => authStore.tienePermiso('facturacion:gestionar'));
 
 /** La API de cuentas devuelve solo el `pacienteId`: los datos del paciente se buscan en Admisión. */
 function pacienteDe(cuenta: CuentaDTO): PacienteDTO | undefined {
@@ -278,7 +283,7 @@ onMounted(() => {
               </svg>
             </Button>
             <Button
-              v-if="(row as any).estado === 'ABIERTA'"
+              v-if="puedeCerrarCuentas && (row as any).estado === 'ABIERTA'"
               size="sm"
               variant="ghost"
               @click="handleCerrarCuenta((row as any).id)"
@@ -396,7 +401,7 @@ onMounted(() => {
       <template #footer>
         <div class="modal-footer-actions">
           <Button
-            v-if="cuentaSeleccionada?.estado === 'ABIERTA'"
+            v-if="puedeCerrarCuentas && cuentaSeleccionada?.estado === 'ABIERTA'"
             variant="danger"
             @click="handleCerrarCuenta(cuentaSeleccionada.id)"
             :loading="cerrandoId === cuentaSeleccionada?.id"

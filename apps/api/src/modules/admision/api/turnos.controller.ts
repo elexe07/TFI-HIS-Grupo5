@@ -26,6 +26,7 @@ import {
   UsuarioActual,
   type UsuarioAutenticado,
 } from '../../iam/public';
+import { solicitanteDe } from '../../../building-blocks/application';
 import { CancelarTurnoCommand } from '../application/cancelar-turno/cancelar-turno.command';
 import { CancelarTurnoHandler } from '../application/cancelar-turno/cancelar-turno.handler';
 import { ListarTurnosHandler } from '../application/listar-turnos/listar-turnos.handler';
@@ -92,10 +93,13 @@ export class TurnosController {
 
   @Get()
   @RequierePermiso(PERMISOS.PACIENTES_LEER)
-  @ApiOperation({ summary: 'Listar turnos' })
+  @ApiOperation({ summary: 'Listar turnos (un paciente solo ve los suyos)' })
   @ApiOkResponse({ description: 'Lista de turnos' })
   @ApiForbiddenResponse({ description: 'PERMISO_FALTANTE: requiere pacientes:leer' })
-  listar(@Query() dto: ListarTurnosDto): Promise<TurnoDto[]> {
-    return this.listarTurnos.ejecutar(new ListarTurnosQuery(dto));
+  listar(
+    @Query() dto: ListarTurnosDto,
+    @UsuarioActual() usuario: UsuarioAutenticado,
+  ): Promise<TurnoDto[]> {
+    return this.listarTurnos.ejecutar(new ListarTurnosQuery(dto, solicitanteDe(usuario)));
   }
 }

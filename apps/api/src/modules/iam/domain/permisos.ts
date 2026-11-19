@@ -29,6 +29,7 @@ export const PERMISOS = {
   INTERNACIONES_GESTIONAR: 'internaciones:gestionar',
   INSUMOS_GESTIONAR: 'insumos:gestionar',
   FACTURACION_LEER: 'facturacion:leer',
+  FACTURACION_GESTIONAR: 'facturacion:gestionar',
   COBERTURA_VALIDAR: 'cobertura:validar',
   REPORTES_LEER: 'reportes:leer',
 } as const;
@@ -53,6 +54,7 @@ export const MATRIZ_PERMISOS: Readonly<Record<NombreRol, readonly Permiso[]>> = 
     P.INTERNACIONES_GESTIONAR,
     P.INSUMOS_GESTIONAR,
     P.FACTURACION_LEER,
+    P.FACTURACION_GESTIONAR,
     P.COBERTURA_VALIDAR,
     P.REPORTES_LEER,
   ],
@@ -88,15 +90,11 @@ export const MATRIZ_PERMISOS: Readonly<Record<NombreRol, readonly Permiso[]>> = 
     P.CAMAS_LEER,
     P.INTERNACIONES_GESTIONAR,
     P.FACTURACION_LEER,
+    P.FACTURACION_GESTIONAR,
     P.COBERTURA_VALIDAR,
   ],
-  PACIENTE: [
-    P.PACIENTES_LEER,
-    P.TURNOS_RESERVAR,
-    P.TURNOS_CANCELAR,
-    P.HCE_LEER,
-    P.FACTURACION_LEER,
-  ],
+  // El paciente solo CONSULTA lo suyo (portal de solo lectura): los casos de uso filtran por dueño.
+  PACIENTE: [P.PACIENTES_LEER, P.HCE_LEER, P.FACTURACION_LEER],
 };
 
 export const esNombreRol = (valor: unknown): valor is NombreRol =>

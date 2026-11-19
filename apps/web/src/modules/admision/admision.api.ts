@@ -22,6 +22,9 @@ export const admisionApi = {
     get<PacienteDTO[]>('/pacientes', { params }),
   crearPaciente: (data: CrearPacienteRequest) => post<PacienteDTO>('/pacientes', data),
   obtenerPaciente: (id: string) => get<PacienteDTO>(`/pacientes/${id}`),
+  /** Vincula la ficha con el usuario (rol PACIENTE) con el que el paciente entra a su portal. */
+  vincularUsuario: (pacienteId: string, usuarioId: string) =>
+    patch<PacienteDTO>(`/pacientes/${pacienteId}/usuario`, { usuarioId }),
 
   // Médicos
   listarMedicos: () => get<MedicoDTO[]>('/medicos'),

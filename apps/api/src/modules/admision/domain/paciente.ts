@@ -1,6 +1,7 @@
 import { AggregateRoot, ErrorDeValidacion, generarId } from '../../../building-blocks/domain';
 import { Cobertura } from './cobertura';
 import { Documento } from './documento';
+import { PacienteYaVinculado } from './errores';
 import { PacienteRegistrado } from './events/paciente-registrado';
 import { Sexo } from './tipos';
 
@@ -150,6 +151,13 @@ export class Paciente extends AggregateRoot {
       this.props.nombre = exigirTexto(datos.nombre, 'El nombre no puede estar vacío');
     if (datos.apellido !== undefined)
       this.props.apellido = exigirTexto(datos.apellido, 'El apellido no puede estar vacío');
+    this.props.actualizadoEn = ahora;
+  }
+
+  /** Vincula la ficha con el usuario del portal. Una ficha no se puede pasar a otro usuario. */
+  vincularUsuario(usuarioId: string, ahora: Date): void {
+    if (this.props.usuarioId && this.props.usuarioId !== usuarioId) throw new PacienteYaVinculado();
+    this.props.usuarioId = usuarioId;
     this.props.actualizadoEn = ahora;
   }
 

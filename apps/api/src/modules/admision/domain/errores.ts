@@ -20,6 +20,32 @@ export class PacienteNoEncontrado extends NoEncontrado {
   }
 }
 
+/** El usuario logueado (rol PACIENTE) todavía no tiene una ficha de paciente vinculada. */
+export class PacienteNoVinculado extends NoEncontrado {
+  constructor() {
+    super('Tu usuario no está vinculado a una ficha de paciente', 'PACIENTE_NO_VINCULADO');
+  }
+}
+
+/** Un paciente intentó ver datos de otro paciente. */
+export class PacienteAjeno extends Prohibido {
+  constructor() {
+    super('Solo podés ver tus propios datos', 'PACIENTE_AJENO');
+  }
+}
+
+export class PacienteYaVinculado extends Conflicto {
+  constructor() {
+    super('La ficha del paciente ya está vinculada a otro usuario', 'PACIENTE_YA_VINCULADO');
+  }
+}
+
+export class UsuarioYaVinculado extends Conflicto {
+  constructor() {
+    super('Ese usuario ya está vinculado a otra ficha de paciente', 'USUARIO_YA_VINCULADO');
+  }
+}
+
 export class MedicoNoEncontrado extends NoEncontrado {
   constructor(id?: string) {
     super(id ? `Médico ${id} no encontrado` : 'Médico no encontrado', 'MEDICO_NO_ENCONTRADO');

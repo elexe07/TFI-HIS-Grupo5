@@ -1,32 +1,85 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
 import { useRecursosStore } from '@/modules/recursos/recursos.store';
+import { useAdmisionStore } from '@/modules/admision/admision.store';
 import { useToastStore } from '@/shared/stores/toast';
 import { Card, Button, Select, Badge, Modal } from '@/shared/components/ui';
-import type { CamaDTO, EstadoCama } from '@/modules/recursos/recursos.types';
+import type { CamaDTO, EstadoCama, HabitacionDTO } from '@/modules/recursos/recursos.types';
 
 const recursosStore = useRecursosStore();
+const admisionStore = useAdmisionStore();
 const toastStore = useToastStore();
 
 const showModal = ref(false);
 const editingCama = ref<CamaDTO | null>(null);
 const nuevoEstado = ref<EstadoCama>('LIBRE');
 
-const sectorFilter = ref('');
-const estadoFilter = ref<EstadoCama | ''>('');
+const sectorFilter = ref<string | null>('');
+const estadoFilter = ref<EstadoCama | null | ''>('');
 
-const allCamas = computed(() => recursosStore.habitaciones.flatMap((h) => h.camas));
 const sectores = computed(() => {
-  const sects = allCamas.value
-    .map((c) => c.habitacion?.sector)
-    .filter((s): s is string => typeof s === 'string' && s.length > 0);
-  return [...new Set(sects)];
+  const sects = recursosStore.habitaciones
+    .map((h) => h.sector)
+    .filter((s): s is string => typeof s === 'string' && s.trim().length > 0);
+  return [...new Set(sects)].sort();
 });
 
 const sectorOptions = computed(() => [
   { value: '', label: 'Todos los sectores' },
   ...sectores.value.map((s: string) => ({ value: s, label: s })),
 ]);
+
+const habitacionesFiltradas = computed(() => {
+  const sector = sectorFilter.value;
+  const estado = estadoFilter.value;
+
+  return recursosStore.habitaciones
+    .filter((hab) => {
+      if (sector && hab.sector !== sector) {
+        return false;
+      }
+      return true;
+    })
+    .map((hab) => {
+      const camas = estado
+        ? hab.camas.filter((cama) => cama.estado === estado)
+        : hab.camas;
+      return {
+        ...hab,
+        camas,
+      };
+    })
+    .filter((hab) => hab.camas.length > 0);
+});
+
+function getPacienteNombre(cama: CamaDTO): string {
+  // 1. Obtener la internación asociada (de la cama o de las internaciones del store)
+  const internacion =
+    cama.internacionActiva ||
+    recursosStore.internaciones.find(
+      (i) => i.camaId === cama.id && i.estado === 'ACTIVA',
+    );
+
+  if (!internacion) {
+    return 'Sin paciente';
+  }
+
+  // 2. Si ya viene poblado el objeto paciente
+  if (internacion.paciente?.apellido && internacion.paciente?.nombre) {
+    return `${internacion.paciente.apellido}, ${internacion.paciente.nombre}`;
+  }
+
+  // 3. Buscar en el store de admisión por pacienteId
+  if (internacion.pacienteId) {
+    const p = admisionStore.pacientes.find((pac) => pac.id === internacion.pacienteId);
+    if (p) {
+      return `${p.apellido}, ${p.nombre}`;
+    }
+    return `Paciente (${internacion.pacienteId.slice(-6)})`;
+  }
+
+  return 'Sin paciente';
+}
 
 function getEstadoVariant(
   estado: EstadoCama,
@@ -40,17 +93,46 @@ function getEstadoVariant(
   return variants[estado] ?? 'info';
 }
 
+const opcionesNuevoEstado = computed(() => {
+  if (!editingCama.value) return [];
+  // No se permite cambiar a OCUPADA manualmente (el estado OCUPADA solo se asigna desde Internación)
+  const opcionesValidas: { value: EstadoCama; label: string }[] = [
+    { value: 'LIBRE', label: 'Libre' },
+    { value: 'EN_LIMPIEZA', label: 'En limpieza' },
+    { value: 'BLOQUEADA', label: 'Bloqueada' },
+  ];
+  return opcionesValidas.filter((op) => op.value !== editingCama.value?.estado);
+});
+
 async function cargarDatos() {
   try {
-    await recursosStore.cargarMapaCamas();
+    await Promise.all([
+      recursosStore.cargarMapaCamas(),
+      recursosStore.cargarInternaciones(),
+      admisionStore.cargarPacientes(),
+    ]);
   } catch (err) {
     toastStore.error('Error', 'No se pudo cargar el mapa de camas');
   }
 }
 
-function abrirModalCambiarEstado(cama: CamaDTO) {
-  editingCama.value = cama;
-  nuevoEstado.value = cama.estado;
+function abrirModalCambiarEstado(cama: CamaDTO, habitacion?: HabitacionDTO) {
+  // Si la cama está ocupada o tiene paciente internado, no permitir cambiar estado manualmente
+  if (cama.estado === 'OCUPADA' || cama.internacionActiva || getPacienteNombre(cama) !== 'Sin paciente') {
+    toastStore.warning(
+      'Cama con paciente',
+      'No se puede cambiar manualmente el estado de una cama con un paciente internado. Debe gestionarse desde la sección Internaciones.',
+    );
+    return;
+  }
+
+  editingCama.value = {
+    ...cama,
+    habitacion: habitacion ?? cama.habitacion,
+  };
+
+  // Si está LIBRE, la opción directa es BLOQUEADA; si está en limpieza/bloqueada, es LIBRE
+  nuevoEstado.value = cama.estado === 'LIBRE' ? 'BLOQUEADA' : 'LIBRE';
   showModal.value = true;
 }
 
@@ -138,7 +220,7 @@ onMounted(() => {
     <!-- Mapa por Habitación -->
     <div class="habitaciones-grid">
       <Card
-        v-for="habitacion in recursosStore.habitaciones"
+        v-for="habitacion in habitacionesFiltradas"
         :key="habitacion.id"
         class="habitacion-card"
       >
@@ -151,21 +233,22 @@ onMounted(() => {
             v-for="cama in habitacion.camas"
             :key="cama.id"
             :class="['cama-card', getEstadoVariant(cama.estado)]"
-            @click="abrirModalCambiarEstado(cama)"
+            @click="abrirModalCambiarEstado(cama, habitacion)"
           >
             <div class="cama-codigo">{{ cama.codigo }}</div>
             <div class="cama-estado">{{ cama.estado }}</div>
-            <div v-if="cama.internacionActiva" class="cama-paciente">
-              {{ cama.internacionActiva.paciente?.apellido }},
-              {{ cama.internacionActiva.paciente?.nombre }}
+            <div
+              :class="['cama-paciente', { empty: getPacienteNombre(cama) === 'Sin paciente' }]"
+              :title="getPacienteNombre(cama)"
+            >
+              {{ getPacienteNombre(cama) }}
             </div>
-            <div v-else class="cama-paciente empty">Sin paciente</div>
           </div>
         </div>
       </Card>
     </div>
 
-    <div v-if="recursosStore.habitaciones.length === 0" class="empty-state">
+    <div v-if="habitacionesFiltradas.length === 0" class="empty-state">
       <svg
         width="64"
         height="64"
@@ -179,8 +262,8 @@ onMounted(() => {
         <path d="M2 8h18"></path>
         <path d="M2 16h18"></path>
       </svg>
-      <h3>No hay habitaciones configuradas</h3>
-      <p class="text-muted">Configure habitaciones y camas desde el backend.</p>
+      <h3>No se encontraron camas</h3>
+      <p class="text-muted">No hay camas que coincidan con los filtros seleccionados.</p>
     </div>
 
     <!-- Modal Cambiar Estado -->
@@ -204,12 +287,7 @@ onMounted(() => {
           <label class="label">Nuevo Estado *</label>
           <Select
             v-model="nuevoEstado"
-            :options="[
-              { value: 'LIBRE', label: 'Libre' },
-              { value: 'OCUPADA', label: 'Ocupada' },
-              { value: 'EN_LIMPIEZA', label: 'En limpieza' },
-              { value: 'BLOQUEADA', label: 'Bloqueada' },
-            ]"
+            :options="opcionesNuevoEstado"
             required
           />
         </div>

@@ -1,3 +1,8 @@
+/**
+ * Entidad de Dominio: Cargo
+ * Representa un ítem facturable dentro de una cuenta (Consulta médica, Medicamento, Día de cama).
+ * Guarda `origenEventoId` para garantizar idempotencia y evitar cobros dobles al consumir eventos.
+ */
 import { Entity, ErrorDeValidacion, generarId, type Id } from '../../../building-blocks/domain';
 import type { ConceptoCargo } from './enums';
 

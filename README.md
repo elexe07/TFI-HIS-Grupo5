@@ -7,6 +7,7 @@ Monolito modular en TypeScript con 6 módulos de negocio:
 - Plan de trabajo: [`ROADMAP.md`](ROADMAP.md)
 - Modelo de datos y DER: [`MODELO-DE-DATOS.md`](MODELO-DE-DATOS.md)
 - Guía de contribución: [`CONTRIBUTING.md`](CONTRIBUTING.md)
+- Módulo Facturación (Explicación Back & Front): [`README-FACTURACION.md`](README-FACTURACION.md)
 - Decisiones de arquitectura: [`docs/adr/`](docs/adr/) · Diagramas C4/DFD: [`docs/c4/`](docs/c4/), [`docs/dfd/`](docs/dfd/)
 
 ---

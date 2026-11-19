@@ -1,3 +1,9 @@
+/**
+ * Agregado raíz de Dominio: Cuenta
+ * Representa la cuenta corriente sanitaria de un paciente (Consulta o Internación).
+ * Encapsula la colección de cargos, cálculo de total bruto, bonificación por obra social,
+ * saldo neto a pagar y reglas de transición de estado (ABIERTA -> CERRADA).
+ */
 import {
   AggregateRoot,
   ErrorDeValidacion,

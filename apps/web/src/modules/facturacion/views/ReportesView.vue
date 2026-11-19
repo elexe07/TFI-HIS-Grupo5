@@ -1,3 +1,11 @@
+<!--
+  Vista: ReportesView.vue
+  Módulo: Facturación
+  Funcionalidad:
+    - Tablero administrativo con dos tipos de reportes ejecutivos:
+      1. Reporte de Facturación (FAC-06): Ingresos por rango de fechas, discriminados por concepto y obra social.
+      2. Reporte de Ocupación Hospitalaria (FAC-07): Censo de camas libres, ocupadas, en limpieza y % global.
+-->
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useFacturacionStore } from '@/modules/facturacion/facturacion.store';

@@ -1,3 +1,12 @@
+<!--
+  Vista: CuentaDetalleView.vue
+  Módulo: Facturación
+  Funcionalidad:
+    - Vista maestra-detalle de una cuenta específica según su ID en la ruta (/facturacion/cuenta/:id).
+    - Muestra los cargos detallados (consultas, medicación, días cama).
+    - Desglosa total bruto, descuento por obra social/prepaga y saldo neto a pagar.
+    - Permite el cierre administrativo de la cuenta cuando está en estado ABIERTA.
+-->
 <script setup lang="ts">
 import { onMounted, ref, computed, watch } from 'vue';
 import { useFacturacionStore } from '@/modules/facturacion/facturacion.store';

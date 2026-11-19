@@ -1,3 +1,11 @@
+<!--
+  Vista: CuentasView.vue
+  Módulo: Facturación
+  Funcionalidad:
+    - Lista general de cuentas hospitalarias (consultas e internaciones).
+    - Filtros reactivos por estado (ABIERTA / CERRADA), tipo de cuenta y búsqueda por paciente.
+    - Acceso directo al detalle y liquidación de cada cuenta.
+-->
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { useFacturacionStore } from '@/modules/facturacion/facturacion.store';

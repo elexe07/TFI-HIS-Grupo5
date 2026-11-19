@@ -1,3 +1,11 @@
+<!--
+  Vista: CoberturaView.vue
+  Módulo: Facturación
+  Funcionalidad:
+    - Validación en tiempo real de credenciales y afiliaciones de Obras Sociales / Prepagas (CASO FAC-04).
+    - Catálogo visual de convenios con financiadores y tarifas vigentes.
+    - Permite aplicar inmediatamente el porcentaje de cobertura aprobado a una cuenta hospitalaria.
+-->
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { useFacturacionStore } from '@/modules/facturacion/facturacion.store';

@@ -29,7 +29,6 @@ const columns: TableColumn[] = [
   },
   { key: 'motivo', label: 'Motivo', width: '140px' },
   { key: 'diagnostico', label: 'Diagnóstico', width: '180px' },
-  { key: 'actions', label: 'Acciones', width: '100px' },
 ];
 
 async function cargarDatos() {

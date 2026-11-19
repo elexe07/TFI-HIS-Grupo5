@@ -1,20 +1,11 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { type CasoDeUso, CLOCK, type Clock } from '../../../../building-blocks/application';
-import { type SeveridadAlergia } from '../../domain/entidades';
 import { HistoriaClinicaNoEncontrada } from '../../domain/errores';
 import {
   HISTORIA_CLINICA_REPOSITORY,
   type HistoriaClinicaRepository,
 } from '../../domain/historia-clinica.repository';
-
-export class RegistrarAlergiaCommand {
-  constructor(
-    readonly pacienteId: string,
-    readonly sustancia: string,
-    readonly severidad: SeveridadAlergia,
-    readonly registradoPor: string,
-  ) {}
-}
+import type { RegistrarAlergiaCommand } from './registrar-alergia.command';
 
 @Injectable()
 export class RegistrarAlergiaHandler implements CasoDeUso<RegistrarAlergiaCommand, { id: string }> {

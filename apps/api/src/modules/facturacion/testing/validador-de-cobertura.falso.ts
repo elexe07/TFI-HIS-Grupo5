@@ -1,8 +1,8 @@
 import {
   type ResultadoValidacionCobertura,
   type ValidadorDeCobertura,
-} from '../domain/ports/validador-de-cobertura';
-import type { ObraSocialRepository } from '../domain/ports/obra-social.repository';
+} from '../domain/validador-de-cobertura';
+import type { ObraSocialRepository } from '../domain/obra-social.repository';
 
 export class ValidadorDeCoberturaFalso implements ValidadorDeCobertura {
   constructor(private readonly obraSocialRepo?: ObraSocialRepository) {}

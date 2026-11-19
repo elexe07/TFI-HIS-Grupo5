@@ -6,8 +6,8 @@ import { Cargo } from '../../domain/cargo';
 import { Cuenta } from '../../domain/cuenta';
 import { ConceptoCargo, TipoCuenta } from '../../domain/enums';
 import { TarifaNoEncontrada } from '../../domain/errores';
-import { CUENTA_REPOSITORY, type CuentaRepository } from '../../domain/ports/cuenta.repository';
-import { TARIFA_REPOSITORY, type TarifaRepository } from '../../domain/ports/tarifa.repository';
+import { CUENTA_REPOSITORY, type CuentaRepository } from '../../domain/cuenta.repository';
+import { TARIFA_REPOSITORY, type TarifaRepository } from '../../domain/tarifa.repository';
 
 @Injectable()
 export class CerrarCuentaInternacionHandler {

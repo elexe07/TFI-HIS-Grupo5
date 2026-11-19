@@ -1,14 +1,16 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { CasoDeUso } from '../../../../building-blocks/application';
 import {
+  EstadoCama,
+  CAMA_REPOSITORY,
+  HABITACION_REPOSITORY,
+  INTERNACION_REPOSITORY,
   type Cama,
   type CamaRepository,
-  EstadoCama,
   type Habitacion,
   type HabitacionRepository,
   type InternacionRepository,
 } from '../../domain';
-import { CAMA_REPOSITORY, HABITACION_REPOSITORY, INTERNACION_REPOSITORY } from '../ports/tokens';
 import type {
   CamaMapaDto,
   HabitacionMapaDto,

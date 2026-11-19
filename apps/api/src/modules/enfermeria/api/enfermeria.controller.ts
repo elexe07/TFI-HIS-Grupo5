@@ -48,10 +48,10 @@ import { RegistrarNotaEnfermeriaCommand } from '../application/registrar-nota-en
 import { RegistrarNotaEnfermeriaHandler } from '../application/registrar-nota-enfermeria/registrar-nota-enfermeria.handler';
 import { RegistrarSignosVitalesCommand } from '../application/registrar-signos-vitales/registrar-signos-vitales.command';
 import { RegistrarSignosVitalesHandler } from '../application/registrar-signos-vitales/registrar-signos-vitales.handler';
-import type { AdministracionMedicacionDto } from '../application/dtos/administracion-medicacion.dto';
-import type { IndicacionDto } from '../application/dtos/indicacion.dto';
-import type { NotaEnfermeriaDto } from '../application/dtos/nota-enfermeria.dto';
-import type { SignosVitalesDto } from '../application/dtos/signos-vitales.dto';
+import type { AdministracionMedicacionDto } from '../application/administracion-medicacion.dto';
+import type { IndicacionDto } from '../application/indicacion.dto';
+import type { NotaEnfermeriaDto } from '../application/nota-enfermeria.dto';
+import type { SignosVitalesDto } from '../application/signos-vitales.dto';
 import { GenerarIndicacionesDto } from './dto/generar-indicaciones.dto';
 import { ListarFiltrosDto } from './dto/listar-filtros.dto';
 import { ListarIndicacionesDto } from './dto/listar-indicaciones.dto';

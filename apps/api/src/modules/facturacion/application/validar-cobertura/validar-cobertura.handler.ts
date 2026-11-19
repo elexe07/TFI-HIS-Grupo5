@@ -1,11 +1,11 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { CLOCK, type Clock } from '../../../../building-blocks/application';
 import type { CasoDeUso } from '../../../../building-blocks/application/caso-de-uso';
-import { CUENTA_REPOSITORY, type CuentaRepository } from '../../domain/ports/cuenta.repository';
+import { CUENTA_REPOSITORY, type CuentaRepository } from '../../domain/cuenta.repository';
 import {
   VALIDADOR_DE_COBERTURA,
   type ValidadorDeCobertura,
-} from '../../domain/ports/validador-de-cobertura';
+} from '../../domain/validador-de-cobertura';
 import type {
   ValidarCoberturaCommand,
   ValidarCoberturaResultado,

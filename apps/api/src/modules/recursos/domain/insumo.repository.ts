@@ -1,6 +1,8 @@
 import type { Id } from '../../../building-blocks/domain';
 import type { Insumo } from './insumo';
 
+export const INSUMO_REPOSITORY = Symbol('InsumoRepository');
+
 export interface FiltroInsumos {
   bajoMinimo?: boolean;
 }

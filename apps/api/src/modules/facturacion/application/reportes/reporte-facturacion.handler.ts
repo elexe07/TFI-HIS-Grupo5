@@ -5,7 +5,7 @@ import {
   REPORTE_FACTURACION_REPOSITORY,
   type ReporteFacturacionPeriodo,
   type ReporteFacturacionRepository,
-} from '../../domain/ports/reporte-facturacion.repository';
+} from '../../domain/reporte-facturacion.repository';
 
 export interface ReporteFacturacionQuery {
   readonly desde: Date;

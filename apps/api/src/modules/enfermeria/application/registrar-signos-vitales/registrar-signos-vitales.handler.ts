@@ -5,7 +5,7 @@ import {
   SIGNOS_VITALES_REPOSITORY,
   type SignosVitalesRepository,
 } from '../../domain/signos-vitales.repository';
-import { mapearSignosVitalesADto, type SignosVitalesDto } from '../dtos/signos-vitales.dto';
+import { mapearSignosVitalesADto, type SignosVitalesDto } from '../signos-vitales.dto';
 import { RegistrarSignosVitalesCommand } from './registrar-signos-vitales.command';
 
 @Injectable()

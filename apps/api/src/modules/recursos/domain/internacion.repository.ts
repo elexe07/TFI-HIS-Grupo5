@@ -1,6 +1,8 @@
 import type { Id } from '../../../building-blocks/domain';
 import type { Internacion } from './internacion';
 
+export const INTERNACION_REPOSITORY = Symbol('InternacionRepository');
+
 export interface InternacionRepository {
   buscarPorId(id: Id): Promise<Internacion | null>;
   buscarActivaPorPacienteId(pacienteId: Id): Promise<Internacion | null>;

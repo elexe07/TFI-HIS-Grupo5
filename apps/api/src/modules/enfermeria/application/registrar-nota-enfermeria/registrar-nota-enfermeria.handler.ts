@@ -5,7 +5,7 @@ import {
   NOTA_ENFERMERIA_REPOSITORY,
   type NotaEnfermeriaRepository,
 } from '../../domain/nota-enfermeria.repository';
-import { mapearNotaADto, type NotaEnfermeriaDto } from '../dtos/nota-enfermeria.dto';
+import { mapearNotaADto, type NotaEnfermeriaDto } from '../nota-enfermeria.dto';
 import { RegistrarNotaEnfermeriaCommand } from './registrar-nota-enfermeria.command';
 
 @Injectable()

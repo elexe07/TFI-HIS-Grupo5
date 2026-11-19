@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { RouterView } from 'vue-router';
-import { useAuthStore } from '@/stores/auth';
-import AppHeader from '@/components/layout/AppHeader.vue';
-import AppSidebar from '@/components/layout/AppSidebar.vue';
-import ToastContainer from '@/components/ui/ToastContainer.vue';
+import { useAuthStore } from '@/modules/iam/auth.store';
+import AppHeader from '@/layout/AppHeader.vue';
+import AppSidebar from '@/layout/AppSidebar.vue';
+import ToastContainer from '@/shared/components/ui/ToastContainer.vue';
 import { onMounted } from 'vue';
 
 const authStore = useAuthStore();

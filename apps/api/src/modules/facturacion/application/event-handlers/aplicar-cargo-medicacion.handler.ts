@@ -6,12 +6,12 @@ import { MEDICACION_ADMINISTRADA, type MedicacionAdministrada } from '../../../e
 import { Cargo } from '../../domain/cargo';
 import { Cuenta } from '../../domain/cuenta';
 import { ConceptoCargo, EstadoCuenta, TipoCuenta } from '../../domain/enums';
-import { CUENTA_REPOSITORY, type CuentaRepository } from '../../domain/ports/cuenta.repository';
+import { CUENTA_REPOSITORY, type CuentaRepository } from '../../domain/cuenta.repository';
 import {
   OBRA_SOCIAL_REPOSITORY,
   type ObraSocialRepository,
-} from '../../domain/ports/obra-social.repository';
-import { TARIFA_REPOSITORY, type TarifaRepository } from '../../domain/ports/tarifa.repository';
+} from '../../domain/obra-social.repository';
+import { TARIFA_REPOSITORY, type TarifaRepository } from '../../domain/tarifa.repository';
 
 @Injectable()
 export class AplicarCargoMedicacionHandler {

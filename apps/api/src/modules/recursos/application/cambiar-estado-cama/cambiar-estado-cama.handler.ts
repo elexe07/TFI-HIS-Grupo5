@@ -1,8 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { CasoDeUso } from '../../../../building-blocks/application';
-import { type CamaRepository, CamaNoEncontrada } from '../../domain';
+import { CamaNoEncontrada, CAMA_REPOSITORY, type CamaRepository } from '../../domain';
 import { mapearCamaADto, type CamaDto } from '../cama.dto';
-import { CAMA_REPOSITORY } from '../ports/tokens';
 import type { CambiarEstadoCamaCommand } from './cambiar-estado-cama.command';
 
 @Injectable()

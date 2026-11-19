@@ -3,8 +3,8 @@ import { createPinia } from 'pinia';
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate';
 import router from './router';
 import App from './App.vue';
-import { useAuthStore } from '@/stores/auth';
-import { useThemeStore } from '@/stores/theme';
+import { useAuthStore } from '@/modules/iam/auth.store';
+import { useThemeStore } from '@/shared/stores/theme';
 import './assets/styles/main.css';
 
 const app = createApp(App);

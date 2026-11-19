@@ -45,3 +45,77 @@ Cualquier otra transición lanza `TransicionDeCamaInvalida` (extiende `Conflicto
 ## Permisos
 
 `camas:leer`, `camas:gestionar`, `internaciones:gestionar`, `insumos:gestionar`
+
+## Estructura
+
+Todos los módulos tienen la misma forma (copiada de `modules/ejemplo/`):
+
+```
+recursos/
+├── domain/                     ← reglas de negocio + PUERTOS (*.repository.ts). Sin Nest/Prisma
+│   ├── events/                   paciente-dado-de-alta.ts, paciente-internado.ts
+│   ├── cama.repository.ts
+│   ├── cama.ts
+│   ├── errores.ts
+│   ├── eventos-procesados.repository.ts
+│   ├── habitacion.repository.ts
+│   ├── habitacion.ts
+│   ├── index.ts
+│   ├── insumo.repository.ts
+│   ├── insumo.ts
+│   ├── internacion.repository.ts
+│   └── internacion.ts
+├── application/                ← casos de uso: una carpeta por caso (command/query + handler + spec)
+│   ├── cambiar-estado-cama/
+│   ├── dar-de-alta/
+│   ├── descontar-insumo-evento/
+│   ├── internar-paciente/
+│   ├── listar-insumos/
+│   ├── listar-internaciones/
+│   ├── obtener-mapa-camas/
+│   ├── registrar-egreso-insumo/
+│   ├── registrar-ingreso-insumo/
+│   ├── event-handlers/           @OnEvent: descontar-insumo-al-administrar-medicacion
+│   └── cama.dto.ts  insumo.dto.ts  internacion.dto.ts  mapeos dominio → DTO de respuesta
+├── infrastructure/             ← adaptadores: implementan los puertos con Prisma (o simulados)
+│   ├── cama.repository.prisma.ts
+│   ├── eventos-procesados.repository.prisma.ts
+│   ├── habitacion.repository.prisma.ts
+│   ├── insumo.repository.prisma.ts
+│   └── internacion.repository.prisma.ts
+├── api/                        ← controllers HTTP + DTOs de entrada con class-validator
+│   ├── camas.controller.ts
+│   ├── insumos.controller.ts
+│   ├── internaciones.controller.ts
+│   └── dto/                      6 DTOs de entrada
+├── public/                     ← lo ÚNICO que otros módulos pueden importar (eventos, tipos)
+│   └── index.ts
+├── testing/                    ← repositorios en memoria y fakes para los tests
+│   └── cama.repository.en-memoria, eventos-procesados.repository.en-memoria, habitacion.repository.en-memoria, index, insumo.repository.en-memoria, internacion.repository.en-memoria
+└── recursos.module.ts          ← enchufa todo: { provide: PUERTO, useClass: AdaptadorPrisma }
+```
+
+## Cómo explicarlo (de la pantalla a la base de datos)
+
+Caso: **internar un paciente** (máquina de estados de la cama + evento hacia Facturación).
+
+```
+[web] modules/recursos/views/InternacionesView.vue  form → recursosStore.internarPaciente(data)
+  → modules/recursos/recursos.store.ts              internarPaciente()
+    → modules/recursos/recursos.api.ts              POST /api/internaciones
+[api] api/internaciones.controller.ts               @RequierePermiso(INTERNACIONES_GESTIONAR), valida InternarPacienteDto
+  → application/internar-paciente/                  InternarPacienteHandler.ejecutar(command)
+    → cama.repository.buscarPorId                   si no existe: CamaNoEncontrada; si no está LIBRE: CamaNoLibre
+    → internacion.repository.buscarActivaPorPacienteId   si ya está internado: PacienteYaInternado
+    → domain/internacion.ts                         Internacion.crear(...) → registra PacienteInternado
+    → domain/cama.ts                                cama.ocupar()   (LIBRE → OCUPADA)
+    → guarda internación y cama                     → infrastructure/*.repository.prisma.ts
+    → EventBus.publicar(...)  'recursos.paciente-internado'
+        → facturacion/.../abrir-cuenta-internacion.handler.ts  (abre la cuenta del paciente)
+  ← InternacionDto
+```
+
+Al dar de alta (`dar-de-alta/`) la cama pasa a EN_LIMPIEZA y se publica `recursos.paciente-dado-de-alta`,
+que cierra la cuenta en Facturación.
+
+Pantallas de este módulo: `apps/web/src/modules/recursos/` (ver `apps/web/README.md`).

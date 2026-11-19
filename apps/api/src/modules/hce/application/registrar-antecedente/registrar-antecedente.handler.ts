@@ -5,15 +5,7 @@ import {
   HISTORIA_CLINICA_REPOSITORY,
   type HistoriaClinicaRepository,
 } from '../../domain/historia-clinica.repository';
-
-export class RegistrarAntecedenteCommand {
-  constructor(
-    readonly pacienteId: string,
-    readonly parentesco: string,
-    readonly condicion: string,
-    readonly registradoPor: string,
-  ) {}
-}
+import type { RegistrarAntecedenteCommand } from './registrar-antecedente.command';
 
 @Injectable()
 export class RegistrarAntecedenteHandler implements CasoDeUso<

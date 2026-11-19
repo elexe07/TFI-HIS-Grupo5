@@ -1,5 +1,5 @@
 import { ConceptoCargo } from '../domain/enums';
-import type { TarifaRepository } from '../domain/ports/tarifa.repository';
+import type { TarifaRepository } from '../domain/tarifa.repository';
 import { Tarifa } from '../domain/tarifa';
 
 export class TarifaRepositoryEnMemoria implements TarifaRepository {

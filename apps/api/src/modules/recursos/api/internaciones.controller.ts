@@ -4,7 +4,6 @@ import {
   Get,
   HttpCode,
   HttpStatus,
-  Inject,
   Param,
   ParseUUIDPipe,
   Post,
@@ -23,11 +22,11 @@ import {
 import { PERMISOS, RequierePermiso } from '../../iam/public';
 import { DarDeAltaCommand } from '../application/dar-de-alta/dar-de-alta.command';
 import { DarDeAltaHandler } from '../application/dar-de-alta/dar-de-alta.handler';
-import { mapearInternacionADto, type InternacionDto } from '../application/internacion.dto';
+import type { InternacionDto } from '../application/internacion.dto';
 import { InternarPacienteCommand } from '../application/internar-paciente/internar-paciente.command';
 import { InternarPacienteHandler } from '../application/internar-paciente/internar-paciente.handler';
-import { INTERNACION_REPOSITORY } from '../application/ports/tokens';
-import type { InternacionRepository } from '../domain';
+import { ListarInternacionesHandler } from '../application/listar-internaciones/listar-internaciones.handler';
+import { ListarInternacionesQuery } from '../application/listar-internaciones/listar-internaciones.query';
 import { DarDeAltaDto } from './dto/dar-de-alta.dto';
 import { InternarPacienteDto } from './dto/internar-paciente.dto';
 
@@ -38,17 +37,15 @@ export class InternacionesController {
   constructor(
     private readonly internarPaciente: InternarPacienteHandler,
     private readonly darDeAlta: DarDeAltaHandler,
-    @Inject(INTERNACION_REPOSITORY)
-    private readonly internacionesRepo: InternacionRepository,
+    private readonly listarInternaciones: ListarInternacionesHandler,
   ) {}
 
   @Get()
   @RequierePermiso(PERMISOS.INTERNACIONES_GESTIONAR)
   @ApiOperation({ summary: 'Listar internaciones' })
   @ApiOkResponse({ description: 'Lista de internaciones' })
-  async listar(@Query('estado') estado?: string): Promise<InternacionDto[]> {
-    const internaciones = await this.internacionesRepo.buscarTodas(estado ? { estado } : undefined);
-    return internaciones.map(mapearInternacionADto);
+  listar(@Query('estado') estado?: string): Promise<InternacionDto[]> {
+    return this.listarInternaciones.ejecutar(new ListarInternacionesQuery(estado));
   }
 
   @Post()

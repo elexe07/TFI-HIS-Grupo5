@@ -158,13 +158,33 @@ _(Para probar roles como **Enfermero** o **Recepcionista**, se pueden crear nuev
 │   │           └── facturacion/  # Cuentas, Cargos, Coberturas y Reportes
 │   └── web/                      # Frontend SPA en Vue 3 + Pinia + Vite
 │       └── src/
-│           ├── components/       # Componentes UI reutilizables (Botones, Tablas, Modales, etc.)
-│           ├── stores/           # Gestión de estado global con Pinia
-│           ├── views/            # Vistas agrupadas por módulo de negocio
-│           ├── router/           # Rutas y guards de navegación según permisos
-│           └── services/         # Clientes HTTP hacia la API con Axios
+│           ├── modules/          # Un módulo por carpeta, mismos nombres que en la API:
+│           │                     #   views/ + <modulo>.store.ts + <modulo>.api.ts + <modulo>.types.ts + <modulo>.routes.ts
+│           ├── shared/           # Genérico (componentes UI, cliente HTTP Axios, toasts, tema)
+│           ├── layout/           # Header y sidebar (menú según permisos)
+│           └── router/           # Junta las rutas de cada módulo + guards de login y permisos
 ├── docs/                         # Documentación técnica (ADRs, diagramas C4 y DFD)
 └── docker-compose.yml            # Definición de infraestructura Docker (PostgreSQL 16)
 ```
 
 ---
+
+## 🗣️ Cómo explicar un módulo
+
+Back y front usan **los mismos nombres de módulo** (`iam`, `admision`, `hce`, `enfermeria`, `recursos`, `facturacion`)
+y todos los módulos tienen la misma forma, así que se explican siempre igual:
+
+1. **Qué hace:** `apps/api/src/modules/<modulo>/README.md` → casos de uso, eventos, tablas.
+2. **Recorrido de una request:** sección _"Cómo explicarlo"_ del mismo README (pantalla → store → api → controller → caso de uso → dominio → repositorio).
+3. **Las capas del backend** (regla de dependencia: todo apunta hacia `domain/`):
+
+| Carpeta           | Qué hay                                                         | Puede importar             |
+| :---------------- | :-------------------------------------------------------------- | :------------------------- |
+| `domain/`         | Entidades, reglas, errores y **puertos** (`*.repository.ts`)    | nada (ni NestJS ni Prisma) |
+| `application/`    | **Una carpeta por caso de uso**: command/query + handler + spec | `domain/`                  |
+| `infrastructure/` | Adaptadores: repositorios Prisma, servicios simulados           | `domain/`, `application/`  |
+| `api/`            | Controllers HTTP + DTOs de entrada validados                    | `application/`, `domain/`  |
+| `public/`         | Lo único que otros módulos pueden importar (eventos, tipos)     | —                          |
+| `testing/`        | Repositorios en memoria para los tests                          | —                          |
+
+`pnpm arch` (dependency-cruiser) verifica estas reglas en CI. El frontend está explicado en [`apps/web/README.md`](apps/web/README.md).

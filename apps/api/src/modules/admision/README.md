@@ -42,3 +42,83 @@ El índice único parcial de turnos (médico + inicio, solo RESERVADO) ya está 
 ## Permisos que usa (coordinar con IAM)
 
 `pacientes:registrar`, `pacientes:leer`, `agenda:definir`, `turnos:reservar`, `turnos:cancelar`, `triaje:registrar`, `guardia:leer`
+
+## Estructura
+
+Todos los módulos tienen la misma forma (copiada de `modules/ejemplo/`):
+
+```
+admision/
+├── domain/                     ← reglas de negocio + PUERTOS (*.repository.ts). Sin Nest/Prisma
+│   ├── events/                   paciente-registrado.ts
+│   ├── agenda.repository.ts
+│   ├── agenda.ts
+│   ├── cobertura.ts
+│   ├── documento.ts
+│   ├── errores.ts
+│   ├── medico.repository.ts
+│   ├── medico.ts
+│   ├── paciente.repository.ts
+│   ├── paciente.ts
+│   ├── tipos.ts
+│   ├── triaje.repository.ts
+│   ├── triaje.ts
+│   ├── turno.repository.ts
+│   └── turno.ts
+├── application/                ← casos de uso: una carpeta por caso (command/query + handler + spec)
+│   ├── atender-triaje/
+│   ├── buscar-paciente-por-id/
+│   ├── buscar-pacientes/
+│   ├── cancelar-turno/
+│   ├── definir-agenda/
+│   ├── listar-medicos/
+│   ├── listar-turnos/
+│   ├── obtener-agenda/
+│   ├── obtener-cola-guardia/
+│   ├── registrar-medico/
+│   ├── registrar-paciente/
+│   ├── registrar-triaje/
+│   ├── reservar-turno/
+│   └── agenda.dto.ts  medico.dto.ts  paciente.dto.ts  triaje.dto.ts  turno.dto.ts  mapeos dominio → DTO de respuesta
+├── infrastructure/             ← adaptadores: implementan los puertos con Prisma (o simulados)
+│   ├── agenda.repository.prisma.ts
+│   ├── medico.repository.prisma.ts
+│   ├── paciente.repository.prisma.ts
+│   ├── triaje.repository.prisma.ts
+│   └── turno.repository.prisma.ts
+├── api/                        ← controllers HTTP + DTOs de entrada con class-validator
+│   ├── guardia.controller.ts
+│   ├── medicos.controller.ts
+│   ├── pacientes.controller.ts
+│   ├── triajes.controller.ts
+│   ├── turnos.controller.ts
+│   └── dto/                      7 DTOs de entrada
+├── public/                     ← lo ÚNICO que otros módulos pueden importar (eventos, tipos)
+│   └── index.ts
+├── testing/                    ← repositorios en memoria y fakes para los tests
+│   └── agenda.repository.en-memoria, index, medico.repository.en-memoria, paciente.repository.en-memoria, triaje.repository.en-memoria, turno.repository.en-memoria
+└── admision.module.ts          ← enchufa todo: { provide: PUERTO, useClass: AdaptadorPrisma }
+```
+
+## Cómo explicarlo (de la pantalla a la base de datos)
+
+Caso: **reservar un turno**.
+
+```
+[web] modules/admision/views/TurnosView.vue    form → admisionStore.reservarTurno(data)
+  → modules/admision/admision.store.ts         reservarTurno(): loading, agrega el turno a la lista
+    → modules/admision/admision.api.ts         admisionApi.reservarTurno() → POST /api/turnos
+[api] api/turnos.controller.ts                 @RequierePermiso(TURNOS_RESERVAR), valida ReservarTurnoDto
+  → application/reservar-turno/                ReservarTurnoHandler.ejecutar(command)
+    → paciente.repository / medico.repository  ¿existen?  si no: PacienteNoEncontrado / MedicoNoEncontrado
+    → domain/agenda.ts                         agenda.permiteTurno(inicio, fin)  si no: TurnoFueraDeAgenda
+    → turno.repository.buscarSuperpuesto       si hay otro turno: FranjaOcupada
+    → domain/turno.ts                          Turno.crear(...)   (la entidad nace válida)
+    → turno.repository.guardar                 → infrastructure/turno.repository.prisma.ts → PostgreSQL
+  ← TurnoDto
+```
+
+Otro caso para mostrar eventos: **registrar paciente** publica `admision.paciente-registrado` y HCE abre la
+historia clínica sola (`hce/application/event-handlers/abrir-historia-al-registrar-paciente.handler.ts`).
+
+Pantallas de este módulo: `apps/web/src/modules/admision/` (ver `apps/web/README.md`).

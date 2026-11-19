@@ -1,6 +1,6 @@
 import { Cuenta } from '../domain/cuenta';
 import { TipoCuenta } from '../domain/enums';
-import type { CuentaRepository } from '../domain/ports/cuenta.repository';
+import type { CuentaRepository } from '../domain/cuenta.repository';
 
 export class CuentaRepositoryEnMemoria implements CuentaRepository {
   private cuentas = new Map<string, Cuenta>();

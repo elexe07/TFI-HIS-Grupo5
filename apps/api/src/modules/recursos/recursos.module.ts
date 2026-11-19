@@ -7,6 +7,7 @@ import { DarDeAltaHandler } from './application/dar-de-alta/dar-de-alta.handler'
 import { DescontarInsumoAlAdministrarMedicacionHandler } from './application/event-handlers/descontar-insumo-al-administrar-medicacion.handler';
 import { DescontarInsumoPorEventoHandler } from './application/descontar-insumo-evento/descontar-insumo-evento.handler';
 import { InternarPacienteHandler } from './application/internar-paciente/internar-paciente.handler';
+import { ListarInternacionesHandler } from './application/listar-internaciones/listar-internaciones.handler';
 import { ListarInsumosHandler } from './application/listar-insumos/listar-insumos.handler';
 import { ObtenerMapaCamasHandler } from './application/obtener-mapa-camas/obtener-mapa-camas.handler';
 import {
@@ -15,7 +16,7 @@ import {
   HABITACION_REPOSITORY,
   INSUMO_REPOSITORY,
   INTERNACION_REPOSITORY,
-} from './application/ports/tokens';
+} from './domain';
 import { RegistrarIngresoInsumoHandler } from './application/registrar-ingreso-insumo/registrar-ingreso-insumo.handler';
 import { RegistrarEgresoInsumoHandler } from './application/registrar-egreso-insumo/registrar-egreso-insumo.handler';
 import { CamaRepositoryPrisma } from './infrastructure/cama.repository.prisma';
@@ -40,6 +41,7 @@ import { InternacionRepositoryPrisma } from './infrastructure/internacion.reposi
     RegistrarEgresoInsumoHandler,
     DescontarInsumoPorEventoHandler,
     ListarInsumosHandler,
+    ListarInternacionesHandler,
     // Event listener
     DescontarInsumoAlAdministrarMedicacionHandler,
     // Puertos -> Adaptadores de Infraestructura

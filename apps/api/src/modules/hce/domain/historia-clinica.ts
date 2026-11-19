@@ -1,15 +1,12 @@
 import { AggregateRoot, generarId } from '../../../building-blocks/domain';
-import {
-  Alergia,
-  AntecedenteFamiliar,
-  Evolucion,
-  Estudio,
-  Prescripcion,
-  type SeveridadAlergia,
-  type TipoEstudio,
-} from './entidades';
+import { Alergia, type SeveridadAlergia } from './alergia';
+import { AntecedenteFamiliar } from './antecedente-familiar';
+import { Estudio, type TipoEstudio } from './estudio';
+import { Evolucion } from './evolucion';
+import { Prescripcion } from './prescripcion';
 import { AlergiaDuplicada, PacienteAlergicoAMedicamento } from './errores';
-import { EvolucionRegistrada, PrescripcionCreada } from './events/hce-events';
+import { EvolucionRegistrada } from './events/evolucion-registrada';
+import { PrescripcionCreada } from './events/prescripcion-creada';
 
 export class HistoriaClinica extends AggregateRoot {
   private readonly _alergias: Alergia[];

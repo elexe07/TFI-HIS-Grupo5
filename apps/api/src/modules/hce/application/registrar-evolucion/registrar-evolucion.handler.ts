@@ -11,18 +11,7 @@ import {
   HISTORIA_CLINICA_REPOSITORY,
   type HistoriaClinicaRepository,
 } from '../../domain/historia-clinica.repository';
-
-export class RegistrarEvolucionCommand {
-  constructor(
-    readonly pacienteId: string,
-    readonly medicoId: string,
-    readonly motivo: string,
-    readonly diagnostico: string,
-    readonly tratamiento?: string,
-    readonly turnoId?: string,
-    readonly internacionId?: string,
-  ) {}
-}
+import type { RegistrarEvolucionCommand } from './registrar-evolucion.command';
 
 @Injectable()
 export class RegistrarEvolucionHandler implements CasoDeUso<

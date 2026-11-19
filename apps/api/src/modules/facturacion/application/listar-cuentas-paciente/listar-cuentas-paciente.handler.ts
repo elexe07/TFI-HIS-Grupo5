@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { CasoDeUso } from '../../../../building-blocks/application/caso-de-uso';
-import { CUENTA_REPOSITORY, type CuentaRepository } from '../../domain/ports/cuenta.repository';
+import { CUENTA_REPOSITORY, type CuentaRepository } from '../../domain/cuenta.repository';
 import {
   mapearCuentaADetalleDto,
   type CuentaDetalleDto,

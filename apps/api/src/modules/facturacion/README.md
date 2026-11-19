@@ -48,3 +48,83 @@ Mientras los otros módulos no estén listos, probar los handlers con eventos fa
 ## Permisos
 
 `facturacion:leer`, `cobertura:validar`, `reportes:leer`
+
+## Estructura
+
+Todos los módulos tienen la misma forma (copiada de `modules/ejemplo/`):
+
+```
+facturacion/
+├── domain/                     ← reglas de negocio + PUERTOS (*.repository.ts). Sin Nest/Prisma
+│   ├── cargo.ts
+│   ├── consultor-de-ocupacion.ts
+│   ├── cuenta.repository.ts
+│   ├── cuenta.ts
+│   ├── enums.ts
+│   ├── errores.ts
+│   ├── obra-social.repository.ts
+│   ├── obra-social.ts
+│   ├── reporte-facturacion.repository.ts
+│   ├── tarifa.repository.ts
+│   ├── tarifa.ts
+│   └── validador-de-cobertura.ts
+├── application/                ← casos de uso: una carpeta por caso (command/query + handler + spec)
+│   ├── cerrar-cuenta/
+│   ├── consultar-cuenta/
+│   ├── listar-cuentas-paciente/
+│   ├── listar-obras-sociales/
+│   ├── listar-tarifas/
+│   ├── reportes/
+│   ├── validar-cobertura/
+│   └── event-handlers/           @OnEvent: abrir-cuenta-internacion, aplicar-cargo-consulta, aplicar-cargo-medicacion, cerrar-cuenta-internacion
+├── infrastructure/             ← adaptadores: implementan los puertos con Prisma (o simulados)
+│   ├── consultor-de-ocupacion.prisma.ts
+│   ├── cuenta.repository.prisma.ts
+│   ├── obra-social.repository.prisma.ts
+│   ├── reporte-facturacion.repository.prisma.ts
+│   ├── tarifa.repository.prisma.ts
+│   └── validador-de-cobertura.simulado.ts
+├── api/                        ← controllers HTTP + DTOs de entrada con class-validator
+│   ├── cobertura.controller.ts
+│   ├── cuentas.controller.ts
+│   ├── obras-sociales.controller.ts
+│   ├── reportes.controller.ts
+│   └── dto/                      3 DTOs de entrada
+├── public/                     ← lo ÚNICO que otros módulos pueden importar (eventos, tipos)
+│   └── index.ts
+├── testing/                    ← repositorios en memoria y fakes para los tests
+│   └── consultor-de-ocupacion.falso, cuenta.repository.en-memoria, index, obra-social.repository.en-memoria, reporte-facturacion.repository.en-memoria, tarifa.repository.en-memoria, validador-de-cobertura.falso
+└── facturacion.module.ts       ← enchufa todo: { provide: PUERTO, useClass: AdaptadorPrisma }
+```
+
+## Cómo explicarlo (de la pantalla a la base de datos)
+
+Facturación casi no tiene "botones": **reacciona a eventos** de los otros módulos. Es el mejor módulo
+para mostrar la comunicación por eventos.
+
+Caso 1 (automático): **cobrar una consulta cuando el médico registra una evolución**.
+
+```
+hce publica 'hce.evolucion-registrada'
+  → application/event-handlers/aplicar-cargo-consulta.handler.ts   @OnEvent(EVOLUCION_REGISTRADA)
+    → cuenta.repository.existeCargoConOrigenEvento   idempotencia: si el evento ya se procesó, no cobra dos veces
+    → busca (o abre) la cuenta del paciente          domain/cuenta.ts  Cuenta.abrir(...) con el % de su obra social
+    → tarifa.repository.buscarPorConcepto(CONSULTA)  si no hay tarifa: TarifaNoEncontrada
+    → domain/cargo.ts  Cargo.crear(...) + cuenta.agregarCargo(cargo)
+    → cuenta.repository.guardar                      → infrastructure/cuenta.repository.prisma.ts
+```
+
+Caso 2 (pantalla): **ver el detalle de una cuenta**.
+
+```
+[web] modules/facturacion/views/CuentaDetalleView.vue  → facturacionStore.obtenerCuenta(id)
+  → modules/facturacion/facturacion.api.ts             GET /api/cuentas/:id
+[api] api/cuentas.controller.ts                        → application/consultar-cuenta/ConsultarCuentaHandler
+  → cuenta.repository.buscarPorId                      → CuentaDetalleDto (cargos, total bruto, descuento por cobertura, total)
+```
+
+La validación de cobertura usa un puerto (`domain/validador-de-cobertura.ts`) con un adaptador **simulado**
+(`infrastructure/validador-de-cobertura.simulado.ts`): para conectar una obra social real solo se cambia el
+adaptador en `facturacion.module.ts`.
+
+Pantallas de este módulo: `apps/web/src/modules/facturacion/` (ver `apps/web/README.md`).

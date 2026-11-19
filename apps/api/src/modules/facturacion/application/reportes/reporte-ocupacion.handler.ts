@@ -4,7 +4,7 @@ import {
   CONSULTOR_DE_OCUPACION,
   type ConsultorDeOcupacion,
   type ResumenOcupacion,
-} from '../../domain/ports/consultor-de-ocupacion';
+} from '../../domain/consultor-de-ocupacion';
 
 @Injectable()
 export class ReporteOcupacionHandler implements CasoDeUso<void, ResumenOcupacion> {

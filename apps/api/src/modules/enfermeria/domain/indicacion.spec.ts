@@ -1,7 +1,7 @@
 import { ESTADOS_INDICACION } from './estado-indicacion';
 import { IndicacionNoEstaPendiente, MotivoOmisionRequerido } from './errores';
 import { Indicacion } from './indicacion';
-import { MEDICACION_ADMINISTRADA } from './events/medicacion-administrada.event';
+import { MEDICACION_ADMINISTRADA } from './events/medicacion-administrada';
 
 describe('Indicacion', () => {
   const fecha = new Date('2026-10-23T10:00:00Z');

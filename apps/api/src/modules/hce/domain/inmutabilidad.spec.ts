@@ -1,4 +1,4 @@
-import { HistoriaClinicaRepositoryEnMemoria } from '../infrastructure/historia-clinica.repository.en-memoria';
+import { HistoriaClinicaRepositoryEnMemoria } from '../testing';
 import { HistoriaClinicaRepositoryPrisma } from '../infrastructure/historia-clinica.repository.prisma';
 
 describe('Inmutabilidad de la HCE (ADR-008)', () => {

@@ -93,3 +93,25 @@ Refresh tokens, recuperación de contraseña, 2FA, bloqueo por intentos, auditor
 ## Eventos
 
 No publica ni consume eventos en el alcance actual.
+
+## Cómo explicarlo (de la pantalla a la base de datos)
+
+Caso: **iniciar sesión** (el resto de los módulos dependen de esto).
+
+```
+[web] modules/iam/views/LoginView.vue          submit → authStore.login(email, password)
+  → modules/iam/auth.store.ts                  login(): llama a la API y guarda token + usuario + permisos
+    → modules/iam/iam.api.ts                   authApi.login() → POST /api/auth/login
+[api] api/auth.controller.ts                   @Publico() @Post('login') valida IniciarSesionDto
+  → application/iniciar-sesion/                IniciarSesionHandler.ejecutar(command)
+    → domain/email.ts                          Email.crear(email)  (valida formato)
+    → domain/usuario.repository.ts             PUERTO buscarPorEmail → infrastructure/usuario.repository.prisma.ts
+    → domain/password-hasher.ts                PUERTO verificar → infrastructure/bcrypt.password-hasher.ts
+    → application/ports/tokens.ts              PUERTO emitir → infrastructure/jwt.tokens.ts
+  ← { token, usuario }   (si falla: CredencialesInvalidas → 401 por el DomainErrorFilter)
+```
+
+Después, en cada request: `api/guards/permisos.guard.ts` (guard global) verifica el token y el
+`@RequierePermiso(PERMISOS.X)` del endpoint. En el front, `router/index.ts` hace lo mismo con `meta.permisos`.
+
+Pantallas de este módulo: `apps/web/src/modules/iam/` (ver `apps/web/README.md`).

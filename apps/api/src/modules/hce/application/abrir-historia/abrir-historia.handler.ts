@@ -5,13 +5,7 @@ import {
   HISTORIA_CLINICA_REPOSITORY,
   type HistoriaClinicaRepository,
 } from '../../domain/historia-clinica.repository';
-
-export class AbrirHistoriaCommand {
-  constructor(
-    readonly pacienteId: string,
-    readonly origenEventoId?: string,
-  ) {}
-}
+import type { AbrirHistoriaCommand } from './abrir-historia.command';
 
 @Injectable()
 export class AbrirHistoriaHandler implements CasoDeUso<AbrirHistoriaCommand, { id: string }> {

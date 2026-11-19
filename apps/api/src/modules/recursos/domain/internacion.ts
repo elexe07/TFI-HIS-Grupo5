@@ -1,6 +1,7 @@
 import { AggregateRoot, generarId, type Id } from '../../../building-blocks/domain';
 import { CantidadInvalida, InternacionYaFinalizada } from './errores';
-import { PacienteDadoDeAlta, PacienteInternado } from './eventos';
+import { PacienteDadoDeAlta } from './events/paciente-dado-de-alta';
+import { PacienteInternado } from './events/paciente-internado';
 
 export enum EstadoInternacion {
   ACTIVA = 'ACTIVA',

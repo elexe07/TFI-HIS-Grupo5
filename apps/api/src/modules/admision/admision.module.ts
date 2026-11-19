@@ -12,11 +12,11 @@ import { ListarMedicosHandler } from './application/listar-medicos/listar-medico
 import { ListarTurnosHandler } from './application/listar-turnos/listar-turnos.handler';
 import { ObtenerAgendaHandler } from './application/obtener-agenda/obtener-agenda.handler';
 import { ObtenerColaGuardiaHandler } from './application/obtener-cola-guardia/obtener-cola-guardia.handler';
-import { AGENDA_REPOSITORY } from './application/ports/tokens';
-import { MEDICO_REPOSITORY } from './application/ports/tokens';
-import { PACIENTE_REPOSITORY } from './application/ports/tokens';
-import { TRIAJE_REPOSITORY } from './application/ports/tokens';
-import { TURNO_REPOSITORY } from './application/ports/tokens';
+import { AGENDA_REPOSITORY } from './domain/agenda.repository';
+import { MEDICO_REPOSITORY } from './domain/medico.repository';
+import { PACIENTE_REPOSITORY } from './domain/paciente.repository';
+import { TRIAJE_REPOSITORY } from './domain/triaje.repository';
+import { TURNO_REPOSITORY } from './domain/turno.repository';
 import { RegistrarMedicoHandler } from './application/registrar-medico/registrar-medico.handler';
 import { RegistrarPacienteHandler } from './application/registrar-paciente/registrar-paciente.handler';
 import { RegistrarTriajeHandler } from './application/registrar-triaje/registrar-triaje.handler';

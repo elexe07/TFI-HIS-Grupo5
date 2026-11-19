@@ -19,10 +19,16 @@ import type {
   TipoCuenta,
   ConceptoCargo,
 } from '@/modules/facturacion/facturacion.types';
+import type { PacienteDTO } from '@/modules/admision/admision.types';
 
 const facturacionStore = useFacturacionStore();
 const admisionStore = useAdmisionStore();
 const toastStore = useToastStore();
+
+/** La API de cuentas devuelve solo el `pacienteId`: los datos del paciente se buscan en Admisión. */
+function pacienteDe(cuenta: CuentaDTO): PacienteDTO | undefined {
+  return cuenta.paciente ?? admisionStore.pacientes.find((p) => p.id === cuenta.pacienteId);
+}
 
 const searchDocumento = ref('');
 const estadoFiltro = ref('');
@@ -31,9 +37,8 @@ const showDetalleModal = ref(false);
 const cuentaSeleccionada = ref<CuentaDTO | null>(null);
 
 const columns: TableColumn<CuentaDTO>[] = [
-  { key: 'id', label: 'ID', width: '80px', format: (value) => (value as string).slice(-8) },
   {
-    key: 'fecha',
+    key: 'createdAt', // la API no manda `fecha`: la fecha de la cuenta es su creación
     label: 'Fecha',
     width: '120px',
     format: (value) => (value ? new Date(value as string).toLocaleDateString('es-AR') : '-'),
@@ -43,7 +48,7 @@ const columns: TableColumn<CuentaDTO>[] = [
     label: 'Paciente',
     format: (_value, row) => {
       const c = row as CuentaDTO;
-      const p = c.paciente || admisionStore.pacientes.find((pac) => pac.id === c.pacienteId);
+      const p = pacienteDe(c);
       return p ? `${p.apellido}, ${p.nombre}` : c.pacienteId ? c.pacienteId.slice(-6) : '-';
     },
   },
@@ -96,10 +101,13 @@ const tiposOptions = [
   { value: 'INTERNACION', label: 'Internación' },
 ];
 
+const pacienteSeleccionado = computed(() =>
+  cuentaSeleccionada.value ? pacienteDe(cuentaSeleccionada.value) : undefined,
+);
+
 const cuentasFiltradas = computed(() => {
   return facturacionStore.cuentas.filter((cuenta) => {
-    const p =
-      cuenta.paciente || admisionStore.pacientes.find((pac) => pac.id === cuenta.pacienteId);
+    const p = pacienteDe(cuenta);
     if (searchDocumento.value) {
       if (
         !p ||
@@ -328,13 +336,13 @@ onMounted(() => {
           </div>
         </div>
 
-        <div v-if="cuentaSeleccionada.paciente" class="paciente-info">
+        <div v-if="pacienteSeleccionado" class="paciente-info">
           <h5>Paciente</h5>
           <p>
-            {{ cuentaSeleccionada.paciente.apellido }}, {{ cuentaSeleccionada.paciente.nombre }} ({{
-              cuentaSeleccionada.paciente.tipoDocumento
+            {{ pacienteSeleccionado.apellido }}, {{ pacienteSeleccionado.nombre }} ({{
+              pacienteSeleccionado.tipoDocumento
             }}
-            {{ cuentaSeleccionada.paciente.numeroDocumento }})
+            {{ pacienteSeleccionado.numeroDocumento }})
           </p>
         </div>
 

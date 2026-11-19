@@ -117,7 +117,7 @@ hce publica 'hce.evolucion-registrada'
 Caso 2 (pantalla): **ver el detalle de una cuenta**.
 
 ```
-[web] modules/facturacion/views/CuentaDetalleView.vue  → facturacionStore.obtenerCuenta(id)
+[web] modules/facturacion/views/CuentasView.vue  botón "Ver detalle" → facturacionStore.obtenerCuenta(id)
   → modules/facturacion/facturacion.api.ts             GET /api/cuentas/:id
 [api] api/cuentas.controller.ts                        → application/consultar-cuenta/ConsultarCuentaHandler
   → cuenta.repository.buscarPorId                      → CuentaDetalleDto (cargos, total bruto, descuento por cobertura, total)

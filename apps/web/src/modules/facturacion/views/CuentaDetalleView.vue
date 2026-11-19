@@ -10,6 +10,7 @@
 <script setup lang="ts">
 import { onMounted, ref, computed, watch } from 'vue';
 import { useFacturacionStore } from '@/modules/facturacion/facturacion.store';
+import { useAdmisionStore } from '@/modules/admision/admision.store';
 import { useToastStore } from '@/shared/stores/toast';
 import { useRouter, useRoute } from 'vue-router';
 import { Card, Button, Badge, Table, Modal } from '@/shared/components/ui';
@@ -17,12 +18,22 @@ import type { TableColumn } from '@/shared/components/ui/Table.types';
 import type { CuentaDTO, EstadoCuenta } from '@/modules/facturacion/facturacion.types';
 
 const facturacionStore = useFacturacionStore();
+const admisionStore = useAdmisionStore();
 const toastStore = useToastStore();
 const router = useRouter();
 const route = useRoute();
 
 const cuentaId = computed(() => route.params.id as string);
 const cuenta = ref<CuentaDTO | null>(null);
+
+/** La API devuelve solo el `pacienteId`: el nombre se busca en los pacientes de Admisión. */
+const nombrePaciente = computed(() => {
+  if (!cuenta.value) return '';
+  const p =
+    cuenta.value.paciente ??
+    admisionStore.pacientes.find((pac) => pac.id === cuenta.value?.pacienteId);
+  return p ? `${p.apellido}, ${p.nombre}` : 'Paciente sin datos';
+});
 const cargando = ref(false);
 const showModalPago = ref(false);
 const pagoForm = ref({ monto: 0, metodoPago: 'EFECTIVO', observaciones: '' });
@@ -69,7 +80,10 @@ const metodosPago = [
 async function cargarCuenta() {
   cargando.value = true;
   try {
-    const data = await facturacionStore.obtenerCuenta(cuentaId.value);
+    const [data] = await Promise.all([
+      facturacionStore.obtenerCuenta(cuentaId.value),
+      admisionStore.pacientes.length === 0 ? admisionStore.cargarPacientes() : Promise.resolve(),
+    ]);
     cuenta.value = data;
   } catch (err) {
     toastStore.error('Error', 'No se pudo cargar la cuenta');
@@ -223,10 +237,10 @@ watch(
           </Button>
         </div>
         <div>
-          <h2>Cuenta N° {{ cuenta.numero }}</h2>
+          <h2>Cuenta #{{ cuenta.id.slice(-8) }}</h2>
           <p class="view-subtitle">
-            {{ cuenta.paciente?.apellido }}, {{ cuenta.paciente?.nombre }} -
-            {{ new Date(cuenta.fecha).toLocaleDateString('es-AR') }}
+            {{ nombrePaciente }} · {{ getTipoLabel(cuenta.tipo) }} ·
+            {{ new Date(cuenta.createdAt).toLocaleDateString('es-AR') }}
           </p>
         </div>
       </div>

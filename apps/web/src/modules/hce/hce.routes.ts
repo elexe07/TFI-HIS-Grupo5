@@ -30,9 +30,7 @@ export const hceRoutes: RouteRecordRaw[] = [
       },
       {
         path: 'prescripciones',
-        name: 'hce.prescripciones',
-        component: () => import('@/modules/hce/views/PrescripcionFormView.vue'),
-        meta: { permisos: ['prescripciones:crear'] as Permiso[], title: 'Prescripciones' },
+        redirect: '/hce',
       },
       {
         path: 'paciente/:pacienteId',

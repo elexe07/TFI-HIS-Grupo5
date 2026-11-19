@@ -97,7 +97,7 @@ const quickActions = computed(() => {
     actions.push({ label: 'Reservar Turno', icon: CalendarIcon, path: '/admision/turnos' });
   if (authStore.tienePermiso('hce:escribir'))
     actions.push({ label: 'Nueva Evolución', icon: FilePlusIcon, path: '/hce' });
-  if (authStore.tienePermiso('enfermeria:signos:crear'))
+  if (authStore.tienePermiso('enfermeria:registrar'))
     actions.push({
       label: 'Registrar Signos',
       icon: HeartIcon,

@@ -32,19 +32,19 @@ const tabs = computed(() => [
     path: '/enfermeria',
     label: 'Indicaciones',
     icon: ClipboardIcon,
-    permisos: ['enfermeria:indicaciones:leer'] as Permiso[],
+    permisos: ['enfermeria:leer'] as Permiso[],
   },
   {
     path: '/enfermeria/signos-vitales',
     label: 'Signos Vitales',
     icon: HeartIcon,
-    permisos: ['enfermeria:signos:crear'] as Permiso[],
+    permisos: ['enfermeria:registrar'] as Permiso[],
   },
   {
     path: '/enfermeria/notas',
     label: 'Notas',
     icon: FileTextIcon,
-    permisos: ['enfermeria:notas:crear'] as Permiso[],
+    permisos: ['enfermeria:registrar'] as Permiso[],
   },
 ]);
 

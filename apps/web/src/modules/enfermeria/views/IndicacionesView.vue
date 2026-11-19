@@ -4,6 +4,7 @@ import { useEnfermeriaStore } from '@/modules/enfermeria/enfermeria.store';
 import { useAdmisionStore } from '@/modules/admision/admision.store';
 import { useRecursosStore } from '@/modules/recursos/recursos.store';
 import { useToastStore } from '@/shared/stores/toast';
+import { useAuthStore } from '@/modules/iam/auth.store';
 import { Card, Button, Input, Select, Badge, Modal, Table } from '@/shared/components/ui';
 import type { TableColumn } from '@/shared/components/ui/Table.types';
 import type { EstadoIndicacion, IndicacionDTO } from '@/modules/enfermeria/enfermeria.types';
@@ -12,6 +13,10 @@ const enfermeriaStore = useEnfermeriaStore();
 const admisionStore = useAdmisionStore();
 const recursosStore = useRecursosStore();
 const toastStore = useToastStore();
+const authStore = useAuthStore();
+
+// El médico consulta las indicaciones; generarlas, administrarlas u omitirlas es del enfermero.
+const puedeRegistrar = computed(() => authStore.tienePermiso('enfermeria:registrar'));
 
 const pacienteId = ref('');
 const internacionId = ref('');
@@ -198,12 +203,16 @@ onMounted(async () => {
   if (admisionStore.pacientes.length === 0) {
     await admisionStore.cargarPacientes();
   }
-  if (recursosStore.internaciones.length === 0) {
-    await recursosStore.cargarInternaciones();
-  }
-  if (recursosStore.insumos.length === 0) {
-    await recursosStore.cargarInsumos();
-  }
+  // Internaciones e insumos son datos de apoyo del formulario (sugerencias). Solo se piden si el
+  // rol puede leerlos, y si fallan la vista sigue con los campos manuales.
+  await Promise.allSettled([
+    recursosStore.internaciones.length === 0 && authStore.tienePermiso('internaciones:gestionar')
+      ? recursosStore.cargarInternaciones()
+      : undefined,
+    recursosStore.insumos.length === 0 && authStore.tienePermiso('insumos:gestionar')
+      ? recursosStore.cargarInsumos()
+      : undefined,
+  ]);
   if (admisionStore.pacienteSeleccionado) {
     pacienteId.value = admisionStore.pacienteSeleccionado.id;
     cargarDatos();
@@ -221,7 +230,12 @@ onMounted(async () => {
         </p>
       </div>
       <div class="view-actions">
-        <Button variant="primary" @click="showGenerarModal = true" :disabled="!pacienteId">
+        <Button
+          v-if="puedeRegistrar"
+          variant="primary"
+          @click="showGenerarModal = true"
+          :disabled="!pacienteId"
+        >
           <svg
             width="18"
             height="18"
@@ -343,7 +357,7 @@ onMounted(async () => {
         <template #cell-actions="{ row }">
           <div class="action-buttons">
             <Button
-              v-if="row.estado === 'PENDIENTE'"
+              v-if="row.estado === 'PENDIENTE' && puedeRegistrar"
               variant="success"
               size="sm"
               @click.stop="administrar(row.id as string)"
@@ -352,14 +366,14 @@ onMounted(async () => {
               Administrar
             </Button>
             <Button
-              v-if="row.estado === 'PENDIENTE'"
+              v-if="row.estado === 'PENDIENTE' && puedeRegistrar"
               variant="danger"
               size="sm"
               @click.stop="abrirOmitir(row.id as string)"
             >
               Omitir
             </Button>
-            <span v-else class="text-muted text-xs">Completada</span>
+            <span v-if="row.estado !== 'PENDIENTE'" class="text-muted text-xs">Completada</span>
           </div>
         </template>
       </Table>

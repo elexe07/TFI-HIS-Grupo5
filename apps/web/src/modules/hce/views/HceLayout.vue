@@ -24,6 +24,12 @@ const tabs = computed(() => [
     icon: FileTextIcon,
     permisos: ['hce:escribir'] as Permiso[],
   },
+  {
+    path: '/hce/prescripciones',
+    label: 'Prescripciones',
+    icon: PillIcon,
+    permisos: ['prescripciones:crear'] as Permiso[],
+  },
 ]);
 
 function isActiveTab(path: string): boolean {

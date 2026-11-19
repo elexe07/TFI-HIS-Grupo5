@@ -109,11 +109,19 @@ const SECCIONES_PERSONAL: NavSection[] = [
         path: '/enfermeria',
         label: 'Enfermería',
         icon: HeartIcon,
-        permisos: ['enfermeria:indicaciones:leer'] as Permiso[],
+        permisos: ['enfermeria:leer'] as Permiso[],
         children: [
           { path: '/enfermeria', label: 'Indicaciones' },
-          { path: '/enfermeria/signos-vitales', label: 'Signos Vitales' },
-          { path: '/enfermeria/notas', label: 'Notas' },
+          {
+            path: '/enfermeria/signos-vitales',
+            label: 'Signos Vitales',
+            permisos: ['enfermeria:registrar'] as Permiso[],
+          },
+          {
+            path: '/enfermeria/notas',
+            label: 'Notas',
+            permisos: ['enfermeria:registrar'] as Permiso[],
+          },
         ],
       },
     ],

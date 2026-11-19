@@ -102,7 +102,7 @@ const navItems = computed(() =>
           path: '/enfermeria',
           label: 'Enfermería',
           icon: HeartIcon,
-          permisos: ['enfermeria:indicaciones:leer'] as Permiso[],
+          permisos: ['enfermeria:leer'] as Permiso[],
         },
         {
           path: '/recursos',

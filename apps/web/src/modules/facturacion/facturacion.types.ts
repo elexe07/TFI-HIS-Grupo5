@@ -22,7 +22,6 @@ export interface TarifaDTO {
 
 export interface CuentaDTO {
   id: string;
-  numero: string;
   pacienteId: string;
   tipo: TipoCuenta;
   referenciaId: string;
@@ -31,7 +30,6 @@ export interface CuentaDTO {
   estado: EstadoCuenta;
   createdAt: string;
   updatedAt: string;
-  fecha: string;
   cargos: CargoDTO[];
   detalles: CargoDTO[];
   pagos: PagoDTO[];

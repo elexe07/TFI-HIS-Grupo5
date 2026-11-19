@@ -36,9 +36,7 @@ export type Permiso =
   | 'facturacion:leer'
   | 'cobertura:validar'
   | 'reportes:leer'
-  | 'iam:usuarios:leer'
-  | 'iam:usuarios:crear'
-  | 'iam:roles:asignar';
+  | 'usuarios:gestionar';
 
 export interface LoginRequest {
   email: string;
@@ -50,29 +48,21 @@ export interface LoginResponse {
   usuario: UsuarioAutenticado;
 }
 
+/** Usuario tal como lo devuelve `GET /usuarios` (backend: application/usuario.dto.ts). Nunca trae el hash. */
 export interface UsuarioDTO {
   id: string;
   email: string;
   nombre: string;
-  rolId: string;
-  rolNombre: string;
+  rol: NombreRol;
+  permisos: Permiso[];
   activo: boolean;
-  createdAt: string;
+  creadoEn: string;
 }
 
+/** Body de `POST /usuarios`. El backend valida email, fortaleza de la contraseña y email único. */
 export interface CrearUsuarioRequest {
   email: string;
   password: string;
   nombre: string;
-  rolId: string;
-}
-
-export interface AsignarRolRequest {
-  rolId: string;
-}
-
-export interface RolDTO {
-  id: string;
-  nombre: string;
-  permisos: Permiso[];
+  rol: NombreRol;
 }

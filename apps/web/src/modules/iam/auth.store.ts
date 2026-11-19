@@ -5,7 +5,13 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import { authApi } from './iam.api';
-import type { UsuarioAutenticado, Permiso, NombreRol } from '@/modules/iam/iam.types';
+import type {
+  CrearUsuarioRequest,
+  NombreRol,
+  Permiso,
+  UsuarioAutenticado,
+  UsuarioDTO,
+} from '@/modules/iam/iam.types';
 
 export const useAuthStore = defineStore(
   'auth',
@@ -13,7 +19,7 @@ export const useAuthStore = defineStore(
     // --- STATE ---
     const token = ref<string | null>(localStorage.getItem('his_token'));
     const usuario = ref<UsuarioAutenticado | null>(null);
-    const usuariosSistema = ref<UsuarioAutenticado[]>([]);
+    const usuariosSistema = ref<UsuarioDTO[]>([]);
     const cargando = ref(false);
     const error = ref<string | null>(null);
 
@@ -112,6 +118,13 @@ export const useAuthStore = defineStore(
       }
     }
 
+    /** Crea el usuario y lo agrega a la lista. Los errores (email repetido, contraseña débil) los muestra la vista. */
+    async function crearUsuario(datos: CrearUsuarioRequest) {
+      const creado = await authApi.crearUsuario(datos);
+      usuariosSistema.value = [...usuariosSistema.value, creado];
+      return creado;
+    }
+
     function setError(msg: string | null) {
       error.value = msg;
     }
@@ -151,6 +164,7 @@ export const useAuthStore = defineStore(
       login,
       logout,
       cargarUsuariosSistema,
+      crearUsuario,
       setError,
       clearError,
       tieneRol,

@@ -131,7 +131,7 @@ const navSections = computed<NavSection[]>(() =>
           path: '/admin',
           label: 'Usuarios y Roles',
           icon: SettingsIcon,
-          permisos: ['iam:usuarios:leer'] as Permiso[],
+          permisos: ['usuarios:gestionar'] as Permiso[],
           children: [{ path: '/admin/usuarios', label: 'Usuarios' }],
         },
       ],

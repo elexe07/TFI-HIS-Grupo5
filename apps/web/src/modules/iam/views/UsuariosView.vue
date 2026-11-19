@@ -2,19 +2,36 @@
 import { onMounted, ref, computed } from 'vue';
 import { useAuthStore } from '@/modules/iam/auth.store';
 import { useToastStore } from '@/shared/stores/toast';
-import { Card, Button, Input, Table, Badge, type TableColumn } from '@/shared/components/ui';
-import type { UsuarioAutenticado, NombreRol } from '@/modules/iam/iam.types';
+import {
+  Card,
+  Button,
+  Input,
+  Select,
+  Table,
+  Badge,
+  Modal,
+  type TableColumn,
+} from '@/shared/components/ui';
+import type { CrearUsuarioRequest, NombreRol, UsuarioDTO } from '@/modules/iam/iam.types';
 
 const authStore = useAuthStore();
 const toastStore = useToastStore();
 
 const search = ref('');
 
-const columns: TableColumn<UsuarioAutenticado>[] = [
+const columns: TableColumn<UsuarioDTO>[] = [
   { key: 'id', label: 'ID', width: '80px', format: (v) => (v as string).slice(-8) },
   { key: 'nombre', label: 'Nombre' },
   { key: 'email', label: 'Email', width: '200px' },
   { key: 'rol', label: 'Rol', width: '140px' },
+];
+
+const ROLES: { value: NombreRol; label: string }[] = [
+  { value: 'ADMINISTRADOR', label: 'Administrador' },
+  { value: 'MEDICO', label: 'Médico' },
+  { value: 'ENFERMERO', label: 'Enfermero' },
+  { value: 'RECEPCIONISTA', label: 'Recepcionista' },
+  { value: 'PACIENTE', label: 'Paciente' },
 ];
 
 const usuariosFiltrados = computed(() => {
@@ -42,8 +59,53 @@ function getRolVariant(rol: NombreRol): 'primary' | 'success' | 'warning' | 'dan
 async function cargarUsuarios() {
   try {
     await authStore.cargarUsuariosSistema();
-  } catch (err) {
+  } catch {
     toastStore.error('Error', 'No se pudieron cargar los usuarios');
+  }
+}
+
+// --- Nuevo usuario ---
+// El front solo exige que no falten campos. Las reglas (email válido, contraseña fuerte,
+// email único) las valida el dominio en el backend y acá mostramos su mensaje tal cual.
+
+const formularioVacio = (): CrearUsuarioRequest => ({
+  nombre: '',
+  email: '',
+  password: '',
+  rol: 'MEDICO',
+});
+
+const mostrarFormulario = ref(false);
+const nuevoUsuario = ref<CrearUsuarioRequest>(formularioVacio());
+const guardando = ref(false);
+const errorFormulario = ref<string | null>(null);
+
+const formularioCompleto = computed(() => {
+  const { nombre, email, password } = nuevoUsuario.value;
+  return nombre.trim() !== '' && email.trim() !== '' && password !== '';
+});
+
+function abrirFormulario() {
+  nuevoUsuario.value = formularioVacio();
+  errorFormulario.value = null;
+  mostrarFormulario.value = true;
+}
+
+async function crearUsuario() {
+  guardando.value = true;
+  errorFormulario.value = null;
+  try {
+    const creado = await authStore.crearUsuario({
+      ...nuevoUsuario.value,
+      nombre: nuevoUsuario.value.nombre.trim(),
+      email: nuevoUsuario.value.email.trim(),
+    });
+    toastStore.success('Usuario creado', `${creado.nombre} (${creado.rol})`);
+    mostrarFormulario.value = false;
+  } catch (err) {
+    errorFormulario.value = err instanceof Error ? err.message : 'No se pudo crear el usuario';
+  } finally {
+    guardando.value = false;
   }
 }
 
@@ -57,8 +119,9 @@ onMounted(() => {
     <div class="view-header">
       <div>
         <h2>Gestión de Usuarios</h2>
-        <p class="view-subtitle">Listado de usuarios del sistema (solo lectura)</p>
+        <p class="view-subtitle">Usuarios del sistema y su rol</p>
       </div>
+      <Button variant="primary" @click="abrirFormulario">+ Nuevo usuario</Button>
     </div>
 
     <Card class="search-card">
@@ -96,25 +159,47 @@ onMounted(() => {
         <template #cell-rol="{ value }">
           <Badge :variant="getRolVariant(value as NombreRol)" size="sm">{{ value }}</Badge>
         </template>
-        <template #cell-actions="{ row: _row }">
-          <div class="action-buttons">
-            <Button size="sm" variant="ghost" @click.stop="() => {}" title="Ver">
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                <circle cx="12" cy="12" r="3"></circle>
-              </svg>
-            </Button>
-          </div>
-        </template>
       </Table>
     </Card>
+    <Modal v-model:modelValue="mostrarFormulario" title="Nuevo usuario" size="md" :closable="true">
+      <form class="form-usuario" @submit.prevent="crearUsuario">
+        <Input v-model="nuevoUsuario.nombre" label="Nombre y apellido" required :maxLength="100" />
+        <Input
+          v-model="nuevoUsuario.email"
+          label="Email"
+          type="email"
+          placeholder="nombre@his.local"
+          autocomplete="off"
+          required
+        />
+        <Input
+          v-model="nuevoUsuario.password"
+          label="Contraseña"
+          type="password"
+          hint="Mínimo 8 caracteres, con al menos una letra y un número"
+          autocomplete="new-password"
+          required
+        />
+        <Select
+          :model-value="nuevoUsuario.rol"
+          @update:model-value="nuevoUsuario.rol = $event as NombreRol"
+          label="Rol"
+          :options="ROLES"
+          required
+        />
+        <p v-if="errorFormulario" class="form-error" role="alert">{{ errorFormulario }}</p>
+      </form>
+      <template #footer>
+        <Button variant="secondary" @click="mostrarFormulario = false">Cancelar</Button>
+        <Button
+          variant="primary"
+          :loading="guardando"
+          :disabled="!formularioCompleto"
+          @click="crearUsuario"
+          >Crear usuario</Button
+        >
+      </template>
+    </Modal>
   </div>
 </template>
 
@@ -150,6 +235,18 @@ onMounted(() => {
 .action-buttons {
   display: flex;
   gap: var(--space-xs);
+}
+
+.form-usuario {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.form-error {
+  margin: 0;
+  color: var(--color-danger);
+  font-size: 0.875rem;
 }
 
 .text-muted {

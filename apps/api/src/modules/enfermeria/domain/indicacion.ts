@@ -2,7 +2,7 @@ import { AggregateRoot, generarId, type Id } from '../../../building-blocks/doma
 import { AdministracionDeMedicacion } from './administracion-medicacion';
 import { IndicacionNoEstaPendiente, MotivoOmisionRequerido } from './errores';
 import { ESTADOS_INDICACION, type EstadoIndicacion } from './estado-indicacion';
-import { MedicacionAdministradaEvent } from './events/medicacion-administrada.event';
+import { MedicacionAdministradaEvent } from './events/medicacion-administrada';
 
 export interface PropsCrearIndicacion {
   readonly id?: string;

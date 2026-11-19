@@ -15,89 +15,74 @@ Frontend desarrollado en **Vue 3 + TypeScript + Vite** para el Sistema de Inform
 
 ## 📁 Estructura del Proyecto
 
+El front está organizado **por módulo** (package by feature), igual que el backend: todo lo de un módulo del HIS
+vive en una sola carpeta, así se puede explicar abriendo solo esa carpeta.
+
 ```
-apps/web/
-├── public/                 # Assets estáticos
-├── src/
-│   ├── assets/
-│   │   └── styles/
-│   │       └── main.css    # Design system (variables, utilidades, animaciones)
-│   ├── components/
-│   │   ├── ui/             # Componentes base reutilizables
-│   │   │   ├── Button.vue
-│   │   │   ├── Input.vue
-│   │   │   ├── Select.vue
-│   │   │   ├── Card.vue
-│   │   │   ├── Table.vue
-│   │   │   ├── Badge.vue
-│   │   │   ├── Modal.vue
-│   │   │   ├── Toast.vue
-│   │   │   └── index.ts    # Barrel exports
-│   │   └── layout/
-│   │       ├── AppHeader.vue
-│   │       └── AppSidebar.vue
-│   ├── composables/
-│   │   ├── useApi.ts       # useApi, useApiList, useForm
-│   │   └── index.ts
-│   ├── router/
-│   │   └── index.ts        # Rutas + guards (auth + RBAC)
-│   ├── services/
-│   │   └── api.ts          # Axios instance + métodos tipados por módulo
-│   ├── stores/
-│   │   ├── auth.ts         # Auth: token, user, roles, permisos
-│   │   ├── admision.ts     # Pacientes, profesionales, agenda, turnos, triaje
-│   │   ├── hce.ts          # HCE, evoluciones, alergias, prescripciones, estudios
-│   │   ├── enfermeria.ts   # Indicaciones, signos vitales, notas, alertas
-│   │   ├── recursos.ts     # Mapa de camas, internaciones, insumos
-│   │   ├── facturacion.ts  # Cuentas, coberturas, reportes
-│   │   ├── toast.ts        # Notificaciones globales
-│   │   └── index.ts
-│   ├── types/
-│   │   └── api.ts          # 500+ interfaces TypeScript (match Prisma schema)
-│   ├── views/
-│   │   ├── iam/
-│   │   │   ├── LoginView.vue
-│   │   │   ├── AdminLayout.vue
-│   │   │   ├── UsuariosView.vue
-│   │   │   └── UsuarioFormView.vue
-│   │   ├── admision/
-│   │   │   ├── AdmisionLayout.vue
-│   │   │   ├── PacientesView.vue
-│   │   │   ├── AgendaView.vue
-│   │   │   ├── TurnosView.vue
-│   │   │   └── TriajeView.vue
-│   │   ├── hce/
-│   │   │   ├── HceLayout.vue
-│   │   │   ├── HistoriaClinicaView.vue
-│   │   │   ├── EvolucionFormView.vue
-│   │   │   └── PrescripcionFormView.vue
-│   │   ├── enfermeria/
-│   │   │   ├── EnfermeriaLayout.vue
-│   │   │   ├── IndicacionesView.vue
-│   │   │   ├── SignosVitalesView.vue
-│   │   │   └── NotasView.vue
-│   │   ├── recursos/
-│   │   │   ├── RecursosLayout.vue
-│   │   │   ├── MapaCamasView.vue
-│   │   │   ├── InternacionesView.vue
-│   │   │   └── InsumosView.vue
-│   │   ├── facturacion/
-│   │   │   ├── FacturacionLayout.vue
-│   │   │   ├── CuentasView.vue
-│   │   │   ├── CoberturaView.vue
-│   │   │   └── ReportesView.vue
-│   │   ├── DashboardView.vue
-│   │   ├── PerfilView.vue
-│   │   └── NotFoundView.vue
-│   ├── App.vue             # Layout principal (header + sidebar + router-view)
-│   └── main.ts             # Bootstrap (Pinia + Router + Toast)
-├── index.html
-├── package.json
-├── tsconfig.json
-├── tsconfig.node.json
-├── vite.config.ts
-└── README.md
+apps/web/src/
+├── main.ts                 # Arranca Vue + Pinia + Router
+├── App.vue                 # Shell: header + sidebar + <RouterView>
+├── router/index.ts         # Junta las rutas de cada módulo + guards (login y permisos)
+├── layout/                 # AppHeader y AppSidebar (menú según permisos del usuario)
+├── modules/                # ← un módulo por integrante, mismo nombre que en apps/api/src/modules
+│   ├── iam/                # Login, usuarios, perfil
+│   ├── admision/           # Pacientes, médicos, agenda, turnos, triaje
+│   ├── hce/                # Historia clínica, evoluciones, prescripciones
+│   ├── enfermeria/         # Indicaciones, signos vitales, notas
+│   ├── recursos/           # Mapa de camas, internaciones, insumos
+│   ├── facturacion/        # Cuentas, cobertura, reportes
+│   └── dashboard/          # Pantalla de inicio (resume datos de varios módulos)
+├── shared/                 # Lo genérico: NO conoce a ningún módulo
+│   ├── components/ui/      # Button, Input, Select, Card, Table, Badge, Modal, Toast
+│   ├── http/client.ts      # Axios: URL base, token JWT, manejo de errores, helpers get/post/patch/del
+│   ├── stores/             # toast (notificaciones) y theme (claro/oscuro)
+│   ├── composables/        # useApi, useApiList, useForm (estado loading/error/data genérico)
+│   ├── types/api.ts        # Tipos genéricos de la API (ErrorApi, PaginatedResponse)
+│   └── views/              # NotFoundView (404)
+└── assets/styles/main.css  # Design system (variables CSS, utilidades)
 ```
+
+### Anatomía de un módulo
+
+Todos los módulos tienen los mismos archivos (ejemplo con `admision/`):
+
+| Archivo              | Qué hace                                                                      |
+| -------------------- | ----------------------------------------------------------------------------- |
+| `views/*.vue`        | Pantallas. Solo presentación: leen del store y llaman a sus acciones.         |
+| `admision.store.ts`  | Store Pinia: estado del módulo (listas, seleccionado, loading) y acciones.    |
+| `admision.api.ts`    | Endpoints HTTP del módulo (`admisionApi.listarPacientes()` → `GET /api/...`). |
+| `admision.types.ts`  | Tipos de lo que manda/recibe la API (espejo de los DTOs del backend).         |
+| `admision.routes.ts` | Rutas del módulo con sus permisos (`meta.permisos`).                          |
+
+> IAM además exporta `auth.store.ts` (token, usuario, permisos), que usan el router, el layout y las pantallas.
+
+### Cómo explicar un módulo (de la pantalla a la base de datos)
+
+El recorrido siempre es el mismo: **view → store → api → endpoint del backend → caso de uso**.
+Ejemplo con el listado de pacientes de Admisión:
+
+```
+modules/admision/admision.routes.ts      /admision  (requiere permiso 'pacientes:leer')
+  → views/PacientesView.vue              onMounted → buscar() → admisionStore.cargarPacientes({ documento, apellido })
+    → admision.store.ts                  cargarPacientes(): loading = true, guarda el resultado en `pacientes`
+      → admision.api.ts                  admisionApi.listarPacientes(params)
+        → shared/http/client.ts          GET /api/pacientes?documento=...  (+ header Authorization: Bearer <token>)
+          → backend: apps/api/src/modules/admision/api/pacientes.controller.ts   @Get()
+            → application/buscar-pacientes/buscar-pacientes.handler.ts       (caso de uso)
+              → domain/paciente.repository.ts → infrastructure/paciente.repository.prisma.ts → PostgreSQL
+```
+
+Para explicar cualquier otro módulo: abrir su `<modulo>.routes.ts` (qué pantallas hay y qué permiso piden),
+elegir una view, seguir la acción del store hasta `<modulo>.api.ts` y de ahí al controller del mismo módulo en
+`apps/api/src/modules/<modulo>/api/`.
+
+### Reglas de dependencia
+
+- `shared/` no importa nada de `modules/` (es genérico y reutilizable).
+- Cada módulo usa su propio store/api. Si una pantalla necesita datos de otro módulo (ej. Enfermería necesita la
+  lista de pacientes), usa el **store** de ese módulo, nunca su `*.api.ts` directo.
+- Los tipos de un módulo pueden referenciar tipos de otro (ej. `InternacionDTO.paciente: PacienteDTO`), porque
+  reflejan lo que devuelve el backend.
 
 ## 🛠️ Instalación y Desarrollo
 
@@ -155,6 +140,8 @@ server: {
 
 ### Estado Global (Pinia)
 
+Cada store vive en su módulo (`modules/<modulo>/<modulo>.store.ts`; el de IAM es `auth.store.ts`). `toast` y `theme` están en `shared/stores/`.
+
 | Store         | Responsabilidad                                                   |
 | ------------- | ----------------------------------------------------------------- |
 | `auth`        | JWT, usuario, roles, permisos, persistencia                       |
@@ -165,23 +152,26 @@ server: {
 | `facturacion` | Cuentas, coberturas, planes, reportes                             |
 | `toast`       | Notificaciones globales (success/error/warning/info)              |
 
-### API Service (Axios)
+### Cliente HTTP (Axios)
 
-- **Interceptores**: JWT automático, manejo de errores 401/403/500, loading global
-- **Métodos tipados**: `api.admision`, `api.hce`, `api.enfermeria`, `api.recursos`, `api.facturacion`, `api.iam`
-- **Tipado estricto**: Request/Response generics con interfaces de `types/api.ts`
+- **`shared/http/client.ts`**: instancia Axios con interceptores (agrega el JWT, ante 401 limpia sesión y va a `/login`) y helpers tipados `get/post/patch/del`.
+- **`modules/<modulo>/<modulo>.api.ts`**: endpoints de cada módulo (`authApi`, `admisionApi`, `hceApi`, `enfermeriaApi`, `recursosApi`, `facturacionApi`).
+- **Tipado estricto**: cada endpoint usa los tipos de `modules/<modulo>/<modulo>.types.ts`.
 
-### Composable `useApi`
+### Composables (`shared/composables/useApi.ts`)
+
+Utilidades genéricas para llamadas async (estado `loading`/`error`/`data`). Hoy las pantallas usan los stores
+de cada módulo para eso; los composables quedan disponibles para pantallas nuevas.
 
 ```ts
 // Uso básico
-const { data, loading, error, execute } = useApi(() => api.admision.getPacientes());
+const { data, loading, error, execute } = useApi(() => admisionApi.listarPacientes());
 
 // Lista con paginación
-const { data, loading, fetchPage } = useApiList(() => api.admision.getPacientes({ page: 1 }));
+const { data, loading, fetchPage } = useApiList(() => admisionApi.listarPacientes());
 
 // Formularios reactivos
-const { form, errors, validate, submit } = useForm(initialData, validationSchema, onSubmit);
+const { values, errors, validate, handleSubmit } = useForm({ nombre: '', apellido: '' });
 ```
 
 ### Router Guards
@@ -274,7 +264,7 @@ interface Props {
 ### Permisos por Módulo
 
 ```ts
-// Ejemplos de permisos (ver types/api.ts)
+// Ejemplos de permisos (ver modules/iam/iam.types.ts)
 'pacientes:leer' | 'pacientes:registrar' | 'pacientes:actualizar';
 'agenda:definir' | 'turnos:reservar' | 'turnos:cancelar';
 'triaje:registrar' | 'guardia:leer';
@@ -327,14 +317,13 @@ interface Props {
 ## 🧪 Testing
 
 ```bash
-# Unit tests (Vitest)
+# El front no tiene tests automatizados todavía; se verifica con:
+pnpm web typecheck   # vue-tsc
+pnpm web lint
+pnpm web build
+
+# Los tests (unitarios + e2e) están en el backend, con Jest:
 pnpm test
-
-# E2E tests (Playwright)
-pnpm test:e2e
-
-# Coverage
-pnpm test:coverage
 ```
 
 ## 📋 Criterios de Evaluación Cumplidos

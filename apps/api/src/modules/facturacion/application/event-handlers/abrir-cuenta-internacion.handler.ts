@@ -4,11 +4,11 @@ import { CLOCK, type Clock } from '../../../../building-blocks/application';
 import { PACIENTE_INTERNADO, type PacienteInternado } from '../../../recursos/public';
 import { Cuenta } from '../../domain/cuenta';
 import { TipoCuenta } from '../../domain/enums';
-import { CUENTA_REPOSITORY, type CuentaRepository } from '../../domain/ports/cuenta.repository';
+import { CUENTA_REPOSITORY, type CuentaRepository } from '../../domain/cuenta.repository';
 import {
   OBRA_SOCIAL_REPOSITORY,
   type ObraSocialRepository,
-} from '../../domain/ports/obra-social.repository';
+} from '../../domain/obra-social.repository';
 
 @Injectable()
 export class AbrirCuentaInternacionHandler {

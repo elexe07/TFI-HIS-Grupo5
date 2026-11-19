@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { CLOCK, type Clock } from '../../../../building-blocks/application';
 import { CuentaNoEncontrada } from '../../domain/errores';
-import { CUENTA_REPOSITORY, type CuentaRepository } from '../../domain/ports/cuenta.repository';
+import { CUENTA_REPOSITORY, type CuentaRepository } from '../../domain/cuenta.repository';
 import {
   mapearCuentaADetalleDto,
   type CuentaDetalleDto,

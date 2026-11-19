@@ -3,7 +3,7 @@ import type {
   ItemReporteFacturacion,
   ReporteFacturacionPeriodo,
   ReporteFacturacionRepository,
-} from '../domain/ports/reporte-facturacion.repository';
+} from '../domain/reporte-facturacion.repository';
 import type { CuentaRepositoryEnMemoria } from './cuenta.repository.en-memoria';
 
 interface RangoAcumulador {

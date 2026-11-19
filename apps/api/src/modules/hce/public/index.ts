@@ -1,14 +1,14 @@
 export {
   EVOLUCION_REGISTRADA,
-  PRESCRIPCION_CREADA,
   EvolucionRegistrada,
+  type EvolucionRegistradaPayload,
+} from '../domain/events/evolucion-registrada';
+export {
+  PRESCRIPCION_CREADA,
   PrescripcionCreada,
   PrescripcionCreadaEvent,
-} from '../domain/events/hce-events';
-export type {
-  EvolucionRegistradaPayload,
-  PrescripcionCreadaPayload,
-} from '../domain/events/hce-events';
+  type PrescripcionCreadaPayload,
+} from '../domain/events/prescripcion-creada';
 export type {
   HistoriaClinicaDto,
   EvolucionDto,

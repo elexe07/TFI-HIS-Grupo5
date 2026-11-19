@@ -1,4 +1,5 @@
-import { PacienteDadoDeAlta, PacienteInternado } from './eventos';
+import { PacienteDadoDeAlta } from './events/paciente-dado-de-alta';
+import { PacienteInternado } from './events/paciente-internado';
 import { InternacionYaFinalizada } from './errores';
 import { EstadoInternacion, Internacion } from './internacion';
 

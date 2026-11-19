@@ -1,22 +1,11 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { type CasoDeUso, CLOCK, type Clock } from '../../../../building-blocks/application';
-import { type TipoEstudio } from '../../domain/entidades';
 import { HistoriaClinicaNoEncontrada } from '../../domain/errores';
 import {
   HISTORIA_CLINICA_REPOSITORY,
   type HistoriaClinicaRepository,
 } from '../../domain/historia-clinica.repository';
-
-export class RegistrarEstudioCommand {
-  constructor(
-    readonly pacienteId: string,
-    readonly tipo: TipoEstudio,
-    readonly descripcion: string,
-    readonly fecha: Date,
-    readonly registradoPor: string,
-    readonly resultado?: string,
-  ) {}
-}
+import type { RegistrarEstudioCommand } from './registrar-estudio.command';
 
 @Injectable()
 export class RegistrarEstudioHandler implements CasoDeUso<RegistrarEstudioCommand, { id: string }> {

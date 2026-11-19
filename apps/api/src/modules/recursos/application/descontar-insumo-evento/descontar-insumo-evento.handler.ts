@@ -1,7 +1,11 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { CasoDeUso } from '../../../../building-blocks/application';
-import type { EventosProcesadosRepository, InsumoRepository } from '../../domain';
-import { EVENTOS_PROCESADOS_REPOSITORY, INSUMO_REPOSITORY } from '../ports/tokens';
+import {
+  EVENTOS_PROCESADOS_REPOSITORY,
+  INSUMO_REPOSITORY,
+  type EventosProcesadosRepository,
+  type InsumoRepository,
+} from '../../domain';
 import type { DescontarInsumoPorEventoCommand } from './descontar-insumo-evento.command';
 
 @Injectable()

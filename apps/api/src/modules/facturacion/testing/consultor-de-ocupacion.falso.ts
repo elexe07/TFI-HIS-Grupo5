@@ -1,7 +1,4 @@
-import type {
-  ConsultorDeOcupacion,
-  ResumenOcupacion,
-} from '../domain/ports/consultor-de-ocupacion';
+import type { ConsultorDeOcupacion, ResumenOcupacion } from '../domain/consultor-de-ocupacion';
 
 export class ConsultorDeOcupacionFalso implements ConsultorDeOcupacion {
   constructor(

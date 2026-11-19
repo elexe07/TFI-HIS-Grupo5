@@ -1,7 +1,11 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
-import type { EventosProcesadosRepository, InsumoRepository } from '../../domain';
-import { EVENTOS_PROCESADOS_REPOSITORY, INSUMO_REPOSITORY } from '../ports/tokens';
+import {
+  EVENTOS_PROCESADOS_REPOSITORY,
+  INSUMO_REPOSITORY,
+  type EventosProcesadosRepository,
+  type InsumoRepository,
+} from '../../domain';
 
 export interface MedicacionAdministradaPayload {
   eventoId: string;

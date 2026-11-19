@@ -5,7 +5,7 @@ import {
   INDICACION_REPOSITORY,
   type IndicacionRepository,
 } from '../../domain/indicacion.repository';
-import { mapearIndicacionADto, type IndicacionDto } from '../dtos/indicacion.dto';
+import { mapearIndicacionADto, type IndicacionDto } from '../indicacion.dto';
 import { OmitirIndicacionCommand } from './omitir-indicacion.command';
 
 @Injectable()

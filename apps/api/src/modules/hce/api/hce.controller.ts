@@ -21,38 +21,24 @@ import {
   UsuarioActual,
   type UsuarioAutenticado,
 } from '../../iam/public';
-import {
-  ConsultarHistoriaHandler,
-  ConsultarHistoriaQuery,
-} from '../application/consultar-historia/consultar-historia.handler';
-import {
-  CrearPrescripcionCommand,
-  CrearPrescripcionHandler,
-} from '../application/crear-prescripcion/crear-prescripcion.handler';
+import { ConsultarHistoriaQuery } from '../application/consultar-historia/consultar-historia.query';
+import { ConsultarHistoriaHandler } from '../application/consultar-historia/consultar-historia.handler';
+import { CrearPrescripcionCommand } from '../application/crear-prescripcion/crear-prescripcion.command';
+import { CrearPrescripcionHandler } from '../application/crear-prescripcion/crear-prescripcion.handler';
+import { RegistrarAlergiaCommand } from '../application/registrar-alergia/registrar-alergia.command';
+import { RegistrarAlergiaHandler } from '../application/registrar-alergia/registrar-alergia.handler';
+import { RegistrarAntecedenteCommand } from '../application/registrar-antecedente/registrar-antecedente.command';
+import { RegistrarAntecedenteHandler } from '../application/registrar-antecedente/registrar-antecedente.handler';
+import { RegistrarEstudioCommand } from '../application/registrar-estudio/registrar-estudio.command';
+import { RegistrarEstudioHandler } from '../application/registrar-estudio/registrar-estudio.handler';
+import { RegistrarEvolucionCommand } from '../application/registrar-evolucion/registrar-evolucion.command';
+import { RegistrarEvolucionHandler } from '../application/registrar-evolucion/registrar-evolucion.handler';
 import type { HistoriaClinicaDto } from '../application/historia-clinica.dto';
-import {
-  RegistrarAlergiaCommand,
-  RegistrarAlergiaHandler,
-} from '../application/registrar-alergia/registrar-alergia.handler';
-import {
-  RegistrarAntecedenteCommand,
-  RegistrarAntecedenteHandler,
-} from '../application/registrar-antecedente/registrar-antecedente.handler';
-import {
-  RegistrarEstudioCommand,
-  RegistrarEstudioHandler,
-} from '../application/registrar-estudio/registrar-estudio.handler';
-import {
-  RegistrarEvolucionCommand,
-  RegistrarEvolucionHandler,
-} from '../application/registrar-evolucion/registrar-evolucion.handler';
-import {
-  CrearPrescripcionDto,
-  RegistrarAlergiaDto,
-  RegistrarAntecedenteDto,
-  RegistrarEstudioDto,
-  RegistrarEvolucionDto,
-} from './dto/hce.dtos';
+import { CrearPrescripcionDto } from './dto/crear-prescripcion.dto';
+import { RegistrarAlergiaDto } from './dto/registrar-alergia.dto';
+import { RegistrarAntecedenteDto } from './dto/registrar-antecedente.dto';
+import { RegistrarEstudioDto } from './dto/registrar-estudio.dto';
+import { RegistrarEvolucionDto } from './dto/registrar-evolucion.dto';
 
 @ApiTags('hce')
 @ApiBearerAuth()

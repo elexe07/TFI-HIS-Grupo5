@@ -1,6 +1,6 @@
 # ADR-006: Frontend React + Vite con pantallas mínimas por módulo
 
-- **Estado:** Propuesto
+- **Estado:** Reemplazado por [ADR-009](ADR-009-frontend-vue-por-modulo.md)
 - **Fecha:** 2026-10-23
 - **Decisores:**
 

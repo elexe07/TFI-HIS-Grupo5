@@ -23,7 +23,7 @@ import { NotaDeEnfermeria } from '../../domain/nota-enfermeria';
 import {
   mapearAdministracionADto,
   type AdministracionMedicacionDto,
-} from '../dtos/administracion-medicacion.dto';
+} from '../administracion-medicacion.dto';
 import { AdministrarMedicacionCommand } from './administrar-medicacion.command';
 
 @Injectable()

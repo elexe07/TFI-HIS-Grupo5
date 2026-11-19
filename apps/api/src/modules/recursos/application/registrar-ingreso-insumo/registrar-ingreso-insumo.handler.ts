@@ -1,8 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { CasoDeUso } from '../../../../building-blocks/application';
-import { type InsumoRepository, InsumoNoEncontrado } from '../../domain';
+import { InsumoNoEncontrado, INSUMO_REPOSITORY, type InsumoRepository } from '../../domain';
 import { mapearInsumoADto, type InsumoDto } from '../insumo.dto';
-import { INSUMO_REPOSITORY } from '../ports/tokens';
 import type { RegistrarIngresoInsumoCommand } from './registrar-ingreso-insumo.command';
 
 @Injectable()

@@ -2,16 +2,11 @@ import { Injectable } from '@nestjs/common';
 import type { Prisma } from '@prisma/client';
 import { generarId } from '../../../building-blocks/domain';
 import { PrismaService } from '../../../building-blocks/infrastructure/prisma/prisma.service';
-import {
-  Alergia,
-  AntecedenteFamiliar,
-  Evolucion,
-  Estudio,
-  Prescripcion,
-  type SeveridadAlergia,
-  type TipoEstudio,
-  type EstadoPrescripcion,
-} from '../domain/entidades';
+import { Alergia, type SeveridadAlergia } from '../domain/alergia';
+import { AntecedenteFamiliar } from '../domain/antecedente-familiar';
+import { Estudio, type TipoEstudio } from '../domain/estudio';
+import { Evolucion } from '../domain/evolucion';
+import { Prescripcion, type EstadoPrescripcion } from '../domain/prescripcion';
 import { HistoriaClinica } from '../domain/historia-clinica';
 import type { HistoriaClinicaRepository } from '../domain/historia-clinica.repository';
 

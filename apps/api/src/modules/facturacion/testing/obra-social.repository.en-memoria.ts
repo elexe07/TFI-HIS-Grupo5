@@ -1,5 +1,5 @@
 import { ObraSocial } from '../domain/obra-social';
-import type { ObraSocialRepository } from '../domain/ports/obra-social.repository';
+import type { ObraSocialRepository } from '../domain/obra-social.repository';
 
 export class ObraSocialRepositoryEnMemoria implements ObraSocialRepository {
   private obras = new Map<string, ObraSocial>();

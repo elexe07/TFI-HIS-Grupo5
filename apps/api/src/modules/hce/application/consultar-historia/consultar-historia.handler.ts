@@ -7,13 +7,7 @@ import {
   type HistoriaClinicaRepository,
 } from '../../domain/historia-clinica.repository';
 import type { HistoriaClinicaDto } from '../historia-clinica.dto';
-
-export class ConsultarHistoriaQuery {
-  constructor(
-    readonly pacienteId: string,
-    readonly usuarioActual: { id: string; rol: string; pacienteId?: string },
-  ) {}
-}
+import type { ConsultarHistoriaQuery } from './consultar-historia.query';
 
 @Injectable()
 export class ConsultarHistoriaHandler implements CasoDeUso<

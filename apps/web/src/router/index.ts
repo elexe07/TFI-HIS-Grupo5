@@ -1,16 +1,24 @@
 /**
- * Router principal con guards de navegación
- * Vue Router 4 + TypeScript
+ * Router principal: junta las rutas de cada módulo (modules/<modulo>/<modulo>.routes.ts)
+ * y define los guards globales de autenticación y permisos.
  */
 import {
   createRouter,
   createWebHistory,
   type RouteLocationNormalized,
   type NavigationGuardNext,
+  type RouteRecordRaw,
 } from 'vue-router';
-import { useAuthStore } from '@/stores/auth';
-import { useToastStore } from '@/stores/toast';
-import type { Permiso } from '@/types/api';
+import { useAuthStore } from '@/modules/iam/auth.store';
+import { useToastStore } from '@/shared/stores/toast';
+import type { Permiso } from '@/modules/iam/iam.types';
+import { iamRoutes } from '@/modules/iam/iam.routes';
+import { dashboardRoutes } from '@/modules/dashboard/dashboard.routes';
+import { admisionRoutes } from '@/modules/admision/admision.routes';
+import { hceRoutes } from '@/modules/hce/hce.routes';
+import { enfermeriaRoutes } from '@/modules/enfermeria/enfermeria.routes';
+import { recursosRoutes } from '@/modules/recursos/recursos.routes';
+import { facturacionRoutes } from '@/modules/facturacion/facturacion.routes';
 
 // ============================================================================
 // TIPOS PARA META DE RUTAS
@@ -28,291 +36,23 @@ declare module 'vue-router' {
 }
 
 // ============================================================================
-// RUTAS
+// RUTAS: cada módulo declara las suyas
 // ============================================================================
 
-import type { RouteRecordRaw } from 'vue-router';
-
 const routes: RouteRecordRaw[] = [
-  // --- AUTENTICACIÓN ---
-  {
-    path: '/login',
-    name: 'login',
-    component: () => import('@/views/iam/LoginView.vue'),
-    meta: {
-      requiresAuth: false,
-      layout: 'auth',
-      title: 'Iniciar Sesión',
-    },
-  },
+  ...iamRoutes,
+  ...dashboardRoutes,
+  ...admisionRoutes,
+  ...hceRoutes,
+  ...enfermeriaRoutes,
+  ...recursosRoutes,
+  ...facturacionRoutes,
 
-  // --- DASHBOARD / INICIO ---
-  {
-    path: '/',
-    name: 'dashboard',
-    component: () => import('@/views/DashboardView.vue'),
-    meta: {
-      requiresAuth: true,
-      layout: 'default',
-      title: 'Dashboard',
-    },
-  },
-
-  // --- ADMISIÓN ---
-  {
-    path: '/admision',
-    name: 'admision',
-    component: () => import('@/views/admision/AdmisionLayout.vue'),
-    meta: {
-      requiresAuth: true,
-      permisos: ['pacientes:leer'] as Permiso[],
-      layout: 'default',
-      title: 'Admisión',
-    },
-    children: [
-      {
-        path: '',
-        name: 'admision.pacientes',
-        component: () => import('@/views/admision/PacientesView.vue'),
-        meta: { title: 'Pacientes' },
-      },
-      {
-        path: 'pacientes/nuevo',
-        name: 'admision.paciente.nuevo',
-        component: () => import('@/views/admision/PacienteFormView.vue'),
-        meta: { permisos: ['pacientes:registrar'] as Permiso[], title: 'Nuevo Paciente' },
-      },
-      {
-        path: 'pacientes/:id/editar',
-        name: 'admision.paciente.editar',
-        component: () => import('@/views/admision/PacienteFormView.vue'),
-        meta: { permisos: ['pacientes:registrar'] as Permiso[], title: 'Editar Paciente' },
-      },
-      {
-        path: 'pacientes/:id',
-        name: 'admision.paciente.detalle',
-        component: () => import('@/views/admision/PacienteDetalleView.vue'),
-        meta: { title: 'Detalle Paciente' },
-      },
-      {
-        path: 'agenda',
-        name: 'admision.agenda',
-        component: () => import('@/views/admision/AgendaView.vue'),
-        meta: { permisos: ['agenda:definir'] as Permiso[], title: 'Agenda Médica' },
-      },
-      {
-        path: 'turnos',
-        name: 'admision.turnos',
-        component: () => import('@/views/admision/TurnosView.vue'),
-        meta: { permisos: ['turnos:reservar'] as Permiso[], title: 'Turnos' },
-      },
-      {
-        path: 'triaje',
-        name: 'admision.triaje',
-        component: () => import('@/views/admision/TriajeView.vue'),
-        meta: {
-          permisos: ['triaje:registrar', 'guardia:leer'] as Permiso[],
-          permisosMode: 'any',
-          title: 'Triaje y Guardia',
-        },
-      },
-    ],
-  },
-
-  // --- HCE ---
-  {
-    path: '/hce',
-    name: 'hce',
-    component: () => import('@/views/hce/HceLayout.vue'),
-    meta: {
-      requiresAuth: true,
-      permisos: ['hce:leer'] as Permiso[],
-      layout: 'default',
-      title: 'Historia Clínica',
-    },
-    children: [
-      {
-        path: '',
-        name: 'hce.inicio',
-        component: () => import('@/views/hce/HistoriaClinicaView.vue'),
-        meta: { title: 'Historia Clínica' },
-      },
-      {
-        path: 'evoluciones',
-        name: 'hce.evoluciones',
-        component: () => import('@/views/hce/EvolucionFormView.vue'),
-        meta: { permisos: ['hce:escribir'] as Permiso[], title: 'Evoluciones' },
-      },
-      {
-        path: 'prescripciones',
-        name: 'hce.prescripciones',
-        component: () => import('@/views/hce/PrescripcionFormView.vue'),
-        meta: { permisos: ['prescripciones:crear'] as Permiso[], title: 'Prescripciones' },
-      },
-      {
-        path: 'paciente/:pacienteId',
-        name: 'hce.historia',
-        component: () => import('@/views/hce/HistoriaClinicaView.vue'),
-        meta: { title: 'Historia Clínica' },
-      },
-      {
-        path: 'paciente/:pacienteId/evolucion/nueva',
-        name: 'hce.evolucion.nueva',
-        component: () => import('@/views/hce/EvolucionFormView.vue'),
-        meta: { permisos: ['hce:escribir'] as Permiso[], title: 'Nueva Evolución' },
-      },
-      {
-        path: 'paciente/:pacienteId/prescripcion/nueva',
-        name: 'hce.prescripcion.nueva',
-        component: () => import('@/views/hce/PrescripcionFormView.vue'),
-        meta: { permisos: ['prescripciones:crear'] as Permiso[], title: 'Nueva Prescripción' },
-      },
-    ],
-  },
-
-  // --- ENFERMERÍA ---
-  {
-    path: '/enfermeria',
-    name: 'enfermeria',
-    component: () => import('@/views/enfermeria/EnfermeriaLayout.vue'),
-    meta: {
-      requiresAuth: true,
-      permisos: ['enfermeria:indicaciones:leer'] as Permiso[],
-      layout: 'default',
-      title: 'Enfermería',
-    },
-    children: [
-      {
-        path: '',
-        name: 'enfermeria.indicaciones',
-        component: () => import('@/views/enfermeria/IndicacionesView.vue'),
-        meta: { title: 'Indicaciones' },
-      },
-      {
-        path: 'signos-vitales',
-        name: 'enfermeria.signos-vitales',
-        component: () => import('@/views/enfermeria/SignosVitalesView.vue'),
-        meta: { permisos: ['enfermeria:signos:crear'] as Permiso[], title: 'Signos Vitales' },
-      },
-      {
-        path: 'notas',
-        name: 'enfermeria.notas',
-        component: () => import('@/views/enfermeria/NotasView.vue'),
-        meta: { permisos: ['enfermeria:notas:crear'] as Permiso[], title: 'Notas de Enfermería' },
-      },
-    ],
-  },
-
-  // --- RECURSOS ---
-  {
-    path: '/recursos',
-    name: 'recursos',
-    component: () => import('@/views/recursos/RecursosLayout.vue'),
-    meta: {
-      requiresAuth: true,
-      permisos: ['camas:leer'] as Permiso[],
-      layout: 'default',
-      title: 'Recursos y Camas',
-    },
-    children: [
-      {
-        path: '',
-        name: 'recursos.mapa-camas',
-        component: () => import('@/views/recursos/MapaCamasView.vue'),
-        meta: { title: 'Mapa de Camas' },
-      },
-      {
-        path: 'internaciones',
-        name: 'recursos.internaciones',
-        component: () => import('@/views/recursos/InternacionesView.vue'),
-        meta: { permisos: ['internaciones:gestionar'] as Permiso[], title: 'Internaciones' },
-      },
-      {
-        path: 'insumos',
-        name: 'recursos.insumos',
-        component: () => import('@/views/recursos/InsumosView.vue'),
-        meta: { permisos: ['insumos:gestionar'] as Permiso[], title: 'Insumos' },
-      },
-    ],
-  },
-
-  // --- FACTURACIÓN ---
-  {
-    path: '/facturacion',
-    name: 'facturacion',
-    component: () => import('@/views/facturacion/FacturacionLayout.vue'),
-    meta: {
-      requiresAuth: true,
-      permisos: ['facturacion:leer'] as Permiso[],
-      layout: 'default',
-      title: 'Facturación',
-    },
-    children: [
-      {
-        path: '',
-        name: 'facturacion.cuentas',
-        component: () => import('@/views/facturacion/CuentasView.vue'),
-        meta: { title: 'Cuentas' },
-      },
-      {
-        path: 'cuenta/:id',
-        name: 'facturacion.cuenta.detalle',
-        component: () => import('@/views/facturacion/CuentaDetalleView.vue'),
-        meta: { title: 'Detalle Cuenta' },
-      },
-      {
-        path: 'cobertura',
-        name: 'facturacion.cobertura',
-        component: () => import('@/views/facturacion/CoberturaView.vue'),
-        meta: { permisos: ['cobertura:validar'] as Permiso[], title: 'Validar Cobertura' },
-      },
-      {
-        path: 'reportes',
-        name: 'facturacion.reportes',
-        component: () => import('@/views/facturacion/ReportesView.vue'),
-        meta: { permisos: ['reportes:leer'] as Permiso[], title: 'Reportes' },
-      },
-    ],
-  },
-
-  // --- ADMINISTRACIÓN (IAM) ---
-  {
-    path: '/admin',
-    name: 'admin',
-    component: () => import('@/views/iam/AdminLayout.vue'),
-    meta: {
-      requiresAuth: true,
-      permisos: ['iam:usuarios:leer'] as Permiso[],
-      layout: 'default',
-      title: 'Administración',
-    },
-    children: [
-      {
-        path: 'usuarios',
-        name: 'admin.usuarios',
-        component: () => import('@/views/iam/UsuariosView.vue'),
-        meta: { title: 'Usuarios' },
-      },
-    ],
-  },
-
-  // --- PERFIL ---
-  {
-    path: '/perfil',
-    name: 'perfil',
-    component: () => import('@/views/PerfilView.vue'),
-    meta: {
-      requiresAuth: true,
-      layout: 'default',
-      title: 'Mi Perfil',
-    },
-  },
-
-  // --- 404 ---
+  // --- 404 (siempre al final) ---
   {
     path: '/:pathMatch(.*)*',
     name: 'not-found',
-    component: () => import('@/views/NotFoundView.vue'),
+    component: () => import('@/shared/views/NotFoundView.vue'),
     meta: {
       layout: 'empty',
       title: 'Página no encontrada',

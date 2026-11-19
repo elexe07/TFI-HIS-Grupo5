@@ -5,7 +5,7 @@ import {
   IndicacionNoEstaPendiente,
   MedicacionYaAdministrada,
 } from '../../domain/errores';
-import { MEDICACION_ADMINISTRADA } from '../../domain/events/medicacion-administrada.event';
+import { MEDICACION_ADMINISTRADA } from '../../domain/events/medicacion-administrada';
 import { AdministracionMedicacionRepositoryEnMemoria } from '../../testing/administracion-medicacion.repository.en-memoria';
 import { IndicacionRepositoryEnMemoria } from '../../testing/indicacion.repository.en-memoria';
 import { NotaEnfermeriaRepositoryEnMemoria } from '../../testing/nota-enfermeria.repository.en-memoria';

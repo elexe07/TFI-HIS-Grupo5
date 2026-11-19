@@ -11,19 +11,7 @@ import {
   HISTORIA_CLINICA_REPOSITORY,
   type HistoriaClinicaRepository,
 } from '../../domain/historia-clinica.repository';
-
-export class CrearPrescripcionCommand {
-  constructor(
-    readonly pacienteId: string,
-    readonly medicoId: string,
-    readonly medicamento: string,
-    readonly dosis: string,
-    readonly frecuenciaHoras: number,
-    readonly duracionDias: number,
-    readonly evolucionId?: string,
-    readonly internacionId?: string,
-  ) {}
-}
+import type { CrearPrescripcionCommand } from './crear-prescripcion.command';
 
 @Injectable()
 export class CrearPrescripcionHandler implements CasoDeUso<

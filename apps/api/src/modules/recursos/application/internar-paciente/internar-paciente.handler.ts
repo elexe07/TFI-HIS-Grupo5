@@ -2,16 +2,17 @@ import { Inject, Injectable } from '@nestjs/common';
 import type { CasoDeUso, EventBus } from '../../../../building-blocks/application';
 import { EVENT_BUS } from '../../../../building-blocks/application';
 import {
-  type CamaRepository,
   CamaNoEncontrada,
   CamaNoLibre,
   EstadoCama,
   Internacion,
-  type InternacionRepository,
   PacienteYaInternado,
+  CAMA_REPOSITORY,
+  INTERNACION_REPOSITORY,
+  type CamaRepository,
+  type InternacionRepository,
 } from '../../domain';
 import { mapearInternacionADto, type InternacionDto } from '../internacion.dto';
-import { CAMA_REPOSITORY, INTERNACION_REPOSITORY } from '../ports/tokens';
 import type { InternarPacienteCommand } from './internar-paciente.command';
 
 @Injectable()

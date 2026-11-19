@@ -1,5 +1,5 @@
 import { EventBusEnMemoria, RelojFijo } from '../../../../building-blocks/testing';
-import { PacienteYaExiste } from '../../domain/errores';
+import { PacienteYaExiste, UsuarioYaVinculado } from '../../domain/errores';
 import { EVENTO_PACIENTE_REGISTRADO } from '../../domain/events/paciente-registrado';
 import { Sexo, TipoDocumento } from '../../domain/tipos';
 import { PacienteRepositoryEnMemoria } from '../../testing/paciente.repository.en-memoria';
@@ -56,5 +56,29 @@ describe('RegistrarPacienteHandler (ADM-01)', () => {
     );
 
     expect(bus.nombres()).toHaveLength(1); // No publica segundo evento
+  });
+
+  it('registra la ficha ya vinculada al usuario del portal', async () => {
+    const res = await handler.ejecutar(
+      new RegistrarPacienteCommand({ ...datosValidos, usuarioId: 'usuario-1' }),
+    );
+
+    expect(res.usuarioId).toBe('usuario-1');
+  });
+
+  it('un usuario del portal no puede quedar vinculado a dos fichas', async () => {
+    await handler.ejecutar(
+      new RegistrarPacienteCommand({ ...datosValidos, usuarioId: 'usuario-1' }),
+    );
+
+    await expect(
+      handler.ejecutar(
+        new RegistrarPacienteCommand({
+          ...datosValidos,
+          numeroDocumento: '40999888',
+          usuarioId: 'usuario-1',
+        }),
+      ),
+    ).rejects.toThrow(UsuarioYaVinculado);
   });
 });

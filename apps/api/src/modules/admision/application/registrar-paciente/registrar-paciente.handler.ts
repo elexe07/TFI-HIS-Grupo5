@@ -8,7 +8,7 @@ import {
 } from '../../../../building-blocks/application';
 import { Cobertura } from '../../domain/cobertura';
 import { Documento } from '../../domain/documento';
-import { PacienteYaExiste } from '../../domain/errores';
+import { PacienteYaExiste, UsuarioYaVinculado } from '../../domain/errores';
 import { Paciente } from '../../domain/paciente';
 import { PACIENTE_REPOSITORY, type PacienteRepository } from '../../domain/paciente.repository';
 import { aPacienteDto, type PacienteDto } from '../paciente.dto';
@@ -29,6 +29,10 @@ export class RegistrarPacienteHandler implements CasoDeUso<RegistrarPacienteComm
     const existente = await this.pacientes.buscarPorDocumento(documento.tipo, documento.numero);
     if (existente) {
       throw new PacienteYaExiste(documento.toString());
+    }
+    // Un usuario del portal tiene una sola ficha (en la base es único: sin esto sería un 500).
+    if (command.usuarioId && (await this.pacientes.buscarPorUsuarioId(command.usuarioId))) {
+      throw new UsuarioYaVinculado();
     }
 
     const cobertura = Cobertura.crear(command.obraSocialCodigo, command.numeroAfiliado);

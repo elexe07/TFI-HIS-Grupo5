@@ -35,6 +35,8 @@ export interface CrearPacienteRequest {
   email?: string;
   obraSocialCodigo?: string;
   numeroAfiliado?: string;
+  /** Usuario del portal (rol PACIENTE) al que queda vinculada la ficha. */
+  usuarioId?: string;
 }
 
 export interface BuscarPacientesParams {

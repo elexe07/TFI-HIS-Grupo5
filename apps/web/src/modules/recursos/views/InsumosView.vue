@@ -2,8 +2,8 @@
 import { ref, onMounted, computed } from 'vue';
 import { useRecursosStore } from '@/modules/recursos/recursos.store';
 import { useToastStore } from '@/shared/stores/toast';
-import { Card, Button, Input, Table, type TableColumn } from '@/shared/components/ui';
-import type { InsumoDTO } from '@/modules/recursos/recursos.types';
+import { Card, Button, Input, Modal, Table, type TableColumn } from '@/shared/components/ui';
+import type { CrearInsumoRequest, InsumoDTO } from '@/modules/recursos/recursos.types';
 
 const recursosStore = useRecursosStore();
 const toastStore = useToastStore();
@@ -109,6 +109,62 @@ async function registrarEgreso() {
   }
 }
 
+// --- Nuevo insumo ---
+// El front solo exige que no falten campos; código único, medicamento no repetido y stock
+// no negativo los valida el backend, y acá se muestra su mensaje tal cual.
+interface FormularioInsumo {
+  codigo: string;
+  nombre: string;
+  medicamentoAsociado: string;
+  stockInicial: string;
+  stockMinimo: string;
+}
+const formularioVacio = (): FormularioInsumo => ({
+  codigo: '',
+  nombre: '',
+  medicamentoAsociado: '',
+  stockInicial: '0',
+  stockMinimo: '0',
+});
+
+const mostrarAlta = ref(false);
+const nuevoInsumo = ref<FormularioInsumo>(formularioVacio());
+const guardandoAlta = ref(false);
+const errorAlta = ref<string | null>(null);
+
+const altaCompleta = computed(() => {
+  const { codigo, nombre, stockInicial, stockMinimo } = nuevoInsumo.value;
+  return !!(codigo.trim() && nombre.trim() && stockInicial !== '' && stockMinimo !== '');
+});
+
+function abrirAlta() {
+  nuevoInsumo.value = formularioVacio();
+  errorAlta.value = null;
+  mostrarAlta.value = true;
+}
+
+async function crearInsumo() {
+  const f = nuevoInsumo.value;
+  const datos: CrearInsumoRequest = {
+    codigo: f.codigo.trim(),
+    nombre: f.nombre.trim(),
+    medicamentoAsociado: f.medicamentoAsociado.trim() || undefined,
+    stockInicial: Number(f.stockInicial),
+    stockMinimo: Number(f.stockMinimo),
+  };
+  guardandoAlta.value = true;
+  errorAlta.value = null;
+  try {
+    const creado = await recursosStore.crearInsumo(datos);
+    toastStore.success('Insumo creado', `${creado.codigo} · ${creado.nombre}`);
+    mostrarAlta.value = false;
+  } catch (err) {
+    errorAlta.value = err instanceof Error ? err.message : 'No se pudo crear el insumo';
+  } finally {
+    guardandoAlta.value = false;
+  }
+}
+
 onMounted(() => {
   cargarInsumos();
 });
@@ -121,6 +177,7 @@ onMounted(() => {
         <h2>Gestión de Insumos</h2>
         <p class="view-subtitle">Inventario de insumos y medicamentos</p>
       </div>
+      <Button variant="primary" @click="abrirAlta">+ Nuevo insumo</Button>
     </div>
 
     <Card class="search-card">
@@ -313,10 +370,90 @@ onMounted(() => {
         </div>
       </div>
     </div>
+
+    <Modal v-model:modelValue="mostrarAlta" title="Nuevo insumo" size="md" :closable="true">
+      <form class="form-alta" @submit.prevent="crearInsumo">
+        <div class="form-alta-grid">
+          <Input
+            v-model="nuevoInsumo.codigo"
+            label="Código"
+            placeholder="Ej. IBU400"
+            hint="Se guarda en mayúsculas"
+            :maxLength="30"
+            required
+          />
+          <Input
+            v-model="nuevoInsumo.nombre"
+            label="Nombre"
+            placeholder="Ej. Ibuprofeno 400 mg"
+            :maxLength="120"
+            required
+          />
+        </div>
+        <Input
+          v-model="nuevoInsumo.medicamentoAsociado"
+          label="Medicamento asociado (opcional)"
+          placeholder="Ej. Ibuprofeno"
+          hint="Si se carga, al administrar ese medicamento se descuenta stock de este insumo"
+          :maxLength="120"
+        />
+        <div class="form-alta-grid">
+          <Input
+            v-model="nuevoInsumo.stockInicial"
+            label="Stock inicial"
+            type="number"
+            min="0"
+            required
+          />
+          <Input
+            v-model="nuevoInsumo.stockMinimo"
+            label="Stock mínimo"
+            type="number"
+            min="0"
+            required
+          />
+        </div>
+        <p v-if="errorAlta" class="form-alta-error" role="alert">{{ errorAlta }}</p>
+      </form>
+      <template #footer>
+        <Button variant="secondary" @click="mostrarAlta = false">Cancelar</Button>
+        <Button
+          variant="primary"
+          :loading="guardandoAlta"
+          :disabled="!altaCompleta"
+          @click="crearInsumo"
+          >Crear insumo</Button
+        >
+      </template>
+    </Modal>
   </div>
 </template>
 
 <style scoped>
+.form-alta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.form-alta-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-md);
+}
+
+@media (max-width: 640px) {
+  .form-alta-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.form-alta-error {
+  margin: 0;
+  color: var(--color-danger);
+  font-size: 0.875rem;
+}
+
 .view-header {
   display: flex;
   align-items: flex-start;

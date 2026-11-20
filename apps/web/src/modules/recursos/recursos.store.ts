@@ -6,6 +6,7 @@ import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import { recursosApi } from './recursos.api';
 import type {
+  CrearInsumoRequest,
   HabitacionDTO,
   ResumenCamas,
   EstadoCama,
@@ -186,6 +187,13 @@ export const useRecursosStore = defineStore('recursos', () => {
     }
   }
 
+  /** Alta de insumo. Los errores (código o medicamento repetido) los muestra el formulario. */
+  async function crearInsumo(datos: CrearInsumoRequest) {
+    const creado = await recursosApi.crearInsumo(datos);
+    insumos.value = [...insumos.value, creado];
+    return creado;
+  }
+
   async function ingresarInsumo(id: string, cantidad: number) {
     cargando.value = true;
     error.value = null;
@@ -254,6 +262,7 @@ export const useRecursosStore = defineStore('recursos', () => {
     internarPaciente,
     darAlta,
     cargarInsumos,
+    crearInsumo,
     ingresarInsumo,
     egresarInsumo,
     clearError,

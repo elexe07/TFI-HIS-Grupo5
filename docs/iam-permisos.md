@@ -22,7 +22,7 @@ Para pedir un permiso nuevo: agregarlo a `PERMISOS`, a la matriz y a esta tabla 
 | `camas:leer`              |       ✔       |   ✔    |     ✔     |       ✔       |          |
 | `camas:gestionar`         |       ✔       |        |     ✔     |               |          |
 | `internaciones:gestionar` |       ✔       |   ✔    |           |       ✔       |          |
-| `insumos:gestionar`       |       ✔       |        |           |               |          |
+| `insumos:gestionar`       |       ✔       |        |     ✔     |               |          |
 | `facturacion:leer`        |       ✔       |        |           |       ✔       |  propio  |
 | `facturacion:gestionar`   |       ✔       |        |           |       ✔       |          |
 | `cobertura:validar`       |       ✔       |        |           |       ✔       |          |

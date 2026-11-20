@@ -79,6 +79,7 @@ export const MATRIZ_PERMISOS: Readonly<Record<NombreRol, readonly Permiso[]>> = 
     P.ENFERMERIA_LEER,
     P.CAMAS_LEER,
     P.CAMAS_GESTIONAR,
+    P.INSUMOS_GESTIONAR,
   ],
   RECEPCIONISTA: [
     P.PACIENTES_REGISTRAR,

@@ -65,3 +65,28 @@ export class InsumoNoEncontrado extends NoEncontrado {
     super(`Insumo '${criterio}' no encontrado`, 'INSUMO_NO_ENCONTRADO');
   }
 }
+
+export class DatosDeInsumoInvalidos extends ErrorDeValidacion {
+  constructor(mensaje: string) {
+    super(mensaje, 'DATOS_INSUMO_INVALIDOS');
+  }
+}
+
+export class InsumoYaExiste extends Conflicto {
+  constructor(codigo: string) {
+    super(`Ya existe un insumo con el código ${codigo}`, 'INSUMO_DUPLICADO');
+  }
+}
+
+/**
+ * El descuento automático de stock (al administrar medicación) busca el insumo por su
+ * medicamento asociado: si dos insumos lo comparten, no sabría cuál descontar.
+ */
+export class MedicamentoYaAsociado extends Conflicto {
+  constructor(medicamento: string, insumoExistente: string) {
+    super(
+      `El medicamento "${medicamento}" ya está asociado al insumo ${insumoExistente}`,
+      'MEDICAMENTO_YA_ASOCIADO',
+    );
+  }
+}

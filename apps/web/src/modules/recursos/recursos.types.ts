@@ -89,6 +89,15 @@ export interface InsumoDTO {
   updatedAt: string;
 }
 
+/** Body de POST /insumos. El back guarda el código en mayúsculas y valida que no se repita. */
+export interface CrearInsumoRequest {
+  codigo: string;
+  nombre: string;
+  medicamentoAsociado?: string;
+  stockInicial: number;
+  stockMinimo: number;
+}
+
 export interface IngresoInsumoRequest {
   cantidad: number;
 }

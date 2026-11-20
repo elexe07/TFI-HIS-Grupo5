@@ -10,7 +10,9 @@ import {
   Query,
 } from '@nestjs/common';
 import {
+  ApiBadRequestResponse,
   ApiBearerAuth,
+  ApiConflictResponse,
   ApiCreatedResponse,
   ApiForbiddenResponse,
   ApiNotFoundResponse,
@@ -22,9 +24,12 @@ import { PERMISOS, RequierePermiso } from '../../iam/public';
 import type { InsumoDto } from '../application/insumo.dto';
 import { ListarInsumosHandler } from '../application/listar-insumos/listar-insumos.handler';
 import { ListarInsumosQuery } from '../application/listar-insumos/listar-insumos.query';
+import { RegistrarInsumoCommand } from '../application/registrar-insumo/registrar-insumo.command';
+import { RegistrarInsumoHandler } from '../application/registrar-insumo/registrar-insumo.handler';
 import { RegistrarIngresoInsumoCommand } from '../application/registrar-ingreso-insumo/registrar-ingreso-insumo.command';
 import { RegistrarIngresoInsumoHandler } from '../application/registrar-ingreso-insumo/registrar-ingreso-insumo.handler';
 import { IngresoInsumoDto } from './dto/ingreso-insumo.dto';
+import { RegistrarInsumoDto } from './dto/registrar-insumo.dto';
 import { EgresoInsumoDto } from './dto/egreso-insumo.dto';
 import { ListarInsumosQueryDto } from './dto/listar-insumos-query.dto';
 import { RegistrarEgresoInsumoCommand } from '../application/registrar-egreso-insumo/registrar-egreso-insumo.command';
@@ -37,6 +42,7 @@ import { RegistrarEgresoInsumoHandler } from '../application/registrar-egreso-in
 @Controller('insumos')
 export class InsumosController {
   constructor(
+    private readonly registrarInsumo: RegistrarInsumoHandler,
     private readonly registrarIngresoInsumo: RegistrarIngresoInsumoHandler,
     private readonly registrarEgresoInsumo: RegistrarEgresoInsumoHandler,
     private readonly listarInsumos: ListarInsumosHandler,
@@ -47,6 +53,16 @@ export class InsumosController {
   @ApiOkResponse({ description: 'Listado de insumos' })
   listar(@Query() query: ListarInsumosQueryDto): Promise<InsumoDto[]> {
     return this.listarInsumos.ejecutar(new ListarInsumosQuery({ bajoMinimo: query.bajoMinimo }));
+  }
+
+  @Post()
+  @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({ summary: 'Dar de alta un insumo nuevo con su stock inicial' })
+  @ApiCreatedResponse({ description: 'Insumo creado' })
+  @ApiConflictResponse({ description: 'INSUMO_DUPLICADO o MEDICAMENTO_YA_ASOCIADO' })
+  @ApiBadRequestResponse({ description: 'DATOS_INSUMO_INVALIDOS o CANTIDAD_INVALIDA' })
+  registrar(@Body() dto: RegistrarInsumoDto): Promise<InsumoDto> {
+    return this.registrarInsumo.ejecutar(new RegistrarInsumoCommand(dto));
   }
 
   @Post(':id/ingresos')

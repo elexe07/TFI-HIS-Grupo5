@@ -1,4 +1,4 @@
-import { CantidadInvalida, StockInsuficiente } from './errores';
+import { CantidadInvalida, DatosDeInsumoInvalidos, StockInsuficiente } from './errores';
 import { Insumo } from './insumo';
 
 describe('Insumo', () => {
@@ -35,6 +35,29 @@ describe('Insumo', () => {
         stockMinimo: 5,
       }),
     ).toThrow(CantidadInvalida);
+  });
+
+  it('normaliza el código a mayúsculas y limpia espacios', () => {
+    const insumo = Insumo.crear({
+      codigo: ' ins-002 ',
+      nombre: ' Gasa estéril ',
+      medicamentoAsociado: '  ',
+      stockActual: 0,
+      stockMinimo: 0,
+    });
+
+    expect(insumo.codigo).toBe('INS-002');
+    expect(insumo.nombre).toBe('Gasa estéril');
+    expect(insumo.medicamentoAsociado).toBeNull();
+  });
+
+  it('rechaza código o nombre vacíos', () => {
+    expect(() => Insumo.crear({ codigo: ' ', nombre, stockActual: 1, stockMinimo: 1 })).toThrow(
+      DatosDeInsumoInvalidos,
+    );
+    expect(() => Insumo.crear({ codigo, nombre: '', stockActual: 1, stockMinimo: 1 })).toThrow(
+      DatosDeInsumoInvalidos,
+    );
   });
 
   describe('Ingreso de stock (REC-05)', () => {

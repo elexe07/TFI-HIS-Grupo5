@@ -17,6 +17,7 @@ import {
   INSUMO_REPOSITORY,
   INTERNACION_REPOSITORY,
 } from './domain';
+import { RegistrarInsumoHandler } from './application/registrar-insumo/registrar-insumo.handler';
 import { RegistrarIngresoInsumoHandler } from './application/registrar-ingreso-insumo/registrar-ingreso-insumo.handler';
 import { RegistrarEgresoInsumoHandler } from './application/registrar-egreso-insumo/registrar-egreso-insumo.handler';
 import { CamaRepositoryPrisma } from './infrastructure/cama.repository.prisma';
@@ -37,6 +38,7 @@ import { InternacionRepositoryPrisma } from './infrastructure/internacion.reposi
     DarDeAltaHandler,
     CambiarEstadoCamaHandler,
     ObtenerMapaCamasHandler,
+    RegistrarInsumoHandler,
     RegistrarIngresoInsumoHandler,
     RegistrarEgresoInsumoHandler,
     DescontarInsumoPorEventoHandler,

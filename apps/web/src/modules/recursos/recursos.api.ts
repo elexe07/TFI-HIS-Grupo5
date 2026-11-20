@@ -3,6 +3,7 @@
  */
 import { get, post, patch } from '@/shared/http/client';
 import type {
+  CrearInsumoRequest,
   EstadoCama,
   EstadoInternacion,
   CamaDTO,
@@ -26,6 +27,7 @@ export const recursosApi = {
 
   // Insumos
   listarInsumos: (params?: { bajoMinimo?: boolean }) => get<InsumoDTO[]>('/insumos', { params }),
+  crearInsumo: (data: CrearInsumoRequest) => post<InsumoDTO>('/insumos', data),
   ingresarInsumo: (id: string, cantidad: number) =>
     post<InsumoDTO>(`/insumos/${id}/ingresos`, { cantidad }),
   egresarInsumo: (id: string, cantidad: number) =>

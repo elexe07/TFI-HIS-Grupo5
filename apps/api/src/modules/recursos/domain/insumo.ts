@@ -1,5 +1,5 @@
 import { AggregateRoot, generarId, type Id } from '../../../building-blocks/domain';
-import { CantidadInvalida, StockInsuficiente } from './errores';
+import { CantidadInvalida, DatosDeInsumoInvalidos, StockInsuficiente } from './errores';
 
 interface InsumoProps {
   id: Id;
@@ -37,20 +37,13 @@ export class Insumo extends AggregateRoot {
     stockActual: number;
     stockMinimo: number;
   }): Insumo {
-    if (!Number.isInteger(props.stockActual) || props.stockActual < 0) {
-      throw new CantidadInvalida('El stock inicial debe ser un entero no negativo');
-    }
-    if (!Number.isInteger(props.stockMinimo) || props.stockMinimo < 0) {
-      throw new CantidadInvalida('El stock mínimo debe ser un entero no negativo');
-    }
-
     return new Insumo({
       id: props.id ?? generarId(),
-      codigo: props.codigo,
-      nombre: props.nombre,
-      medicamentoAsociado: props.medicamentoAsociado ?? null,
-      stockActual: props.stockActual,
-      stockMinimo: props.stockMinimo,
+      codigo: exigirTexto(props.codigo, 'El código no puede estar vacío').toUpperCase(),
+      nombre: exigirTexto(props.nombre, 'El nombre no puede estar vacío'),
+      medicamentoAsociado: props.medicamentoAsociado?.trim() || null,
+      stockActual: exigirEnteroNoNegativo(props.stockActual, 'El stock inicial'),
+      stockMinimo: exigirEnteroNoNegativo(props.stockMinimo, 'El stock mínimo'),
       updatedAt: new Date(),
     });
   }
@@ -108,4 +101,17 @@ export class Insumo extends AggregateRoot {
     this._stockActual -= cantidad;
     this._updatedAt = new Date();
   }
+}
+
+function exigirTexto(valor: string, mensaje: string): string {
+  const limpio = valor.trim();
+  if (!limpio) throw new DatosDeInsumoInvalidos(mensaje);
+  return limpio;
+}
+
+function exigirEnteroNoNegativo(valor: number, campo: string): number {
+  if (!Number.isInteger(valor) || valor < 0) {
+    throw new CantidadInvalida(`${campo} debe ser un entero no negativo`);
+  }
+  return valor;
 }

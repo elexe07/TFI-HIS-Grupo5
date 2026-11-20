@@ -48,7 +48,15 @@ export const useAuthStore = defineStore(
     );
 
     // --- ACTIONS ---
-    async function initAuth() {
+    // main.ts y el guard del router piden inicializar la sesión: se valida una sola vez por carga
+    // de la página (así /auth/me no se pide de más).
+    let inicializacion: Promise<void> | null = null;
+    function initAuth(): Promise<void> {
+      inicializacion ??= restaurarSesion();
+      return inicializacion;
+    }
+
+    async function restaurarSesion() {
       const storedToken = localStorage.getItem('his_token');
       const storedUsuario = localStorage.getItem('his_usuario');
 

@@ -4,13 +4,8 @@ import { useAuthStore } from '@/modules/iam/auth.store';
 import AppHeader from '@/layout/AppHeader.vue';
 import AppSidebar from '@/layout/AppSidebar.vue';
 import ToastContainer from '@/shared/components/ui/ToastContainer.vue';
-import { onMounted } from 'vue';
 
 const authStore = useAuthStore();
-
-onMounted(() => {
-  authStore.initAuth();
-});
 </script>
 
 <template>

@@ -7,6 +7,7 @@ import { useEnfermeriaStore } from '@/modules/enfermeria/enfermeria.store';
 import { useRecursosStore } from '@/modules/recursos/recursos.store';
 import { useFacturacionStore } from '@/modules/facturacion/facturacion.store';
 import { Card, Badge } from '@/shared/components/ui';
+import type { Permiso } from '@/modules/iam/iam.types';
 
 const authStore = useAuthStore();
 const admisionStore = useAdmisionStore();
@@ -110,15 +111,24 @@ const quickActions = computed(() => {
   return actions;
 });
 
+/**
+ * Cada contador se pide solo si el rol puede leer ese dato (sin 403 de más), y con allSettled:
+ * si uno falla, los demás contadores igual se muestran.
+ */
 async function cargarDashboard() {
+  const puede = (permiso: Permiso) => authStore.tienePermiso(permiso);
+  enfermeriaStore.setContexto('');
   try {
-    await Promise.all([
-      admisionStore.cargarPacientes(),
-      admisionStore.cargarTurnos({ fechaDesde: new Date().toISOString().split('T')[0] }),
-      recursosStore.cargarMapaCamas(),
-      recursosStore.cargarInternaciones({ estado: 'ACTIVA' }),
-      enfermeriaStore.setContexto(''),
-      facturacionStore.cargarCuentas(),
+    await Promise.allSettled([
+      puede('pacientes:leer') ? admisionStore.cargarPacientes() : undefined,
+      puede('pacientes:leer')
+        ? admisionStore.cargarTurnos({ fechaDesde: new Date().toISOString().split('T')[0] })
+        : undefined,
+      puede('camas:leer') ? recursosStore.cargarMapaCamas() : undefined,
+      puede('internaciones:gestionar')
+        ? recursosStore.cargarInternaciones({ estado: 'ACTIVA' })
+        : undefined,
+      puede('facturacion:leer') ? facturacionStore.cargarCuentas() : undefined,
     ]);
 
     if (stats.value[0]) stats.value[0].value = admisionStore.pacientes.length;
